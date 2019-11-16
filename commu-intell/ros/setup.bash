@@ -3,3 +3,4 @@
 source devel/setup.bash
 chmod +x src/beginner_tutorials/srv/*
 chmod +x src/beginner_tutorials/scripts/*
+chmod +x src/imu/src/scripts/*
