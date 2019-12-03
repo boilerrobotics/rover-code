@@ -27,7 +27,7 @@ class motor_driver:
         if self.speed > 0:
             self.motor.forward(self.speed)
         elif self.speed < 0:
-            self.motor.backward(self.speed)
+            self.motor.backward(abs(self.speed))
         else:
             self.motor.stop()
 
