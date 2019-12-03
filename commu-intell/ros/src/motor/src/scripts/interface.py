@@ -39,4 +39,8 @@ if __name__ == '__main__':
         while True:
             m.drive_motor()
     except KeyboardInterrupt:
+        print("Ctrl C is detected")
+        exit(0)
+    except Exception as e:
+        print(e)
         exit(0)
