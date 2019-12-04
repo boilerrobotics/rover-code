@@ -39,18 +39,28 @@
 import rospy
 from std_msgs.msg import String
 
-def talker():
+MinValue = -100
+MaxValue = 100
+
+def talker2():
     pub = rospy.Publisher('chatter', String, queue_size=10)
-    rospy.init_node('talker', anonymous=True)
-    rate = rospy.Rate(10) # 10hz
+    rospy.init_node('talker2', anonymous=True)
     while not rospy.is_shutdown():
-        hello_str = "hello world %s" % rospy.get_time()
-        rospy.loginfo(hello_str)
-        pub.publish(hello_str)
-        rate.sleep()
+        message = raw_input('Please enter your message: ')
+        try:
+            message = float(message)
+        except ValueError as e:
+            print('Only number is accepted')
+        else: 
+            if message > MaxValue or message < MinValue:
+                print('accapatable ranage is between {} and {}'.format(MinValue, MaxValue))
+            else: 
+                message = "{} {}".format(rospy.get_time(), message)
+                rospy.loginfo(message)
+                pub.publish(message)
 
 if __name__ == '__main__':
     try:
-        talker()
+        talker2()
     except rospy.ROSInterruptException:
         pass
