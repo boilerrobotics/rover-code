@@ -8,6 +8,9 @@
 #include "Wire.h"
 
 #define DEBUG
+#define GYRO_FS 1000.0
+#define ACCE_FS 2.0
+#define RESOLUTION 32768 // 16 bits / 2
 
 ros::NodeHandle  nh;
 
@@ -19,7 +22,7 @@ const int MPU_ADDR = 0x68;
 int16_t accelerometer_x, accelerometer_y, accelerometer_z;
 int16_t gyro_x, gyro_y, gyro_z;
 int16_t temperature;
-char tmp_str[7];
+uint8_t resgister_temp;
 
 void setup()
 {
@@ -31,11 +34,35 @@ void setup()
   Wire.write(0x6B); // PWR_MGMT_1 register
   Wire.write(0); // set to zero (wakes up the MPU-6050)
   Wire.endTransmission(true);
+  // set gyroscope full scale range to 1000 degree/sec (FS_SEL = 2)
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x1B);
+  Wire.endTransmission(false);
+  Wire.requestFrom(MPU_ADDR, 1, true);
+  resgister_temp = Wire.read();
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x1B);
+  Wire.write((resgister_temp & (0x00) << 3) | (0x02 << 3));
+  Wire.endTransmission(true);
+  // set accelerometer full scale range to 2g (AFS_SEL = 0)
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x1B);
+  Wire.endTransmission(false);
+  Wire.requestFrom(MPU_ADDR, 1, true);
+  resgister_temp = Wire.read();
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x1B);
+  Wire.write((resgister_temp & (0x00) << 3) | (0x00 << 3));
+  Wire.endTransmission(true);
 }
 
-char* convert_int16_to_str(int16_t i) {
-  sprintf(tmp_str, "%6d", i);
-  return tmp_str;
+float convert_acce(int16_t i) {
+//  Serial.println(ACCE_FS / RESOLUTION);
+  return i * ACCE_FS / RESOLUTION;
+}
+
+float convert_gyro(int16_t i) {
+  return i * (GYRO_FS / RESOLUTION) ;
 }
 
 void read_sensor() {
@@ -52,13 +79,13 @@ void read_sensor() {
   gyro_y = Wire.read() << 8 | Wire.read();
   gyro_z = Wire.read() << 8 | Wire.read();
 #ifdef DEBUG
-  Serial.print("aX = "); Serial.print(convert_int16_to_str(accelerometer_x));
-  Serial.print(" | aY = "); Serial.print(convert_int16_to_str(accelerometer_y));
-  Serial.print(" | aZ = "); Serial.print(convert_int16_to_str(accelerometer_z));
+  Serial.print("aX = "); Serial.print(convert_acce(accelerometer_x));
+  Serial.print(" | aY = "); Serial.print(convert_acce(accelerometer_y));
+  Serial.print(" | aZ = "); Serial.print(convert_acce(accelerometer_z));
   Serial.print(" | tmp = "); Serial.print(temperature / 340.00 + 36.53);
-  Serial.print(" | gX = "); Serial.print(convert_int16_to_str(gyro_x));
-  Serial.print(" | gY = "); Serial.print(convert_int16_to_str(gyro_y));
-  Serial.print(" | gZ = "); Serial.print(convert_int16_to_str(gyro_z));
+  Serial.print(" | gX = "); Serial.print(convert_gyro(gyro_x));
+  Serial.print(" | gY = "); Serial.print(convert_gyro(gyro_y));
+  Serial.print(" | gZ = "); Serial.print(convert_gyro(gyro_z));
   Serial.println();
 #endif
 }
