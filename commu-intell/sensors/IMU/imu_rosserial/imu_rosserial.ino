@@ -1,13 +1,9 @@
-/*
-   rosserial Publisher Example
-   Prints "hello world!"
-*/
-
 #include <ros.h>
 #include <std_msgs/String.h>
 #include "Wire.h"
 
-#define DEBUG
+//#define DEBUG
+#define IMU_ON
 #define GYRO_FS 1000.0
 #define ACCE_FS 2.0
 #define RESOLUTION 32768 // 16 bits / 2
@@ -29,7 +25,12 @@ void setup()
 {
   nh.initNode();
   nh.advertise(imu_pub);
+
+#ifdef DEBUG
   Serial.begin(115200);
+#endif
+
+#ifdef IMU_ON
   Wire.begin();
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x6B); // PWR_MGMT_1 register
@@ -55,6 +56,7 @@ void setup()
   Wire.write(0x1B);
   Wire.write((resgister_temp & (0x00) << 3) | (0x00 << 3));
   Wire.endTransmission(true);
+#endif
 }
 
 char* convert_acce(int16_t i) {
@@ -99,8 +101,11 @@ void read_sensor() {
 
 void loop()
 {
+#ifdef IMU_ON
   read_sensor();
-  str_msg.data = hello;
+#endif
+
+  str_msg.data = convert_temp(temperature);
   imu_pub.publish(&str_msg);
   nh.spinOnce();
   delay(1000);
