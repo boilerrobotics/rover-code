@@ -2,11 +2,15 @@
 #include <std_msgs/String.h>
 #include "Wire.h"
 
-//#define DEBUG
+#define DEBUG
 #define IMU_ON
 #define GYRO_FS 1000.0
 #define ACCE_FS 2.0
 #define RESOLUTION 32768 // 16 bits / 2
+
+// timer1 1Hz 
+#define TIMER1_CMR 15624
+#define TIMER1_PRE 0x05
 
 ros::NodeHandle  nh;
 
@@ -44,7 +48,7 @@ void setup()
   resgister_temp = Wire.read();
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x1B);
-  Wire.write((resgister_temp & (0x00) << 3) | (0x02 << 3));
+  Wire.write((resgister_temp & (~(0x03) << 3)) | (0x02 << 3));
   Wire.endTransmission(true);
   // set accelerometer full scale range to 2g (AFS_SEL = 0)
   Wire.beginTransmission(MPU_ADDR);
@@ -54,7 +58,7 @@ void setup()
   resgister_temp = Wire.read();
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x1B);
-  Wire.write((resgister_temp & (0x00) << 3) | (0x00 << 3));
+  Wire.write((resgister_temp & (~(0x03) << 3)) | (0x00 << 3));
   Wire.endTransmission(true);
 #endif
 }
