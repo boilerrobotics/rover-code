@@ -23,6 +23,7 @@ int16_t accelerometer_x, accelerometer_y, accelerometer_z;
 int16_t gyro_x, gyro_y, gyro_z;
 int16_t temperature;
 uint8_t resgister_temp;
+char tmp_str[5];
 
 void setup()
 {
@@ -56,13 +57,19 @@ void setup()
   Wire.endTransmission(true);
 }
 
-float convert_acce(int16_t i) {
-//  Serial.println(ACCE_FS / RESOLUTION);
-  return i * ACCE_FS / RESOLUTION;
+char* convert_acce(int16_t i) {
+  dtostrf(i * ACCE_FS / RESOLUTION, 4, 3, tmp_str);
+  return tmp_str;
 }
 
-float convert_gyro(int16_t i) {
-  return i * (GYRO_FS / RESOLUTION) ;
+char* convert_gyro(int16_t i) {
+  dtostrf(i * (GYRO_FS / RESOLUTION), 4, 1, tmp_str);
+  return tmp_str;
+}
+
+char* convert_temp(int16_t i) {
+  dtostrf(i / 340.00 + 36.53, 4, 2, tmp_str);
+  return tmp_str;
 }
 
 void read_sensor() {
@@ -82,7 +89,7 @@ void read_sensor() {
   Serial.print("aX = "); Serial.print(convert_acce(accelerometer_x));
   Serial.print(" | aY = "); Serial.print(convert_acce(accelerometer_y));
   Serial.print(" | aZ = "); Serial.print(convert_acce(accelerometer_z));
-  Serial.print(" | tmp = "); Serial.print(temperature / 340.00 + 36.53);
+  Serial.print(" | tmp = "); Serial.print(convert_temp(temperature));
   Serial.print(" | gX = "); Serial.print(convert_gyro(gyro_x));
   Serial.print(" | gY = "); Serial.print(convert_gyro(gyro_y));
   Serial.print(" | gZ = "); Serial.print(convert_gyro(gyro_z));
