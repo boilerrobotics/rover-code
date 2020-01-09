@@ -2,15 +2,14 @@
 #include <std_msgs/String.h>
 #include "Wire.h"
 
-#define DEBUG
+//#define DEBUG
 #define IMU_ON
 #define GYRO_FS 1000.0
 #define ACCE_FS 2.0
 #define RESOLUTION 32768 // 16 bits / 2
 
-// timer1 1Hz 
-#define TIMER1_CMR 15624
-#define TIMER1_PRE 0x05
+// timer1 2Hz prescale 1024
+#define TIMER1_CMR 7812
 
 ros::NodeHandle  nh;
 
@@ -25,8 +24,21 @@ int16_t temperature;
 uint8_t resgister_temp;
 char tmp_str[5];
 
+bool timer1_flag;
+
 void setup()
 {
+
+  cli();
+  TCCR1A = 0;
+  TCCR1B = 0;
+  TCNT1 = 0;
+  OCR1A = TIMER1_CMR;
+  TCCR1B |= (1 << WGM12);
+  TCCR1B |= (1 << CS12) | (1 << CS10);
+  TIMSK1 |= (1 << OCIE1A);
+  sei();
+
   nh.initNode();
   nh.advertise(imu_pub);
 
@@ -61,6 +73,10 @@ void setup()
   Wire.write((resgister_temp & (~(0x03) << 3)) | (0x00 << 3));
   Wire.endTransmission(true);
 #endif
+}
+
+ISR(TIMER1_COMPA_vect) {
+  timer1_flag = true;
 }
 
 char* convert_acce(int16_t i) {
@@ -105,12 +121,14 @@ void read_sensor() {
 
 void loop()
 {
+  if (timer1_flag) {
 #ifdef IMU_ON
-  read_sensor();
+    timer1_flag = false;
+    read_sensor();
+    str_msg.data = convert_temp(temperature);
+    imu_pub.publish(&str_msg);
+    nh.spinOnce();
 #endif
-
-  str_msg.data = convert_temp(temperature);
-  imu_pub.publish(&str_msg);
-  nh.spinOnce();
-  delay(1000);
+  }
+  
 }
