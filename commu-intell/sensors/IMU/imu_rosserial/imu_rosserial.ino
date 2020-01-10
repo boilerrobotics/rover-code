@@ -16,19 +16,16 @@ ros::NodeHandle  nh;
 std_msgs::String str_msg;
 ros::Publisher imu_pub("imu", &str_msg);
 
-char hello[13] = "hello world!";
 const int MPU_ADDR = 0x68;
-int16_t accelerometer_x, accelerometer_y, accelerometer_z;
-int16_t gyro_x, gyro_y, gyro_z;
-int16_t temperature;
-uint8_t resgister_temp;
-char tmp_str[5];
+char payload[50];
+float accelerometer_x, accelerometer_y, accelerometer_z;
+float gyro_x, gyro_y, gyro_z;
+float temperature;
 
 bool timer1_flag;
 
 void setup()
 {
-
   cli();
   TCCR1A = 0;
   TCCR1B = 0;
@@ -47,6 +44,7 @@ void setup()
 #endif
 
 #ifdef IMU_ON
+  uint8_t resgister_temp;
   Wire.begin();
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x6B); // PWR_MGMT_1 register
@@ -79,43 +77,68 @@ ISR(TIMER1_COMPA_vect) {
   timer1_flag = true;
 }
 
-char* convert_acce(int16_t i) {
-  dtostrf(i * ACCE_FS / RESOLUTION, 4, 3, tmp_str);
-  return tmp_str;
+float convert_acce(int16_t i) {
+  return i * ACCE_FS / RESOLUTION;
 }
 
-char* convert_gyro(int16_t i) {
-  dtostrf(i * (GYRO_FS / RESOLUTION), 4, 1, tmp_str);
-  return tmp_str;
+float convert_gyro(int16_t i) {
+  return i * (GYRO_FS / RESOLUTION);
 }
 
-char* convert_temp(int16_t i) {
-  dtostrf(i / 340.00 + 36.53, 4, 2, tmp_str);
-  return tmp_str;
+float convert_temp(int16_t i) {
+  return i / 340.00 + 36.53;
 }
 
 void read_sensor() {
+
+  char tmp_str[6];
+
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x3B);
   Wire.endTransmission(false);
   Wire.requestFrom(MPU_ADDR, 7 * 2, true);
 
-  accelerometer_x = Wire.read() << 8 | Wire.read();
-  accelerometer_y = Wire.read() << 8 | Wire.read();
-  accelerometer_z = Wire.read() << 8 | Wire.read();
-  temperature = Wire.read() << 8 | Wire.read();
-  gyro_x = Wire.read() << 8 | Wire.read();
-  gyro_y = Wire.read() << 8 | Wire.read();
-  gyro_z = Wire.read() << 8 | Wire.read();
+  accelerometer_x = convert_acce(Wire.read() << 8 | Wire.read());
+  accelerometer_y = convert_acce(Wire.read() << 8 | Wire.read());
+  accelerometer_z = convert_acce(Wire.read() << 8 | Wire.read());
+  temperature = convert_temp(Wire.read() << 8 | Wire.read());
+  gyro_x = convert_gyro(Wire.read() << 8 | Wire.read());
+  gyro_y = convert_gyro(Wire.read() << 8 | Wire.read());
+  gyro_z = convert_gyro(Wire.read() << 8 | Wire.read());
+
+  sprintf(payload, "");
+  dtostrf(accelerometer_x, 4, 3, tmp_str);
+  strcat(payload, tmp_str);
+  strcat(payload, ":");
+  dtostrf(accelerometer_y, 4, 3, tmp_str);
+  strcat(payload, tmp_str);
+  strcat(payload, ":");
+  dtostrf(accelerometer_z, 4, 3, tmp_str);
+  strcat(payload, tmp_str);
+  strcat(payload, ":");
+  dtostrf(temperature, 4, 2, tmp_str);
+  strcat(payload, tmp_str);
+  strcat(payload, ":");
+  dtostrf(gyro_x, 4, 1, tmp_str);
+  strcat(payload, tmp_str);
+  strcat(payload, ":");
+  dtostrf(gyro_y, 4, 1, tmp_str);
+  strcat(payload, tmp_str);
+  strcat(payload, ":");
+  dtostrf(gyro_z, 4, 1, tmp_str);
+  strcat(payload, tmp_str);
+
+
 #ifdef DEBUG
-  Serial.print("aX = "); Serial.print(convert_acce(accelerometer_x));
-  Serial.print(" | aY = "); Serial.print(convert_acce(accelerometer_y));
-  Serial.print(" | aZ = "); Serial.print(convert_acce(accelerometer_z));
-  Serial.print(" | tmp = "); Serial.print(convert_temp(temperature));
-  Serial.print(" | gX = "); Serial.print(convert_gyro(gyro_x));
-  Serial.print(" | gY = "); Serial.print(convert_gyro(gyro_y));
-  Serial.print(" | gZ = "); Serial.print(convert_gyro(gyro_z));
+  Serial.print("aX = "); Serial.print(accelerometer_x);
+  Serial.print(" | aY = "); Serial.print(accelerometer_y);
+  Serial.print(" | aZ = "); Serial.print(accelerometer_z);
+  Serial.print(" | tmp = "); Serial.print(temperature);
+  Serial.print(" | gX = "); Serial.print(gyro_x);
+  Serial.print(" | gY = "); Serial.print(gyro_y);
+  Serial.print(" | gZ = "); Serial.print(gyro_z);
   Serial.println();
+  Serial.println(payload);
 #endif
 }
 
@@ -125,10 +148,10 @@ void loop()
 #ifdef IMU_ON
     timer1_flag = false;
     read_sensor();
-    str_msg.data = convert_temp(temperature);
+    str_msg.data = payload;
     imu_pub.publish(&str_msg);
     nh.spinOnce();
 #endif
   }
-  
+
 }
