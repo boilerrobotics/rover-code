@@ -9,7 +9,7 @@ char* convert_int16_to_str(int16_t i) { // converts int16 to string. Moreover, r
   return tmp_str;
 }
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Wire.begin();
   Wire.beginTransmission(MPU_ADDR); // Begins a transmission to the I2C slave (GY-521 board)
   Wire.write(0x6B); // PWR_MGMT_1 register
