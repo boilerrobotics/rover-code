@@ -8,4 +8,3 @@
 ### Run setup.bash 
 
 # You are good to go 
-# god how the hell does git work
