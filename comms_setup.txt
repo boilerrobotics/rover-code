@@ -10,4 +10,4 @@ export ROS_IP="Rover IP"
 export ROS_HOSTNAME="Rover IP"
 export ROS_MASTER_URI=http://localhost:11311
 
-#BE SURE TO CHANGE "Base Statopn IP" and "Rover IP" TO THAT INFORMATION RESPECTIVELY
+#BE SURE TO CHANGE "Base Station IP" and "Rover IP" TO THAT INFORMATION RESPECTIVELY
