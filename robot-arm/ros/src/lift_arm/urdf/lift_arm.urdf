@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.5.1-0-g916b5db  Build Version: 1.5.7152.31018
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="lift_arm">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-0.065259797102561 0.203202246268845 -0.249961532467723"
+        rpy="0 0 0" />
+      <mass
+        value="1.179868608" />
+      <inertia
+        ixx="0.0368549618408966"
+        ixy="2.92358447473642E-20"
+        ixz="-1.19668108927298E-19"
+        iyy="0.0365959410247457"
+        iyz="-2.13747907385528E-18"
+        izz="0.00037531587646352" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://lift_arm/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://lift_arm/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="linear_link">
+    <inertial>
+      <origin
+        xyz="0.0254 -0.0127 -0.0827229300254183"
+        rpy="0 0 0" />
+      <mass
+        value="0.137644504402458" />
+      <inertia
+        ixx="0.000425731058333742"
+        ixy="1.27233718206023E-21"
+        ixz="-5.36223898327071E-22"
+        iyy="0.000436756948115229"
+        iyz="9.75771582907356E-22"
+        izz="2.58263445248687E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://lift_arm/meshes/linear_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://lift_arm/meshes/linear_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="linear_joint"
+    type="prismatic">
+    <origin
+      xyz="-0.0906597971025609 0.190502246268845 -0.184354473542594"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="linear_link" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="0"
+      upper="0"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="rotation_link_1">
+    <inertial>
+      <origin
+        xyz="-0.1524 0.0104761126263124 3.33066907387547E-16"
+        rpy="0 0 0" />
+      <mass
+        value="0.293996360681221" />
+      <inertia
+        ixx="5.7552881350584E-05"
+        ixy="-2.9124508778059E-19"
+        ixz="8.3470332391583E-18"
+        iyy="0.00393780518425589"
+        iyz="-7.40244737538535E-21"
+        izz="0.00394217052220637" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://lift_arm/meshes/rotation_link_1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://lift_arm/meshes/rotation_link_1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rotation_joint_1"
+    type="continuous">
+    <origin
+      xyz="0.0253999999999999 0 -0.1524"
+      rpy="3.14159265358979 -0.00540938599402059 3.14159265358979" />
+    <parent
+      link="linear_link" />
+    <child
+      link="rotation_link_1" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="rotation_link_2">
+    <inertial>
+      <origin
+        xyz="-2.77555756156289E-17 -0.0126999999999999 -0.0233336507202963"
+        rpy="0 0 0" />
+      <mass
+        value="0.0720962484024577" />
+      <inertia
+        ixx="6.44570191483337E-05"
+        ixy="8.27429190975541E-22"
+        ixz="2.96461531539005E-21"
+        iyy="7.01967698247007E-05"
+        iyz="2.23317968021953E-21"
+        izz="1.34920199462554E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://lift_arm/meshes/rotation_link_2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://lift_arm/meshes/rotation_link_2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rotation_joint_2"
+    type="continuous">
+    <origin
+      xyz="-0.3048 0 0"
+      rpy="3.14159265358979 0.965542419827105 3.14159265358979" />
+    <parent
+      link="rotation_link_1" />
+    <child
+      link="rotation_link_2" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <transmission name="tran0">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="linear_joint">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor0">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="tran1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="rotation_joint_1">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor0">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="tran2">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="rotation_joint_2">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor0">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <gazebo>
+    <plugin name="control" filename="libgazebo_ros_control.so"/>
+  </gazebo>
+  <gazebo>
+    <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+      <jointName>linear_joint rotation_joint_1 rotation_joint_2</jointName>
+    </plugin>
+  </gazebo>
+
+</robot>
