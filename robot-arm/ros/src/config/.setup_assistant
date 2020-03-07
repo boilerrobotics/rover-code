@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: lift_arm
+    relative_path: urdf/lift_arm.urdf
+    xacro_args: ""
+  SRDF:
+    relative_path: config/lift_arm.srdf
+  CONFIG:
+    author_name: Daniel Lawson
+    author_email: lawson95@purdue.edu
+    generated_timestamp: 1583279139
