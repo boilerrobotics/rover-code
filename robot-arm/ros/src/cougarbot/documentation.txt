@@ -22,6 +22,12 @@ Nodes
     1. joy
       message attribute type:
         Joy
+      message content:
+        message returns a dictionary containing several arrays containing the button values of a controller
+        refer to excel document for specific bindings: 
+          https://docs.google.com/spreadsheets/d/1_YTPg-EpEpEhJ_Gl9P_vPXSGXR5jMfLDfVQo8wOG6rM/edit#gid=0
+      Description:
+        Outputs the joystick state.
     2. move_group/feedback
       message attribuet type:
         MoveGroupActionFeedback
