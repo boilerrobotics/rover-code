@@ -1,17 +1,19 @@
-import serial
+import serial 
 import time
 import string
 import pynmea2
 
 while True:
-	port="/dev/ttyAMA0"
-	ser=serial.Serial(port, baudrate=9600, timeout=0.5)
+	port = "/dev/ttyAMA0" #this port depends on the port you connect the gps to the Pi
+	#you may have to change it accordingly
+	ser = serial.Serial(port, baudrate = 9600, timeout = 0.5) #open serial port
+	#reads every 0.5 seconds
 	dataout = pynmea2.NMEAStreamReader()
-	newdata=ser.readline()
+	newdata = ser.readline()
 
-	if newdata[0:6] == "$GPRMC":
-		newmsg=pynmea2.parse(newdata)
-		lat=newmsg.latitude
-		lng=newmsg.longitude
+	if newdata[0:6] == "$GPRMC": #out of all the input you get, this filters relevant input
+		newmsg = pynmea2.parse(newdata)
+		lat = newmsg.latitude
+		lng = newmsg.longitude
 		gps = "Latitude = " + str(lat) + "and Longitude = " + str(lng)
 		print(gps)

@@ -1,13 +1,12 @@
-
-from gps_raw_data.srv import gps_srv, gps_srvResponse
 import rospy
+from gps_raw_data.srv import gps_srv, gps_srvResponse
 
-def handle_two_floats(req):
-    return gps_srvResponse(req.a, req.b)
+def handle_reuest():
+    return gps_srvResponse(latitude, longitude)
 
 def get_gps_server():
     rospy.init_node('get_gps_server')
-    s = rospy.Service('get_gps_server', gps_srv, handle_two_floats)
+    s = rospy.Service('get_gps_server', gps_srv, handle_requests)
     rospy.spin()
 
 if __name__ == "__main__":
