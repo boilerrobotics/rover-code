@@ -8,7 +8,7 @@ from std_msgs.msg._String import String
 # Start Date: April 3, 2020                                                                #
 # Last Edit: April 4, 2020                                                                 #   
 #                                                                                          #
-# Status:Incomplete (Need working on get_num_of_pulese(period) function)                   #
+# Status:Incomplete (Need working on get_num_of_pulses(period) function)                   #
 # and getEncoder once get the hardware                                                     #
 #                                                                                          #    
 # Maintance:                                                                               #                            
