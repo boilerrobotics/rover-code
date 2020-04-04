@@ -1,0 +1,14 @@
+Please start your files with a block commment like shown below:
+
+'''
+===============================================================================
+Program Description 
+	This program takes input from the joystick and returns normalised speeds 
+    for each driving motor
+
+Author:         Jehan Shah, jehan.shah8@gmail.com
+Maintainer:     Jehan Shah, jehan.shah8@gmail.com
+Version:        March 31, 2020
+Status:         In progress
+===============================================================================
+'''
