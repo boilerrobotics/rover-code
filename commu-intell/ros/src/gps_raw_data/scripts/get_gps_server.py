@@ -5,10 +5,10 @@ import rospy
 def handle_two_floats(req):
     return gps_srvResponse(req.a, req.b)
 
-def add_two_ints_server():
+def get_gps_server():
     rospy.init_node('get_gps_server')
     s = rospy.Service('get_gps_server', gps_srv, handle_two_floats)
     rospy.spin()
 
 if __name__ == "__main__":
-    add_two_ints_server()
+    get_gps_server()
