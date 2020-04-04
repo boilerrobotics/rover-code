@@ -45,7 +45,8 @@ class Arm:
         self.currents = { motor:0 for motor in self.motor_names}
         self.xyz_positions    = { axis:0 for axis in self.xyz_names}
         self.elbow_left = True
-
+	
+	# change CPR to adapt to our robot
         self.CPR = {'shoulder': -12.08 * 4776.38,
                     'elbow'   : -12.08 * 2442.96,
                     'yaw'     : -float(48)/27 * 34607,
