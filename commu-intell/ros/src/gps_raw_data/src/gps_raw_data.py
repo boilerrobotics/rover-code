@@ -3,7 +3,8 @@ import time
 import string
 import pynmea2
 
-while True:
+def readLatLng():
+	coordinates = []
 	port = "/dev/ttyAMA0" #this port depends on the port you connect the gps to the Pi
 	#you may have to change it accordingly
 	ser = serial.Serial(port, baudrate = 9600, timeout = 0.5) #open serial port
@@ -15,5 +16,8 @@ while True:
 		newmsg = pynmea2.parse(newdata)
 		lat = newmsg.latitude
 		lng = newmsg.longitude
+		coordinates = [lat, lng]
 		gps = "Latitude = " + str(lat) + "and Longitude = " + str(lng)
 		print(gps)
+
+	return coordinates
