@@ -1,6 +1,7 @@
 import math as math
 import rospy
 from std_msgs.msg._String import String
+
 #==========================================================================================#
 # This program calculate and publish the linear velocity of the encoder                    #
 #                                                                                          #
@@ -16,11 +17,14 @@ from std_msgs.msg._String import String
 
 # keeping counting pulses
 # def getEncoder once get the hardware
+def getEncoder():
+        return 0
 
 def get_num_Of_pulses(period):
     # return number of pulses in that period
-    # KEEP WORKING ON IT
-   return 10
+    duty_cycle = 0.5
+    num_pulses = duty_cycle * period
+    return int(num_pulses)
 
 
 # DO NOT CHANGE ANYTHING BELOW
