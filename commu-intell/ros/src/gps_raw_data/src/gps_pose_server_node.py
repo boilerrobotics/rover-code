@@ -1,5 +1,5 @@
 import rospy
-from gps_raw_data.srv import gps_srv, gps_srvResponse
+from gps_raw_data.srv import gpsSrv, gpsSrvResponse
 from gps_pose import gps
 
 def handle_requests():
