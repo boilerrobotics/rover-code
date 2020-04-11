@@ -1,18 +1,16 @@
 import rospy
 from gps_raw_data.srv import gps_srv, gps_srvResponse
-from gps_raw_data import readLatLng
+from gps_pose import gps
 
 def handle_requests():
-    port = raw_input('Enter port: ')
-    baudrate = raw_input('Enter baud rate: ')
-    timeout = raw_input('Enter timout: ')
-    coordinates = readLatLng(port, baudrate, timeout)
-    return gps_srvResponse(coordinates[0], coordinates[1])
+    gps1 = gps()
+    #gps1.set_latitude_longitude()
+    return gps_srvResponse(gps1)
 
-def get_gps_server():
-    rospy.init_node('get_gps_server')
-    s = rospy.Service('get_gps_server', gps_srv, handle_requests)
+def gps_pose_server_node():
+    rospy.init_node('gps_pose_server_node')
+    s = rospy.Service('gps_pose', gps_srv, handle_requests)
     rospy.spin()
 
 if __name__ == "__main__":
-    get_gps_server()
+    gps_pose_server_node()
