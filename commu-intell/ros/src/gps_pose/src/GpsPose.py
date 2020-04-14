@@ -3,7 +3,7 @@ import time
 import string
 import pynmea2
 
-class gps:
+class GpsPose:
 	
 	_latitude
 	_longitude
@@ -14,20 +14,21 @@ class gps:
 		self._longitude = 0
 		self._altitude = 0
 
-	def get_latitude() {
+	def _get_latitude() {
 		return self._latitude
 	}
 
-	def get_longitude() {
+	def _get_longitude() {
 		return self._longitude
 	}
 
-	def get_altitude() {
+	def _get_altitude() {
 		return self._altitude
 	}
 
-	def set_latitude_longitude():
-		while (True):
+	def update():
+		count = 0
+		while (count < 2):
 			port = "/dev/ttyAMA0"
 			ser = serial.Serial(port, baudrate=9600, timeout=0.5)
 			dataout = pynmea2.NMEAStreamReader()
@@ -37,4 +38,4 @@ class gps:
 				newmsg = pynmea2.parse(newdata)
 				self.latitude = newmsg.latitude
 				self.longitude = newmsg.longitude
-				coordinates = [self.latitude, self.longitude]  #return terminates loop right?
+				count = count + 1
