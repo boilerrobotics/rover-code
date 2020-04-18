@@ -1,2 +1,4 @@
 Header Header
-GpsPose gps
+String latitude
+String longitude
+float32 altitude
