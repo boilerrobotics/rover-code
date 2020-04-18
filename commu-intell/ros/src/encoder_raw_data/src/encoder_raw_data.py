@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import math as math
 import rospy
 from std_msgs.msg._String import String
@@ -17,14 +18,12 @@ from std_msgs.msg._String import String
 
 # keeping counting pulses
 # def getEncoder once get the hardware
-def getEncoder():
-        return 0
+# def getEncoder():
+#    return 0
 
 def get_num_Of_pulses(period):
     # return number of pulses in that period
-    duty_cycle = 0.5
-    num_pulses = duty_cycle * period
-    return int(num_pulses)
+    return 100
 
 
 # DO NOT CHANGE ANYTHING BELOW
