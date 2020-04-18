@@ -1,4 +1,4 @@
 Header Header
-String latitude
-String longitude
+string latitude
+string longitude
 float32 altitude
