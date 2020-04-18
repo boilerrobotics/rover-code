@@ -1,6 +1,6 @@
 Please start your files with a block commment like shown below:
 
-'''
+"""
 ===============================================================================
 Program Description 
 	This program takes input from the joystick and returns normalised speeds 
@@ -11,4 +11,15 @@ Maintainer:     Jehan Shah, jehan.shah8@gmail.com
 Version:        March 31, 2020
 Status:         In progress
 ===============================================================================
-'''
+"""
+
+def do_something(arg)
+    """
+    This function does ...
+    
+    Args:
+        arg (int): Meaningful description
+        
+    Returns:
+        my_list: Meaningful description [1,6]
+    """
