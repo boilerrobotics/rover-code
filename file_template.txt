@@ -1,4 +1,4 @@
-Please start your files with a block commment like shown below:
+Project specific style guide in addition to the PEP 8 standard
 
 """
 ===============================================================================
