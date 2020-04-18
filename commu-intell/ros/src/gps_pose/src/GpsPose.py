@@ -3,7 +3,7 @@ import time
 import string
 import pynmea2
 
-class GpsPose:
+class GpsRawData:
 	
 	_latitude
 	_longitude
@@ -14,17 +14,17 @@ class GpsPose:
 		self._longitude = 0
 		self._altitude = 0
 
-	def _get_latitude() {
+	def _get_latitude():
 		return self._latitude
-	}
+	
 
-	def _get_longitude() {
+	def _get_longitude():
 		return self._longitude
-	}
+	
 
-	def _get_altitude() {
+	def _get_altitude():
 		return self._altitude
-	}
+	
 
 	def update():
 		count = 0
