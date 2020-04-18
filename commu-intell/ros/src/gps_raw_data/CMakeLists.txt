@@ -50,13 +50,13 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
  add_message_files(
    FILES
-   gpsMsg.msg
+   Gps.msg
  )
 
 ## Generate services in the 'srv' folder
  add_service_files(
    FILES
-   gpsSrv.srv
+   GetGpsRaw.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -104,7 +104,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES gps_raw_data
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime 
 #  DEPENDS system_lib
 )
 
