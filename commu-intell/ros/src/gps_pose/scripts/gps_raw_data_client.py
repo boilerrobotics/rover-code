@@ -19,5 +19,7 @@ if __name__ == "__main__":
         print usage()
         sys.exit(1)
     print "Requesting coordinates"
-    gps = gps_raw_data_client()
-    print "Latitude: %s and Longitude: %s "%(gps._get_latitude(), gps._get_longitude)
+    gps_data = gps_raw_data_client()
+    print('Latitude: {}'.format(gps_data.latitude))
+    print('Longitude: {}'.format(gps_data.longitude))
+    print('Altitute: {}'.format(gps_data.altitute))
