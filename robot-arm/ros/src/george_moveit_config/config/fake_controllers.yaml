@@ -1,0 +1,6 @@
+controller_list:
+  - name: fake_george_arm_controller
+    joints:
+      - platter_joint
+      - shoulder_joint
+      - elbow_joint
