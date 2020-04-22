@@ -187,11 +187,11 @@ class Arm:
 		  	  - y*(FIRST_LINK**2 - SECOND_LINK**2 + x**2 + y**2)/(2*FIRST_LINK*(x**2 + y**2)**(3/2)))
 	  		  /math.sqrt(1 - (FIRST_LINK**2 - SECOND_LINK**2 + x**2 + y**2)**2/(4*FIRST_LINK**2*(x**2 + y**2)))
 
-        elbow_diff_x = -x/(FIRST_LINK*SECOND_LINK*math.sqrt(1 - (FIRST_LINK**2 + SECOND_LINK**2 - x**2 - y**2)**2
-			/(4*FIRST_LINK**2*SECOND_LINK**2)))
+        elbow_diff_x = -x/(FIRST_LINK*SECOND_LINK*math.sqrt
+			(1 - (FIRST_LINK**2 + SECOND_LINK**2 - x**2 - y**2)**2/(4*FIRST_LINK**2*SECOND_LINK**2)))
 
-        elbow_diff_y = -y/(FIRST_LINK*SECOND_LINK*math.sqrt(1 - (FIRST_LINK**2 + SECOND_LINK**2 - x**2 - y**2)**2
-			/(4*FIRST_LINK**2*SECOND_LINK**2)))
+        elbow_diff_y = -y/(FIRST_LINK*SECOND_LINK*math.sqrt
+			(1 - (FIRST_LINK**2 + SECOND_LINK**2 - x**2 - y**2)**2/(4*FIRST_LINK**2*SECOND_LINK**2)))
 
         dnative = {}
         dnative['shoulder'] = shoulder_diff_x * dxyz['x'] + shoulder_diff_y * dxyz['y'] 
