@@ -6,6 +6,8 @@ ser = serial.Serial('/dev/ttyACM0', 9600, timeout=5.0)
 
 earth_radius = 6371000 # meters
 
+p_constant = 10
+
 target_location = {
     'latitude': 13.214337,
     'longitude': 100.938345
@@ -54,6 +56,12 @@ while True:
             
             delta_lat = msg.latitude - prev_location['latitude']
             delta_long = msg.longitude - prev_location['longitude']
+
+            current_direction = math.degrees(math.atan2(delta_lat, delta_long))
+            print('Currect Direction: {:.2f} degrees'.format(current_direction))
+
+            direction_error = target_direction - current_direction
+            speed_different = direction_error/180 * p_constant
             
             prev_location['latitude'] = msg.latitude
             prev_location['longitude'] = msg.longitude
