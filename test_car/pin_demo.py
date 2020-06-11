@@ -13,7 +13,7 @@ def main():
 	try:
 		while True:
 			time.sleep(1)
-			print("sending {} to pin {}".format(pin_state, output_pin)) #just terminal printing for our sanity
+			#print("sending {} to pin {}".format(pin_state, output_pin)) #just terminal printing for our sanity
 			GPIO.output(output_pin, pin_state) #actually changes pin value
 			pin_state ^= GPIO.HIGH #alternates
 	finally:
