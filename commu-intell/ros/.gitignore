@@ -3,4 +3,4 @@ devel/
 src/CMakeLists.txt
 install/
 .catkin_workspace
-
+*.pyc
