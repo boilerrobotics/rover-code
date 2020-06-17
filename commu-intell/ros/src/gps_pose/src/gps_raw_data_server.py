@@ -1,5 +1,17 @@
 #!/usr/bin/env python
 
+"""
+===============================================================================
+Program Description 
+	This is GPS interface script.
+
+Author:         Maddy, Thirawat Bureetes(Thirawat.tam@gmail.com)
+Maintainer:     Thirawat Bureetes(Thirawat.tam@gmail.com)
+Version:        June 13, 2020
+Status:         In progress
+===============================================================================
+"""
+
 import rospy
 from gps_pose.srv import GetGpsPose, GetGpsPoseResponse
 from gps_pose.msg import GpsPose
