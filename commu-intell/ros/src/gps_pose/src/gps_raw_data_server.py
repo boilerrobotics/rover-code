@@ -3,7 +3,7 @@
 """
 ===============================================================================
 Program Description 
-	This is GPS interface script.
+	This is GPS raw data server script.
 
 Author:         Maddy, Thirawat Bureetes(Thirawat.tam@gmail.com)
 Maintainer:     Thirawat Bureetes(Thirawat.tam@gmail.com)

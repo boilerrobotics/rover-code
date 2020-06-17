@@ -1,8 +1,20 @@
 #!/usr/bin/env python
 
+"""
+===============================================================================
+Program Description 
+	This is GPS raw data cliient script.
+
+Author:         Maddy, Thirawat Bureetes(Thirawat.tam@gmail.com)
+Maintainer:     Thirawat Bureetes(Thirawat.tam@gmail.com)
+Version:        June 16, 2020
+Status:         In progress
+===============================================================================
+"""
+
 import sys
 import rospy
-from gps_pose.srv import *
+from gps_pose.srv import GetGpsPose
 
 def gps_raw_data_client():
     rospy.wait_for_service('gps_raw_data')
@@ -24,4 +36,5 @@ if __name__ == "__main__":
     gps_data = gps_raw_data_client()
     print('Latitude: {}'.format(gps_data.latitude))
     print('Longitude: {}'.format(gps_data.longitude))
-    print('Altitute: {}'.format(gps_data.altitude))
+    print('Last Update: {}'.format(gps_data.last_update))
+    print('Ground Speed: {}'.format(gps_data.raw_speed))
