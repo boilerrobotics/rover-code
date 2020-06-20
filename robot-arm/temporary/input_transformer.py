@@ -51,7 +51,7 @@ class Controller:
             
             input = ''
             # the joystick has 6 axes (and 11 buttons)
-            if ((len(data.axes) == 6) and (len(data.buttons11 == 11)):
+            if ((len(data.axes) == 6) and (len(data.buttons11 == 11))):
                 input = 'joystick'
             else:
                 # controlller code here, change else to elif,
