@@ -5,7 +5,6 @@ from sensor_msgs.msg import Joy
 from X.msg import Actions
 import json
 
-
 class Controller:
     def __init__(self):
         # create a publisher for the arm actions
