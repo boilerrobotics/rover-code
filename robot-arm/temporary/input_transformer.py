@@ -61,7 +61,7 @@ class Controller:
             # bind actions by iterating through the bindings dictionary
             for key in self.bindings:
                 # if the key is a joint
-                if key in joint_names
+                if key in joint_names:
                     binding = self.bindings[key][input]
                     action_type, number = parse_binding(binding)
                     actions_msg.joints[joint_names.index(key)] = data[action_type][number]
@@ -77,7 +77,7 @@ class Controller:
                     # if both pressed, stay at 1x so check that just one pressed
                     if double and not half:
                         actions_msg.speed = 2
-                    else if half and not double:
+                    elif half and not double:
                         actions_msg.speed = .5
                     else:
                         actions_msg.speed = 1
