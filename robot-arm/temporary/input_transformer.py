@@ -13,7 +13,7 @@ class Controller:
         # rospy.Subscriber('arm_actions', Actions, callback)
         self.publisher = rospy.Publisher('arm_actions', Actions)
 
-        # create node
+        # create node, 'anonymous' makes sure the IDs are distictive each time
         rospy.init_node('input_transformer', anonymous=True)
 
         # load the binding json
@@ -26,13 +26,13 @@ class Controller:
         def parse_binding(binding):
             bracket_index = binding.index('[')
             action_type = binding[0:bracket_index]
-            number = binding[bracket_index: bracket_index + 1]
+            number = binding[bracket_index: bracket_index + 1] # are you sure it's always 2-digit #
             return action_type, number
 
         def joy_callback(data):
             # do stuff w/ data
 
-            # determine the form of input being used (joystick vs controller
+            # determine the form of input being used (joystick vs controller)
             # and then publish the actions
 
             # create message
@@ -86,7 +86,7 @@ class Controller:
             # publish the fully formed msg
             self.publisher.publish(actions_msg)
         
-        # subscribe to joy, the source of raw controller inptu
+        # subscribe to joy, the source of raw controller input
         rospy.Subscriber("joy", Joy, joy_callback)
 
         # spin() keeps python from exiting until node is stopped
