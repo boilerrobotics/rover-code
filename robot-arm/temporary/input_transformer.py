@@ -25,7 +25,7 @@ class Controller:
         def parse_binding(binding):
             bracket_index = binding.index('[')
             action_type = binding[0:bracket_index]
-            number = binding[bracket_index: bracket_index + 1]
+            number = binding[bracket_index: len(binding) - 1]
             return action_type, number
 
         def joy_callback(data):
