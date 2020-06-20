@@ -7,7 +7,7 @@ import json
 
 
 class Controller:
-    __init__(self):
+    def __init__(self):
         # create a publisher for the arm actions
         # you could subscribe to this information using
         # rospy.Subscriber('arm_actions', Actions, callback)
