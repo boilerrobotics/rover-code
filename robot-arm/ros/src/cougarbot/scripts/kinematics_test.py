@@ -31,7 +31,7 @@ class ArmController:
         self.inverse_scale = 5
         self.mode = mode
         group_name = "arm"
-
+        #test
         # init moveit and ros node
         moveit_commander.roscpp_initialize(sys.argv)
         rospy.init_node('forward_kinematics_test', anonymous=True)
