@@ -37,7 +37,7 @@ class Controller:
             # create message
             actions_msg = Actions()
             # name of joint at index in actions_msg.joints
-            joint_names = ["lift", "shoulder", "elbow"] #, "grip"]
+            joint_names = ["lift", "shoulder", "elbow", "grip"]
             # array containing joint update values 
             actions_msg.joints = [0] * len(joint_names)
 
@@ -65,7 +65,6 @@ class Controller:
                     binding = self.bindings[key][input]
                     action_type, number = parse_binding(binding)
                     actions_msg.joints[joint_names.index(key)] = data[action_type][number]
-                # todo, maybe make this a toggle
                 elif key == 'speed':
                     # determine the keys for 2x and .5x speeds
                     speed_double_input = self.bindings.speed['2'][input]
@@ -82,8 +81,6 @@ class Controller:
                         actions_msg.speed = .5
                     else:
                         actions_msg.speed = 1
-
-                # todo handle the grip parsing
             
             # publish the fully formed msg
             self.publisher.publish(actions_msg)
