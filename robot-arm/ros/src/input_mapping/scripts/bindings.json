@@ -10,19 +10,25 @@
         }
     },
     "lift": {
-        "joystick": "",
+        "joystick": "axes[5]",
         "controller": "NA"
     },
     "shoulder": {
-        "joystick": "",
+        "joystick": "axes[1]",
         "controller": "NA"
     },
     "elbow": {
-        "joystick": "",
+        "joystick": "axes[0]",
         "controller": "NA"
     },
     "grip": {
-        "joystick": "",
-        "controller": "NA"
+        "open": {
+            "joystick": "buttons[0]",
+            "controller": "NA"
+        },
+        "close": {
+            "joystick": "buttons[1]",
+            "controller": "NA"    
+        }
     }
 }
