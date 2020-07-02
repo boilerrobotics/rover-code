@@ -1,0 +1,28 @@
+{
+    "speed": {
+        "2": {
+            "joystick": "buttons[11]",
+            "controller": "NA"
+        },
+        ".5": {
+            "joystick": "buttons[10]",
+            "controller": "NA"
+        }
+    },
+    "lift": {
+        "joystick": "",
+        "controller": "NA"
+    },
+    "shoulder": {
+        "joystick": "",
+        "controller": "NA"
+    },
+    "elbow": {
+        "joystick": "",
+        "controller": "NA"
+    },
+    "grip": {
+        "joystick": "",
+        "controller": "NA"
+    }
+}
