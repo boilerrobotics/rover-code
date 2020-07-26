@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 from std_msgs.msg import String
@@ -35,12 +35,12 @@ class motor_driver:
 if __name__ == '__main__':
     m = motor_driver() 
     # rospy.spin()
-    try:
-        while True:
+     while True:
+        try:
             m.drive_motor()
-    except KeyboardInterrupt:
-        print("Ctrl C is detected")
-        exit(0)
-    except Exception as e:
-        print(e)
-        exit(0)
+        except KeyboardInterrupt:
+            print("Ctrl C is detected")
+            exit(0)
+        except Exception as e:
+            print(e)
+            exit(0)
