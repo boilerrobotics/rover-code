@@ -1,0 +1,35 @@
+Package Name:
+  cougarbot
+Status: 
+  Completed 
+Description:
+  This is a package for to testing both forwards and inverse kinematisc with the cougarbot arm.
+  Version 1:
+    Code is currently hardcoded to work with the F310 logitech controller. Inverse and forwards kinematics in same text file. 
+Dependencies:
+    todo
+Nodes
+  Node Name:
+    forward_kinematics_test
+  Author(s):
+    Daniel Lawson
+  Maintainer(s):
+    Daniel Lawson
+  Description:
+    This node currently uses a single script soon be replaced with several seperate scripts, seperating
+    forwards and inverse kinematics code and support for several different controllers.
+  Subscribes to:
+    1. joy
+      message attribute type:
+        Joy
+      message content:
+        message returns a dictionary containing several arrays containing the button values of a controller
+        refer to excel document for specific bindings: 
+          https://docs.google.com/spreadsheets/d/1_YTPg-EpEpEhJ_Gl9P_vPXSGXR5jMfLDfVQo8wOG6rM/edit#gid=0
+      Description:
+        Outputs the joystick state.
+    2. move_group/feedback
+      message attribuet type:
+        MoveGroupActionFeedback
+      
+    
