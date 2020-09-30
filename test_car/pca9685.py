@@ -11,6 +11,7 @@ pca.frequency = 60
 
 # steering = servo.Servo(pca.channels[0], min_pulse=220, max_pulse=440)
 steering = servo.Servo(pca.channels[0])
+pca.channels[3].duty_cycle = int((75/100)*65536)
 
 for i in range(40, 140, 5):
     steering.angle = i
@@ -18,8 +19,10 @@ for i in range(40, 140, 5):
     time.sleep(1)
 for i in range(40, 140, 5):
     steering.angle = 180 - i
-    print(i)
+    print(180 - i)
     time.sleep(1)
+
+
 
 steering.angle = 90
 
