@@ -15,7 +15,7 @@ import rospy
 from sensor_msgs.msg import Joy
 from board import SCL, SDA
 import busio
-import adafruit_pca9685
+from adafruit_pca9685 import PCA9685
 
 class Motor:
     '''
@@ -23,13 +23,14 @@ class Motor:
     '''
 
     MAX_SCALE = (2**16) - 1 
+    SPEED_RATIO = 0.5
     
     def __init__(self, pca, forward, backward):
         '''
             Need PWM channals for forward and backward and pca instance
         '''
-        self.forward = pca.channel[forward]
-        self.backward = pca.channel[backward]
+        self.forward = pca.channels[forward]
+        self.backward = pca.channels[backward]
 
     def set_speed(self, speed):
         '''
@@ -37,10 +38,10 @@ class Motor:
         '''
         if -1 <= speed < 0:
             self.forward.duty_cycle = 0
-            self.backward.duty_cycle = speed * self.MAX_SCALE
+            self.backward.duty_cycle = int(-1 * speed * self.MAX_SCALE * self.SPEED_RATIO)
         
         elif 0 < speed <= 1:
-            self.forward.duty_cycle = speed * self.MAX_SCALE
+            self.forward.duty_cycle = int(speed * self.MAX_SCALE * self.SPEED_RATIO)
             self.backward.duty_cycle = 0
         
         else:
@@ -67,23 +68,20 @@ class Minirover:
         ]
 
         rospy.init_node('minirover_driver', anonymous=True)
-        rospy.Subscriber('joy', Joy, callback)
+        rospy.Subscriber('joy', Joy, self.callback)
         rospy.spin()
 
     def callback(self, payload):
         
         params = Joy()
-        print(payload)
-
-        # Need to extract Joy information
-        left_speed = 0
-        right_speed = 0
+        left_speed = payload.axes[1]
+        right_speed = payload.axes[4]
 
         for wheel in self.left_wheels:
             wheel.set_speed(left_speed)
 
         for wheel in self.right_wheels:
-            wheel.set_speed(left_speed)
+            wheel.set_speed(right_speed)
 
 if __name__ == '__main__':
     
