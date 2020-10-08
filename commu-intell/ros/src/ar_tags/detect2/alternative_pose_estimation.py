@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import numpy
 import cv2
 import cv2.aruco as aruco
@@ -31,7 +33,8 @@ board = aruco.GridBoard_create(
 # Create vectors we'll be using for rotations and translations for postures
 rvecs, tvecs = None, None
 
-cam = cv2.VideoCapture('gridboardiphonetest.mp4')
+#cam = cv2.VideoCapture('gridboardiphonetest.mp4')
+cam = cv2.VideoCapture(0)
 
 while(cam.isOpened()):
     # Capturing each frame of our video stream
@@ -52,7 +55,10 @@ while(cam.isOpened()):
                 detectedIds = ids,
                 rejectedCorners = rejectedImgPoints,
                 cameraMatrix = cameraMatrix,
-                distCoeffs = distCoeffs)   
+                distCoeffs = distCoeffs)
+
+        print (ids) 
+        print (corners)  
 
         ###########################################################################
         # TODO: Add validation here to reject IDs/corners not part of a gridboard #
@@ -71,6 +77,7 @@ while(cam.isOpened()):
             # Estimate the posture per each Aruco marker
             rvecs, tvecs = aruco.estimatePoseSingleMarkers(corners, 1, cameraMatrix, distCoeffs)           
             for rvec, tvec in zip(rvecs, tvecs):
+                print (tvecs)
                 QueryImg = aruco.drawAxis(QueryImg, cameraMatrix, distCoeffs, rvec, tvec, 1)
         # Display our image
         cv2.imshow('QueryImage', QueryImg)

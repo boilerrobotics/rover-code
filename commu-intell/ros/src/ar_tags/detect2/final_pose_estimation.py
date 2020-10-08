@@ -1,8 +1,8 @@
-#!/usr/bin/python
-
 import numpy as np
 import cv2
+cv2.__version__
 import cv2.aruco as aruco
+#import cv_bridge.aruco as aruco
 
 cap = cv2.VideoCapture(0)
 
