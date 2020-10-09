@@ -1,0 +1,7 @@
+<launch>
+    <!-- joy node -->
+        <node respawn="true" pkg="joy" type="joy_node" name="minirover_joy" >
+            <param name="dev" type="string" value="/dev/input/js1" />
+        </node>
+
+<launch> 
