@@ -3,16 +3,18 @@
 """
 ===============================================================================
 Program Description 
-	This program recieve the command from joy stick and drive the minirover.
-Author:         Thirawat Bureetes(Thirawat.tam@gmail.com), Ben Sukboontip, Pum Khai, Bryan Yakimisky, Preston Rahim
+	This program send the command to drive the motors.
+Author:         Thirawat Bureetes(Thirawat.tam@gmail.com), 
+                Ben Sukboontip, Pum Khai, Bryan Yakimisky, 
+                Preston Rahim
 Maintainer:     Thirawat Bureetes(Thirawat.tam@gmail.com)
-Version:        September 30, 2020
+Version:        November 9, 2020
 Status:         In progress
 ===============================================================================
 """
 
 import rospy
-from sensor_msgs.msg import Joy
+from minirover.msg import WheelSpeed
 from board import SCL, SDA
 import busio
 from adafruit_pca9685 import PCA9685
@@ -68,14 +70,13 @@ class Minirover:
         ]
 
         rospy.init_node('minirover_driver', anonymous=True)
-        rospy.Subscriber('joy', Joy, self.callback)
+        rospy.Subscriber('wheel_speed', WheelSpeed, self.callback)
         rospy.spin()
 
     def callback(self, payload):
         
-        params = Joy()
-        left_speed = payload.axes[1]
-        right_speed = payload.axes[4]
+        left_speed = payload.left
+        right_speed = payload.right
 
         for wheel in self.left_wheels:
             wheel.set_speed(left_speed)
