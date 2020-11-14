@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.5.1-0-g916b5db  Build Version: 1.5.7152.31018
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="arm_gl_fea_simplified">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.42345 -0.78175 0.39384"
+        rpy="0 0 0" />
+      <mass
+        value="2.0723" />
+      <inertia
+        ixx="0.26421"
+        ixy="6.1363E-17"
+        ixz="-1.9907E-16"
+        iyy="0.2632"
+        iyz="0.00035409"
+        izz="0.013402" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm_gl_fea_simplified/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.89804 0.91765 0.92941 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm_gl_fea_simplified/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="vertical_link">
+    <inertial>
+      <origin
+        xyz="0 0.5 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.387044214922262" />
+      <inertia
+        ixx="0.0322552327537149"
+        ixy="-1.49590120069303E-36"
+        ixz="6.13340385785994E-55"
+        iyy="3.0963537193781E-06"
+        iyz="-1.61974125244963E-36"
+        izz="0.0322552327537149" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm_gl_fea_simplified/meshes/vertical_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.647058823529412 0.619607843137255 0.588235294117647 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm_gl_fea_simplified/meshes/vertical_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="vertical_joint"
+    type="fixed">
+    <origin
+      xyz="0.423450362301353 -0.782708702943532 0.0396698439511794"
+      rpy="1.5707963267949 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="vertical_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="platter_link">
+    <inertial>
+      <origin
+        xyz="-0.0235662692170292 0.025399999949718 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.398296145349297" />
+      <inertia
+        ixx="0.000214682110310005"
+        ixy="-1.52488269497031E-12"
+        ixz="1.1659937580349E-18"
+        iyy="0.00092936740729898"
+        iyz="2.76913256258746E-19"
+        izz="0.00071736201304245" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm_gl_fea_simplified/meshes/platter_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm_gl_fea_simplified/meshes/platter_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="platter_joint"
+    type="prismatic">
+    <origin
+      xyz="0 0.53251 0"
+      rpy="-1.5708 1.5708 1.5708" />
+    <parent
+      link="vertical_link" />
+    <child
+      link="platter_link" />
+    <axis
+      xyz="0 -1 0" />
+    <limit
+      lower="-1"
+      upper="1"
+      effort="1"
+      velocity="0.5" />
+  </joint>
+  <link
+    name="shoulder_link">
+    <inertial>
+      <origin
+        xyz="0.0127000003051759 -0.0254000053166686 0.174999999206176"
+        rpy="0 0 0" />
+      <mass
+        value="0.105597198583122" />
+      <inertia
+        ixx="0.00108414506305135"
+        ixy="-4.20665938749841E-16"
+        ixz="-1.99052742604761E-18"
+        iyy="0.00108418007531679"
+        iyz="3.32568535185555E-11"
+        izz="2.00593657995657E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm_gl_fea_simplified/meshes/shoulder_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm_gl_fea_simplified/meshes/shoulder_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="shoulder_joint"
+    type="continuous">
+    <origin
+      xyz="-0.0782449948367555 0 0.00551040839348338"
+      rpy="0 1.15241714978897 3.14159262615075" />
+    <parent
+      link="platter_link" />
+    <child
+      link="shoulder_link" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="elbow_link">
+    <inertial>
+      <origin
+        xyz="7.65777941058587E-10 -0.0254000026946232 0.184999999630036"
+        rpy="0 0 0" />
+      <mass
+        value="0.0926170680415613" />
+      <inertia
+        ixx="0.0012631837987792"
+        ixy="6.202690042249E-13"
+        ixz="-6.48657831007343E-18"
+        iyy="0.00124261014014764"
+        iyz="1.74989527473706E-11"
+        izz="4.12154752797879E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm_gl_fea_simplified/meshes/elbow_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://arm_gl_fea_simplified/meshes/elbow_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="elbow_joint"
+    type="continuous">
+    <origin
+      xyz="0.0126999999999996 0 0.335000000000001"
+      rpy="0 0.753722210653423 0" />
+    <parent
+      link="shoulder_link" />
+    <child
+      link="elbow_link" />
+    <axis
+      xyz="0 0.999999999999999 0" />
+  </joint>
+</robot>
