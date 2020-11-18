@@ -2,6 +2,7 @@ import random
 import serial
 import time
 import threading
+import rospy
 
 _trystimeout = 3
 
@@ -123,16 +124,18 @@ def crc_update(data):
 def _sendcommand(address, command):
     crc_clear()
     crc_update(address)
-    port.write(chr(address))
+    #port.write(chr(address))
+    port.write(chr(address).encode())
     crc_update(command)
-    port.write(chr(command))
+    port.write(chr(command).encode())
     return
 
 
 def _readchecksumword():
     data = port.read(2)
     if len(data) == 2:
-        crc = (ord(data[0]) << 8) | ord(data[1])
+        #crc = (ord(data[0]) << 8) | ord(data[1])
+        crc = (data[0] << 8) | data[1]
         return 1, crc
     return 0, 0
 
@@ -179,7 +182,7 @@ def _readslong():
 
 def _writebyte(val):
     crc_update(val & 0xFF)
-    port.write(chr(val & 0xFF))
+    port.write(str.encode(chr(val & 0xFF)))
 
 
 def _writesbyte(val):
@@ -692,7 +695,7 @@ def _write444444441(address, cmd, val1, val2, val3, val4, val5, val6, val7, val8
 def SendRandomData(cnt):
     for i in range(0, cnt):
         byte = random.getrandbits(8)
-        port.write(chr(byte))
+        port.write(str.encode(chr(byte)))
     return
 
 
@@ -778,24 +781,26 @@ def ReadVersion(address):
     while 1:
         port.flushInput()
         _sendcommand(address, Cmd.GETVERSION)
-        str = ""
+        string = ""
         passed = True
         for i in range(0, 48):
             data = port.read(1)
             if len(data):
-                val = ord(data)
+                val = data[0]
+                #val = data
                 crc_update(val)
                 if val == 0:
                     break
-                str += data[0]
+                string += str(data[0])
             else:
                 passed = False
                 break
+        rospy.logwarn(string)
         if passed:
             crc = _readchecksumword()
             if crc[0]:
                 if _crc & 0xFFFF == crc[1] & 0xFFFF:
-                    return 1, str
+                    return 1, string
                 else:
                     time.sleep(0.01)
         trys -= 1

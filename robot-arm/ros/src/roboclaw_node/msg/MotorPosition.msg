@@ -1,5 +1,5 @@
 # this message contains information for setting encoder positions
-float32 accel
-float32 speed
-float32 decel
+int32 accel
+int32 speed
+int32 deccel
 float32 angle

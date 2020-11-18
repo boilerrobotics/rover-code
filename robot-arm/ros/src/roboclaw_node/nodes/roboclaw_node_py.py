@@ -8,7 +8,7 @@ import rospy
 import tf
 from geometry_msgs.msg import Quaternion, Twist
 from nav_msgs.msg import Odometry
-from roboclaw_node.msg import MotorPosition 
+from roboclaw_node.msg import MotorPosition
 import math 
 
 __author__ = "bwbazemore@uga.edu (Brad Bazemore)"
@@ -145,7 +145,9 @@ class Node:
         dev_name = rospy.get_param("~dev", "/dev/ttyACM0")
         baud_rate = int(rospy.get_param("~baud", "115200"))
 
+
         self.address = int(rospy.get_param("~address", "128"))
+
         if self.address > 0x87 or self.address < 0x80:
             rospy.logfatal("Address out of range")
             rospy.signal_shutdown("Address out of range")
@@ -167,7 +169,9 @@ class Node:
             version = roboclaw.ReadVersion(self.address)
         except Exception as e:
             rospy.logwarn("Problem getting roboclaw version")
+            rospy.logwarn(e)
             rospy.logdebug(e)
+            version = [1, 0]
             pass
 
         if not version[0]:
@@ -188,9 +192,9 @@ class Node:
         # hardcode ticks per rotation
         self.ticks_per_rotation = 500
 
-        rospy.Subscriber("cmd_vel", Twist, self.cmd_vel_callback)
-        rospy.Subscriber("cmd_pos_1", MotorPositions, self.cmd_pos_callback_m1)
-        rospy.Subscriber("cmd_pos_2", MotorPositions, self.cmd_pos_callback_m1) 
+        #rospy.Subscriber("cmd_vel", Twist, self.cmd_vel_callback)
+        rospy.Subscriber("cmd_pos_1", MotorPosition, self.cmd_pos_callback_m1)
+        #rospy.Subscriber("cmd_pos_2", MotorPosition, self.cmd_pos_callback_m1) 
  
 
         rospy.sleep(1)
@@ -228,17 +232,17 @@ class Node:
                 rospy.logwarn("ReadEncM1 OSError: %d", e.errno)
                 rospy.logdebug(e)
 
-            try:
-                status2, enc2, crc2 = roboclaw.ReadEncM2(self.address)
-            except ValueError:
-                pass
-            except OSError as e:
-                rospy.logwarn("ReadEncM2 OSError: %d", e.errno)
-                rospy.logdebug(e)
+            # try:
+            #     status2, enc2, crc2 = roboclaw.ReadEncM2(self.address)
+            # except ValueError:
+            #     pass
+            # except OSError as e:
+            #     rospy.logwarn("ReadEncM2 OSError: %d", e.errno)
+            #     rospy.logdebug(e)
 
-            if ('enc1' in vars()) and ('enc2' in vars()):
-                rospy.logdebug(" Encoders %d %d" % (enc1, enc2))
-                self.encodm.update_publish(enc1, enc2)
+            if ('enc1' in vars()): #and ('enc2' in vars()):
+                rospy.logdebug(" Encoders %d %d" % (50, 50))
+                self.encodm.update_publish(50, 50)
 
                 self.updater.update()
             r_time.sleep()
@@ -249,14 +253,16 @@ class Node:
     def cmd_pos_callback_m2(self, motor_position):
         self.cmd_pos_callback(motor_position, 'M2')
 
-# def SpeedAccelDeccelPositionM2(address, accel, speed, deccel, position, buffer):
+    # def SpeedAccelDeccelPositionM2(address, accel, speed, deccel, position, buffer):
     def cmd_pos_callback(self, motor_position, motor_name):
-        ticks = motor_position.angle / (2 * math.pi) * self.ticks_per_rotation
+        ticks = int(motor_position.angle / (2 * math.pi) * self.ticks_per_rotation)
         try:
             if motor_name == 'M1':
-                roboclaw.SpeedAccelDeccelPositionM1(self.address, motor_position.accel,
-                                                    motor_position.speed, motor_position.deccel,
-                                                   ticks, 1)
+                rospy.logwarn("We are here!")
+                roboclaw.ForwardM1(self.address, 63)
+                #roboclaw.SpeedAccelDeccelPositionM1(self.address, motor_position.accel,
+                #                                    motor_position.speed, motor_position.deccel,
+                #                                   ticks, 1)
             elif motor_name == 'M2':
                 roboclaw.SpeedAccelDeccelPositionM2(self.address, motor_position.accel,
                                                     motor_position.speed, motor_position.deccel,
