@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-1-g15f4949  Build Version: 1.6.7594.29634
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot name="brc_arm_description">
+  <link name="world" />
+  <joint name="fixed" type="fixed">
+    <parent link="world" />
+    <child link="base_link" />
+  </joint>
+  <link name="base_link">
+
+    <inertial>
+      <origin xyz="-2.11343969456389E-17 0.380907780979827 0.00436320369577436" rpy="0 0 0" />
+      <mass value="5.45066325397829" />
+      <inertia ixx="0.585603075889073" ixy="1.11438534941001E-18" ixz="2.82887074164515E-18" iyy="0.0231148604746449" iyz="-0.00342685216919011" izz="0.580821568393074" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/base_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/base_link.STL" />
+      </geometry>
+      <surface>
+        <contact>
+          <ode>
+            <min_depth>0.01</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </collision>
+  </link>
+  <link name="carriage">
+
+    <inertial>
+      <origin xyz="2.54221011075845E-18 0.025 0.0539046334093021" rpy="0 0 0" />
+      <mass value="0.447720870142158" />
+      <inertia ixx="0.00109900282993972" ixy="8.14695699840894E-21" ixz="1.47343826082545E-20" iyy="0.00119322484755841" iyz="-3.342955089797E-22" izz="0.000280772380177922" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/carriage.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/carriage.STL" />
+      </geometry>
+      <surface>
+        <contact>
+          <ode>
+            <min_depth>0.01</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </collision>
+  </link>
+  <joint name="carriageJ" type="prismatic">
+    <origin xyz="0 0 0.065" rpy="1.5708 0 0" />
+    <parent link="base_link" />
+    <child link="carriage" />
+    <axis xyz="0 1 0" />
+    <limit lower="0" upper="0.885" effort="150" velocity="5" />
+    <dynamics damping="0.0" friction="0.0" />
+  </joint>
+  <link name="midarm1">
+
+    <inertial>
+      <origin xyz="-0.159701601070546 0.0249999999999995 -0.0165852560799679" rpy="0 0 0" />
+      <mass value="0.989206914918607" />
+      <inertia ixx="0.000943765598063704" ixy="1.34398360332114E-18" ixz="0.000610338767563651" iyy="0.0075546869758055" iyz="-1.74522921257232E-19" izz="0.0075329806065106" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/midarm1.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/midarm1.STL" />
+      </geometry>
+      <surface>
+        <contact>
+          <ode>
+            <min_depth>0.01</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </collision>
+  </link>
+  <joint name="midarm1J" type="continuous">
+    <origin xyz="0 0 0.1" rpy="0 1.5708 0" />
+    <parent link="carriage" />
+    <child link="midarm1" />
+    <axis xyz="0 1 0" />
+    <limit lower="0" upper="6.283" effort="100" velocity="5" />
+    <dynamics damping="0.1" friction="0.0" />
+  </joint>
+  <link name="midarm2">
+
+    <inertial>
+      <origin xyz="0.0449212345365615 -0.0253103856032611 -1.45232730548053E-16" rpy="0 0 0" />
+      <mass value="0.141963495408494" />
+      <inertia ixx="3.70449285832413E-05" ixy="2.43267434930873E-06" ixz="8.1024723690131E-21" iyy="0.000170530553349407" iyz="-2.75934099765684E-21" izz="0.000192427643669373" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/midarm2.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/midarm2.STL" />
+      </geometry>
+      <surface>
+        <contact>
+          <ode>
+            <min_depth>0.01</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </collision>
+  </link>
+  <joint name="midarm2J" type="continuous">
+    <origin xyz="-0.35 0 0" rpy="0 0 -3.1416" />
+    <parent link="midarm1" />
+    <child link="midarm2" />
+    <axis xyz="0 1 0" />
+    <limit lower="0" upper="6.283" effort="100" velocity="5" />
+    <dynamics damping="0.1" friction="0.0" />
+  </joint>
+  <link name="wrist1">
+
+    <inertial>
+      <origin xyz="0.102261852760838 5.55111512312578E-17 -0.0106433368332069" rpy="0 0 0" />
+      <mass value="0.488568583470577" />
+      <inertia ixx="0.000271976776615562" ixy="-9.58628476651825E-19" ixz="-6.37616343563583E-05" iyy="0.00203807956523635" iyz="-1.44134546530286E-20" izz="0.00196874683347988" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/wrist1.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/wrist1.STL" />
+      </geometry>
+      <surface>
+        <contact>
+          <ode>
+            <min_depth>0.01</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </collision>
+  </link>
+  <joint name="wrist1J" type="revolute">
+    <origin xyz="0.08 -0.025 0" rpy="0 0 0" />
+    <parent link="midarm2" />
+    <child link="wrist1" />
+    <axis xyz="0 0 1" />
+    <limit lower="0" upper="1.57079632679" effort="100" velocity="5" />
+    <dynamics damping="0.1" friction="0.0" />
+  </joint>
+  <link name="wrist2">
+
+    <inertial>
+      <origin xyz="0.0450280262277557 0.0138835798459232 0.00701326299384444" rpy="0 0 0" />
+      <mass value="0.195554532888646" />
+      <inertia ixx="0.000160518318477719" ixy="4.90165740092502E-06" ixz="-2.89393984428497E-06" iyy="0.00010168972371044" iyz="4.73434638107085E-08" izz="0.000214765494358691" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/wrist2.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/wrist2.STL" />
+      </geometry>
+      <surface>
+        <contact>
+          <ode>
+            <min_depth>0.01</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </collision>
+  </link>
+  <joint name="wrist2J" type="continuous">
+    <origin xyz="0.225 0 0" rpy="-3.1416 0 0" />
+    <parent link="wrist1" />
+    <child link="wrist2" />
+    <axis xyz="0 1 0" />
+    <limit lower="0" upper="6.283" effort="100" velocity="5" />
+    <dynamics damping="0.1" friction="0.0" />
+  </joint>
+  <link name="EEbase">
+
+    <inertial>
+      <origin xyz="-6.67754378663832E-17 2.77555756156289E-17 -0.0378694927465382" rpy="0 0 0" />
+      <mass value="0.09260447609595" />
+      <inertia ixx="4.81318826783347E-05" ixy="-3.52329631201495E-21" ixz="-6.17781188850379E-21" iyy="7.32482359165229E-05" iyz="2.30793069866546E-20" izz="3.29932559448167E-05" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/EEbase.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/EEbase.STL" />
+      </geometry>
+      <surface>
+        <contact>
+          <ode>
+            <min_depth>0.01</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </collision>
+  </link>
+  <joint name="EEbaseJ" type="continuous">
+    <origin xyz="0.095 0 0" rpy="0 -1.5708 0" />
+    <parent link="wrist2" />
+    <child link="EEbase" />
+    <axis xyz="0 0 1" />
+    <limit lower="0" upper="0" effort="100" velocity="5" />
+    <dynamics damping="0.1" friction="0.0" />
+  </joint>
+
+  <!-- End Effector -->
+  <!-- <link name="RLink1">
+
+    <inertial>
+      <origin xyz="0.0400000000000037 -0.00250000000000015 -6.66133814775094E-16" rpy="0 0 0" />
+      <mass value="0.00668722339297274" />
+      <inertia ixx="1.38550163626322E-07" ixy="-2.80847215529844E-22" ixz="1.32203765077796E-20" iyy="4.66129432520501E-06" iyz="6.59485655849877E-23" izz="4.55060759238274E-06" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/RLink1.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/RLink1.STL" />
+      </geometry>
+      <surface>
+        <contact>
+          <ode>
+            <min_depth>0.01</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </collision>
+  </link>
+  <joint name="RLink1J" type="revolute">
+    <origin xyz="0.024 -0.011 -0.019185" rpy="0 0 0" />
+    <parent link="EEbase" />
+    <child link="RLink1" />
+    <axis xyz="0 1 0" />
+    <limit lower="-6.283" upper="-5.242" effort="100" velocity="5" />
+    <dynamics damping="0.3" friction="0.0" />
+  </joint>
+  <link name="RFinger">
+
+    <inertial>
+      <origin xyz="0.0174831476155701 0.0707338411471631 -0.0109999999999996" rpy="0 0 0" />
+      <mass value="0.052748844949343" />
+      <inertia ixx="9.60936833531591E-05" ixy="-3.36352218446776E-05" ixz="-3.82273712059081E-20" iyy="1.6892750542267E-05" iyz="-1.04902516665487E-19" izz="0.000108731360402846" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/RFinger.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 0.717647058823529 0.819607843137255 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/RFinger.STL" />
+      </geometry>
+      <surface>
+        <contact>
+          <ode>
+            <min_depth>0.01</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </collision>
+  </link>
+  <joint name="RFingerJ" type="continuous">
+    <origin xyz="0.08 0 0" rpy="-1.5708 0 3.1416" />
+    <parent link="RLink1" />
+    <child link="RFinger" />
+    <axis xyz="0 0 1" />
+    <limit lower="0" upper="0" effort="100" velocity="5" />
+    <mimic joint="RLink1J" multiplier="1" offset="0" />
+    <dynamics damping="0.1" friction="0.0" />
+  </joint>
+  <gazebo>
+    <plugin name="RFingerJ_mimic_joint_plugin" filename="libroboticsgroup_upatras_gazebo_mimic_joint_plugin.so">
+      <joint>RLink1J</joint>
+      <mimicJoint>RFingerJ</mimicJoint>
+      <multiplier>1</multiplier>
+      <offset>0</offset>
+      <robotNamespace>/</robotNamespace>
+    </plugin>
+  </gazebo>
+
+  <link name="LLink1">
+
+    <inertial>
+      <origin xyz="-0.0399999999999939 -0.00250000000000013 0" rpy="0 0 0" />
+      <mass value="0.00668722339297275" />
+      <inertia ixx="1.38550163626322E-07" ixy="4.17613575070295E-23" ixz="7.26972165963073E-22" iyy="4.66129432520502E-06" iyz="9.1233885874819E-23" izz="4.55060759238275E-06" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/LLink1.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/LLink1.STL" />
+      </geometry>
+      <surface>
+        <contact>
+          <ode>
+            <min_depth>0.01</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </collision>
+  </link>
+  <joint name="LLink1J" type="continuous">
+    <origin xyz="-0.024 -0.011 -0.019185" rpy="0 0 0" />
+    <parent link="EEbase" />
+    <child link="LLink1" />
+    <axis xyz="0 1 0" />
+    <limit lower="0" upper="0" effort="100" velocity="5" />
+    <mimic joint="RLink1J" multiplier="-1" offset="0" />
+    <dynamics damping="0.1" friction="0.0" />
+  </joint>
+  <gazebo>
+    <plugin name="LLink1J_mimic_joint_plugin" filename="libroboticsgroup_upatras_gazebo_mimic_joint_plugin.so">
+      <joint>RLink1J</joint>
+      <mimicJoint>LLink1J</mimicJoint>
+      <multiplier>-1</multiplier>
+      <offset>0</offset>
+      <robotNamespace>/</robotNamespace>
+    </plugin>
+  </gazebo>
+
+  <link name="LFinger">
+
+    <inertial>
+      <origin xyz="0.0174831476155641 0.070733841147171 0.0109999999999999" rpy="0 0 0" />
+      <mass value="0.052748844949343" />
+      <inertia ixx="9.60936833531594E-05" ixy="-3.36352218446776E-05" ixz="1.57064639602602E-20" iyy="1.6892750542267E-05" iyz="3.95311469569102E-20" izz="0.000108731360402846" />
+    </inertial>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/LFinger.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 0.717647058823529 0.819607843137255 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://brc_arm_description/meshes/LFinger.STL" />
+      </geometry>
+      <surface>
+        <contact>
+          <ode>
+            <min_depth>0.01</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </collision>
+  </link>
+  <joint name="LFingerJ" type="continuous">
+    <origin xyz="-0.08 0 0" rpy="-1.5708 0 0" />
+    <parent link="LLink1" />
+    <child link="LFinger" />
+    <axis xyz="0 0 1" />
+    <limit lower="0" upper="0" effort="100" velocity="5" />
+    <mimic joint="LLink1J" multiplier="-1" offset="0" />
+    <dynamics damping="0.1" friction="0.0" />
+  </joint>
+  <gazebo>
+    <plugin name="LFingerJ_mimic_joint_plugin" filename="libroboticsgroup_upatras_gazebo_mimic_joint_plugin.so">
+      <joint>LLink1J</joint>
+      <mimicJoint>LFingerJ</mimicJoint>
+      <multiplier>-1</multiplier>
+      <offset>0</offset>
+      <robotNamespace>/</robotNamespace>
+    </plugin>
+  </gazebo> -->
+
+  <!-- Simulation -->
+  <transmission name="trans_carriageJ">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="carriageJ">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="carriageJ_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="trans_midarm1J">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="midarm1J">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="midarm1J_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="trans_midarm2J">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="midarm2J">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="midarm2J_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="trans_wrist1J">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="wrist1J">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="wrist1J_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="trans_wrist2J">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="wrist2J">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="wrist2J_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="trans_EEbaseJ">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="EEbaseJ">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="EEbaseJ_motor">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <!-- <transmission name="trans_RLink1J">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="RLink1J">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="RLink1J_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission> -->
+  <!-- <transmission name="trans_RFingerJ">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="RFingerJ">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="RFingerJ_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="trans_LLink1J">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="LLink1J">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="LLink1J_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="trans_LFingerJ">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="LFingerJ">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="LFingerJ_motor">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission> -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/</robotNamespace>
+    </plugin>
+  </gazebo>
+</robot>

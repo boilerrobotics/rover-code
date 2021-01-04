@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: brc_arm_description
+    relative_path: urdf/brc_arm_description.urdf
+    xacro_args: ""
+  SRDF:
+    relative_path: config/brc_arm_description.srdf
+  CONFIG:
+    author_name: andy
+    author_email: ding258@purdue.edu
+    generated_timestamp: 1608345001

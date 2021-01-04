@@ -1,0 +1,13 @@
+controller_list:
+  - name: fake_robot_arm_controller
+    type: $(arg execution_type)
+    joints:
+      - carriageJ
+      - midarm1J
+      - midarm2J
+      - wrist1J
+      - wrist2J
+      - EEbaseJ
+initial:  # Define initial robot poses.
+  - group: robot_arm
+    pose: front
