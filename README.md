@@ -7,7 +7,7 @@
 - Run `catkin_make`
 - Run `setup.bash`
 
-### For Robot Arm
+### For Robot Arm:
 - Setup ROS Noetic on Ubuntu 20.04 follwing this [link](http://wiki.ros.org/noetic/Installation/Ubuntu).
 - Clone this project into your machine, and use the [arm](https://github.com/boilerrobotics/BRC2019-2020/tree/arm) branch
 - Navigate to the **robot-arm** directory
