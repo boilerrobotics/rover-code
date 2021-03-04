@@ -7,6 +7,7 @@ import { MiniRoverComponent } from './mini-rover/mini-rover.component';
 
 import { IMqttServiceOptions, MqttModule } from "ngx-mqtt";
 import { environment as env } from '../environments/environment';
+import { MapComponent } from './map/map.component';
 
 const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: env.mqtt.server,
@@ -17,7 +18,8 @@ const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
 @NgModule({
   declarations: [
     AppComponent,
-    MiniRoverComponent
+    MiniRoverComponent,
+    MapComponent
   ],
   imports: [
     BrowserModule,
