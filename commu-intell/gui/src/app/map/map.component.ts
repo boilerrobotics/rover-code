@@ -1,10 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 
+import * as olsource from 'ol/source';
 import Map from 'ol/Map';
 import TileLayer from 'ol/layer/Tile';
 import View from 'ol/View';
-import OSM from 'ol/source/OSM';
-import * as olProj from 'ol/proj';
+import Feature from 'ol/Feature';
+import { Point } from 'ol/geom';
+import { Icon, Style } from 'ol/style';
+import { fromLonLat } from 'ol/proj';
+import { Vector } from 'ol/layer';
+
+
+
 
 @Component({
   selector: 'gps-map',
@@ -14,25 +21,49 @@ import * as olProj from 'ol/proj';
 export class MapComponent implements OnInit {
 
   map: Map;
-  target_longitude: number = 7.0785;
-  target_latitude: number = 7.0785;
+  layer: Vector;
+  target_longitude: number = -86.91617;
+  target_latitude: number = 40.421679;
 
   ngOnInit(): void {
     this.map = new Map({
       target: 'test_map',
       layers: [
         new TileLayer({
-          source: new OSM()
+          source: new olsource.OSM()
         })
       ],
       view: new View({
-        center: olProj.fromLonLat([
+        center: fromLonLat([
           this.target_longitude, 
           this.target_latitude
         ]),
-        zoom: 17
+        zoom: 16
       })
     });
+
+    this.layer = new Vector({
+      source: new olsource.Vector({
+        features: [
+          new Feature({
+            geometry: new Point(fromLonLat([
+              this.target_longitude, 
+              this.target_latitude
+            ]))
+          })
+        ]
+      })
+    });
+    // this.layer.setStyle(
+    //   new Style({
+    //     image: new Icon({
+    //       color: '#ffcd46',
+    //       crossOrigin: 'anonymous',
+    //       src: 'dot.png',
+    //     })
+    //   })
+    // );
+    this.map.addLayer(this.layer);
   }
 
 }
