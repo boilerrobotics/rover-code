@@ -3,7 +3,7 @@ from math import pi, cos, sin
 
 import diagnostic_msgs
 import diagnostic_updater
-import roboclaw_driver.roboclaw_driver as roboclaw
+from roboclaw_3 import Roboclaw
 import rospy
 import tf
 from geometry_msgs.msg import Quaternion, Twist
@@ -154,7 +154,8 @@ class Node:
 
         # TODO need someway to check if address is correct
         try:
-            roboclaw.Open(dev_name, baud_rate)
+            roboclaw = Roboclaw(dev_name, baud_rate)
+            roboclaw.Open()
         except Exception as e:
             rospy.logfatal("Could not connect to Roboclaw")
             rospy.logdebug(e)
