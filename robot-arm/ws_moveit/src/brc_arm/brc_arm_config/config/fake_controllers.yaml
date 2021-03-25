@@ -8,6 +8,10 @@ controller_list:
       - wrist1J
       - wrist2J
       - EEbaseJ
+  - name: fake_hand_controller
+    type: $(arg execution_type)
+    joints:
+      - RLink1J
 initial:  # Define initial robot poses.
   - group: robot_arm
     pose: front

@@ -5,10 +5,8 @@
   <rosparam file="$(find brc_arm_config)/config/ros_controllers.yaml" command="load"/>
 
   <!-- Load the controllers -->
-  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" args="joint_state_controller arm_controller"/>
-
-  <node name="ros_control_controller_manager" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" args="--stopped joint_group_position_controller"/>
+  <!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"  -->
+    <!-- output="screen" args="arm_position_controller "/> -->
+   <include file="$(find brc_arm_hardware_interface)/launch/brc_arm_position_trajectory_controllers.launch" />
 
 </launch>

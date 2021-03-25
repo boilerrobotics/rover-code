@@ -1,0 +1,39 @@
+<launch>
+	<rosparam file="$(find brc_arm_hardware_interface)/config/hardware.yaml" command="load"/>
+	<rosparam file="$(find brc_arm_hardware_interface)/config/controllers.yaml" command="load"/>
+	<rosparam file="$(find brc_arm_hardware_interface)/config/joint_limits.yaml" command="load"/>
+
+<!-- Load example URDF -->
+  <param name="robot_description" command="$(find xacro)/xacro '$(find brc_arm_description)/urdf/brc_arm_description.urdf'" />
+
+
+<group ns="brc_arm">
+
+<node name="brc_arm_hardware_interface" pkg="brc_arm_hardware_interface" type="brc_arm_hardware_interface_node" output="screen" />
+
+	<!-- Load controller manager -->
+    <!-- <node name="ros_control_controller_manager" pkg="controller_manager" type="controller_manager" respawn="false" -->
+	  <!-- output="screen" args=" -->
+			<!-- /brc_arm/controller/state -->
+			<!-- /brc_arm/controller/trajectory" /> -->
+
+	<!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/"   -->
+		<!-- args="  -->
+			<!-- /brc_arm/controller/state -->
+			<!-- /brc_arm/controller/trajectory -->
+		<!-- "/>		 -->
+	<node name="controller_spawner" pkg="controller_manager" type="spawner"
+		args=" 
+			/brc_arm/controller/state
+			/brc_arm/controller/trajectory
+		"/>		
+
+
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+</group>
+
+	<!-- <node pkg="moveit_ros_move_group" type="move_group" name="brc_arm" output="screen"> -->
+		<remap from="joint_states" to="brc_arm/joint_states"/>
+	<!-- </node> -->
+</launch>

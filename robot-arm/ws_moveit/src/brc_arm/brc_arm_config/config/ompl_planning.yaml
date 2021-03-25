@@ -155,3 +155,31 @@ robot_arm:
     - SPARStwo
   projection_evaluator: joints(carriageJ,midarm1J)
   longest_valid_segment_fraction: 0.005
+hand:
+  planner_configs:
+    - AnytimePathShortening
+    - SBL
+    - EST
+    - LBKPIECE
+    - BKPIECE
+    - KPIECE
+    - RRT
+    - RRTConnect
+    - RRTstar
+    - TRRT
+    - PRM
+    - PRMstar
+    - FMT
+    - BFMT
+    - PDST
+    - STRIDE
+    - BiTRRT
+    - LBTRRT
+    - BiEST
+    - ProjEST
+    - LazyPRM
+    - LazyPRMstar
+    - SPARS
+    - SPARStwo
+  projection_evaluator: joints(LLink1J,LFingerJ)
+  longest_valid_segment_fraction: 0.005

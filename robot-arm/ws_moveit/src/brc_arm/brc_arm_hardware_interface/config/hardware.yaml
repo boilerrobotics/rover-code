@@ -1,0 +1,11 @@
+brc_arm:
+  hardware_interface:
+    loop_hz: 10 #hz
+    joints:
+      - carriageJ
+      - midarm1J
+      - midarm2J
+      - wrist1J
+      - wrist2J
+      - EEbaseJ
+    

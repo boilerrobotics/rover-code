@@ -1,8 +1,9 @@
 controller_list:
-  - name: "arm_controller"
+  - name: /brc_arm/controller/trajectory
     action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
-    joints:
+    default: true
+    joints: 
       - carriageJ
       - midarm1J
       - midarm2J
