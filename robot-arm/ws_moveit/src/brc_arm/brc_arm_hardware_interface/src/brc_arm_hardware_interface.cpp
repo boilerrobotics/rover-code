@@ -38,12 +38,21 @@
 */
 
 #include <brc_arm_hardware_interface/brc_arm_hardware_interface.h>
+#include "std_msgs/String.h"
+#include <sstream>
 
 namespace brc_arm_hardware_interface
 {
+
 BRCArmHardwareInterface::BRCArmHardwareInterface(ros::NodeHandle& nh, urdf::Model* urdf_model)
   : ros_control_boilerplate::GenericHWInterface(nh, urdf_model)
 {
+  // runs the initialization stuff in the boilerplate library as well
+
+  // Setup message to publish
+  //ros::Publisher motor_pub = nh.advertise<roboclaw_node::MotorPosition>("motor_commands", 20);
+  //motor_sub = nh.subscribe("\\brc_arm\\motor_positions", 10, BRCArmHardwareInterface::positionCallback);
+  motor_sub = nh.subscribe("motor_positions", 10, &BRCArmHardwareInterface::positionCallback, this);
   ROS_INFO_NAMED("brc_arm_hardware_interface", "BRCArmHardwareInterface Ready.");
 }
 
@@ -76,10 +85,35 @@ void BRCArmHardwareInterface::write(ros::Duration& elapsed_time)
   // sim_hw_interface.cpp IN THIS PACKAGE
   //
   // DUMMY PASS-THROUGH CODE
-  for (std::size_t joint_id = 0; joint_id < num_joints_; ++joint_id) {
-   joint_position_[joint_id] = joint_position_command_[joint_id];
+  //for (std::size_t joint_id = 0; joint_id < num_joints_; ++joint_id) {
+  // joint_position_[joint_id] = joint_position_command_[joint_id];
    //ROS_INFO_NAMED("controller", "%f", joint_position_command_[0]);
+  //}
+
+  roboclaw_node::MotorPosition msg;
+  std::vector<int32_t> motor_num;
+  std::vector<float> motor_angle;
+
+//   # this message contains information for setting encoder positions
+// int32[] motor_number
+// int32[] accel
+// int32[] speed
+// int32[] deccel
+// float32[] angle
+  
+  for (std::size_t joint_id = 0; joint_id < num_joints_; ++joint_id) {
+    motor_num.push_back(joint_id);
+    motor_angle.push_back(joint_position_command_[joint_id]);
   }
+
+  msg.motor_number = motor_num;
+  msg.angle = motor_angle;
+
+  if(motor_pub.getNumSubscribers() > 0)
+  {
+    motor_pub.publish(msg);
+  }
+
 
   // END DUMMY CODE
   //
@@ -120,6 +154,14 @@ void BRCArmHardwareInterface::enforceLimits(ros::Duration& period)
   // ----------------------------------------------------
   // ----------------------------------------------------
   // ----------------------------------------------------
+}
+
+void BRCArmHardwareInterface::positionCallback(const roboclaw_node::EncoderValues::ConstPtr& msg) {
+  //ROS_INFO("received enc pos");
+  for (std::size_t joint_id = 0; joint_id < num_joints_; ++joint_id) {
+   joint_position_[joint_id] = msg->angles.at(joint_id);
+   //ROS_INFO_NAMED("controller", "%f", joint_position_command_[0]);
+  }
 }
 
 }  // namespace brc_arm_hardware_interface

@@ -41,6 +41,9 @@
 #define ROS_CONTROL_BRC_ARM_HARDWARE_INTERFACE_H
 
 #include "ros_control_boilerplate/generic_hw_interface.h"
+#include "roboclaw_node/MotorPosition.h"
+#include "roboclaw_node/EncoderValues.h"
+#include <vector>
 
 namespace brc_arm_hardware_interface
 {
@@ -62,6 +65,11 @@ public:
 
   /** \breif Enforce limits for all values before writing */
   virtual void enforceLimits(ros::Duration& period);
+
+  virtual void positionCallback(const roboclaw_node::EncoderValues::ConstPtr& msg);
+
+  ros::Publisher motor_pub;
+  ros::Subscriber motor_sub;
 
 };  // class
 
