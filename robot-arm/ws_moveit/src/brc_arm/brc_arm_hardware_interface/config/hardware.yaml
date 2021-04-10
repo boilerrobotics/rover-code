@@ -1,11 +1,15 @@
 brc_arm:
   hardware_interface:
     loop_hz: 10 #hz
-    joints:
+    joints_list:
       - carriageJ
       - midarm1J
       - midarm2J
       - wrist1J
       - wrist2J
       - EEbaseJ
+      - RLink1J
+      - RFingerJ
+      - LLink1J
+      - LFingerJ
     

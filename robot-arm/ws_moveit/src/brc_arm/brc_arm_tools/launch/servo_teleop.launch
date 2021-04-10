@@ -1,0 +1,17 @@
+<launch>
+  
+
+  
+
+  <include file="$(find brc_arm_config)/launch/planning_context.launch">
+    <arg name="load_robot_description" value="false"/>
+  </include>
+
+<!-- This node does the servoing calculations -->
+  <node name="servo_server" pkg="moveit_servo" type="servo_server" output="screen" >
+    <param name="servo_server" type="string" value="" />
+    <rosparam ns="" command="load" file="$(find brc_arm_tools)/config/servo_config.yaml" />
+    <remap from="joint_states" to="brc_arm/joint_states"/>
+  </node>
+
+</launch>

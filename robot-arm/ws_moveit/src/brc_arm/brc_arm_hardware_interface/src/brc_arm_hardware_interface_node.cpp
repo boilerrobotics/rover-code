@@ -52,7 +52,6 @@ int main(int argc, char** argv)
   // Create the hardware interface specific to your robot
   std::shared_ptr<brc_arm_hardware_interface::BRCArmHardwareInterface> brc_arm_hardware_interface(new brc_arm_hardware_interface::BRCArmHardwareInterface(nh));
   brc_arm_hardware_interface->motor_pub = nh.advertise<roboclaw_node::MotorPosition>("motor_commands", 20);
-  //brc_arm_hardware_interface->motor_sub = nh.subscribe("\\brc_arm\\motor_positions", 10, &brc_arm_hardware_interface::BRCArmHardwareInterface::positionCallback, brc_arm_hardware_interface.get());
 
   brc_arm_hardware_interface->init();
 

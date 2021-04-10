@@ -313,7 +313,7 @@
         <child link="LLink1" />
         <axis xyz="0 1 0" />
         <limit lower="0" upper="0" effort="0" velocity="0" />
-        <mimic joint="RLink1J" multiplier="1" offset="0" />
+        <mimic joint="RLink1J" multiplier="-1" offset="0" />
     </joint>
     <link name="LFinger">
         

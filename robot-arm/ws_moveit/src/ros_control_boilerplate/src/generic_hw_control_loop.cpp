@@ -52,21 +52,21 @@ GenericHWControlLoop::GenericHWControlLoop(ros::NodeHandle& nh,
   controller_manager_.reset(new controller_manager::ControllerManager(hardware_interface_.get(), nh_));
 
   // Load rosparams
-  ros::NodeHandle rpsnh(nh, name_);
+  ros::NodeHandle rpsnh(nh, "hardware_interface");//name_);
   std::size_t error = 0;
-  //error += !rosparam_shortcuts::get(name_, rpsnh, "loop_hz", loop_hz_);
+  error += !rosparam_shortcuts::get(name_, rpsnh, "loop_hz", loop_hz_);
   //error += !rosparam_shortcuts::get(name_, rpsnh, "cycle_time_error_threshold", cycle_time_error_threshold_);
   //rosparam_shortcuts::shutdownIfError(name_, error);
 
   // Get current time for use with first update
   clock_gettime(CLOCK_MONOTONIC, &last_time_);
 
-  desired_update_period_ = ros::Duration(1 / 10);//loop_hz_);
+  desired_update_period_ = ros::Duration(1 / loop_hz_);
 }
 
 void GenericHWControlLoop::run()
 {
-  ros::Rate rate(10);//loop_hz_);
+  ros::Rate rate(loop_hz_);
   while (ros::ok())
   {
     update();

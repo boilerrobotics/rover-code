@@ -43,6 +43,7 @@
 #include "ros_control_boilerplate/generic_hw_interface.h"
 #include "roboclaw_node/MotorPosition.h"
 #include "roboclaw_node/EncoderValues.h"
+#include "std_msgs/Float32.h"
 #include <vector>
 
 namespace brc_arm_hardware_interface
@@ -68,8 +69,12 @@ public:
 
   virtual void positionCallback(const roboclaw_node::EncoderValues::ConstPtr& msg);
 
+  virtual void clawPositionCallback(const std_msgs::Float32::ConstPtr& msg);
+
   ros::Publisher motor_pub;
   ros::Subscriber motor_sub;
+
+  ros::Subscriber claw_sub;
 
 };  // class
 

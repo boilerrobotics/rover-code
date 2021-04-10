@@ -1,66 +1,44 @@
-# Simulation settings for using moveit_sim_controllers
-moveit_sim_hw_interface:
-  joint_model_group: robot_arm
-  joint_model_group_pose: front
-# Settings for ros_control_boilerplate control loop
-generic_hw_control_loop:
-  loop_hz: 300
-  cycle_time_error_threshold: 0.01
-# Settings for ros_control hardware interface
-hardware_interface:
-  joints:
-    - carriageJ
-    - midarm1J
-    - midarm2J
-    - wrist1J
-    - wrist2J
-    - EEbaseJ
-    - RLink1J
-  sim_control_mode: 1  # 0: position, 1: velocity
-# Publish all joint states
-# Creates the /joint_states topic necessary in ROS
-joint_state_controller:
-  type: joint_state_controller/JointStateController
-  publish_rate: 50
-controller_list:
-  []
-arm_position_controller:
-  type: position_controllers/JointTrajectoryController
-  joints:
-    - carriageJ
-    - midarm1J
-    - midarm2J
-    - wrist1J
-    - wrist2J
-    - EEbaseJ
-  gains:
-    carriageJ:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    midarm1J:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    midarm2J:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    wrist1J:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    wrist2J:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
-    EEbaseJ:
-      p: 100
-      d: 1
-      i: 1
-      i_clamp: 1
+brc_arm:
+  controller:
+    state:
+      type: joint_state_controller/JointStateController
+      publish_rate: 50
+    trajectory:
+      type: position_controllers/JointTrajectoryController
+      joints:
+        - carriageJ
+        - midarm1J
+        - midarm2J
+        - wrist1J
+        - wrist2J
+        - EEbaseJ
+      gains:
+        carriageJ: {p: 10.0, i: 0.0, d: 1.0}
+        midarm1J: {p: 10.0, i: 0.0, d: 1.0}
+        midarm2J: {p: 10.0, i: 0.0, d: 1.0}
+        wrist1J: {p: 10.0, i: 0.0, d: 1.0}
+        wrist2J: {p: 10.0, i: 0.0, d: 1.0}
+        EEbaseJ: {p: 10.0, i: 0.0, d: 1.0}
+      constraints:
+        goal_time: 10.0
+        carriageJ:
+          goal: 0.1
+        midarm1J:
+          goal: 0.1
+        midarm2J:
+          goal: 0.1
+        wrist1J:
+          goal: 0.1
+        wrist2J:
+          goal: 0.1
+        EEbaseJ:
+          goal: 0.1
+    position:
+      type: position_controllers/JointGroupPositionController
+      joints:
+        - carriageJ
+        - midarm1J
+        - midarm2J
+        - wrist1J
+        - wrist2J
+        - EEbaseJ

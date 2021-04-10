@@ -57,7 +57,7 @@ GenericHWInterface::GenericHWInterface(const ros::NodeHandle& nh, urdf::Model* u
   ros::NodeHandle rpnh(
       nh_, "hardware_interface");  // TODO(davetcoleman): change the namespace to "generic_hw_interface" aka name_
   std::size_t error = 0;
-  error += !rosparam_shortcuts::get(name_, rpnh, "joints", joint_names_);
+  error += !rosparam_shortcuts::get(name_, rpnh, "joints_list", joint_names_);
   rosparam_shortcuts::shutdownIfError(name_, error);
 }
 
