@@ -161,6 +161,7 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
    scripts/go_to_position_node.py
+   scripts/brc_arm_node.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
