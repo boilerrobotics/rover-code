@@ -74,7 +74,7 @@ void BRCArmHardwareInterface::read(ros::Duration& elapsed_time)
 void BRCArmHardwareInterface::write(ros::Duration& elapsed_time)
 {
   // Safety
-  //enforceLimits(elapsed_time);
+  enforceLimits(elapsed_time);
 
   // ----------------------------------------------------
   // ----------------------------------------------------

@@ -47,12 +47,32 @@
     <arg name="moveit_warehouse_database_path" value="$(arg db_path)"/>
   </include>
 
+  <include file="$(find brc_arm_config)/launch/planning_context.launch">
+    <arg name="load_robot_description" value="false"/>
+  </include>
   <!-- This node does the servoing calculations -->
   <node name="servo_server" pkg="moveit_servo" type="servo_server" output="screen" >
     <param name="servo_server" type="string" value="" />
     <rosparam ns="" command="load" file="$(find brc_arm_tools)/config/servo_config.yaml" />
     <remap from="joint_states" to="brc_arm/joint_states"/>
   </node>
+
+  <!-- joy node -->
+  <node respawn="true" pkg="joy"
+        type="joy_node" name="arm_joy" >
+    <param name="dev" type="string" value="/dev/input/js2" />
+    <!-- <param name="deadzone" value="0.12" /> -->
+  </node>
+
+  <!-- teleop_tools translates a joystick command into a twist message -->
+  <!-- <arg name="cmd_vel" default="arm_joy" />
+  <arg name="teleop_config" default="$(find brc_arm_tools)/config/stick_via_teleop_tools.yaml" />
+  <rosparam file="$(arg teleop_config)" command="load" />
+
+  <node pkg="joy_teleop" type="joy_teleop.py" name="joy_teleop">
+    <remap from="cmd_vel" to="$(arg cmd_vel)" />
+    <remap from="joy" to="spacenav/joy" />
+  </node> -->
 
 	<!-- NODES -->
 	<!--node pkg="tf" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0 0 0 0 odom_combined base_link 100" /-->

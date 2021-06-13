@@ -11,50 +11,50 @@ joint_limits:
   EEbaseJ:
     has_velocity_limits: false
     max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
+    has_acceleration_limits: true
+    max_acceleration: 10
   LFingerJ:
     has_velocity_limits: false
     max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
+    has_acceleration_limits: true
+    max_acceleration: 10
   LLink1J:
     has_velocity_limits: false
     max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
+    has_acceleration_limits: true
+    max_acceleration: 10
   RFingerJ:
     has_velocity_limits: false
     max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
+    has_acceleration_limits: true
+    max_acceleration: 10
   RLink1J:
     has_velocity_limits: false
     max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
+    has_acceleration_limits: true
+    max_acceleration: 10
   carriageJ:
     has_velocity_limits: false
     max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
+    has_acceleration_limits: true
+    max_acceleration: 10
   midarm1J:
     has_velocity_limits: false
     max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
+    has_acceleration_limits: true
+    max_acceleration: 10
   midarm2J:
     has_velocity_limits: false
     max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
+    has_acceleration_limits: true
+    max_acceleration: 10
   wrist1J:
     has_velocity_limits: false
     max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
+    has_acceleration_limits: true
+    max_acceleration: 10
   wrist2J:
     has_velocity_limits: false
     max_velocity: 0
-    has_acceleration_limits: false
-    max_acceleration: 0
+    has_acceleration_limits: true
+    max_acceleration: 10

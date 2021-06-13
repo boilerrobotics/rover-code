@@ -7,6 +7,7 @@ import rospy
 import moveit_commander
 import moveit_msgs.msg
 import geometry_msgs.msg
+from sensor_msgs.msg import Joy
 from controller_manager_msgs.srv import SwitchController
 
 def move_to_coord(move_group, x, y, z):
@@ -36,13 +37,34 @@ def switch_to_group_position_controller():
     try:
         switch_controller = rospy.ServiceProxy('/brc_arm/controller_manager/switch_controller', SwitchController)
         #ret = switch_controller(['/brc_arm/controller/position'], ['/brc_arm/controller/trajectory'], 2)
-        ret = switch_controller(['/brc_arm/controller/position'], ['/brc_arm/controller/trajectory'], 0, False, 0.0)
+        ret = switch_controller(['/brc_arm/controller/position'], ['/brc_arm/controller/trajectory'], 2, False, 0.0)
     except rospy.ServiceException:
         print("Service call failed")
 
+def joy_callback(data):
+    axes = data.axes
+    buttons = data.buttons
+    #print(axes)
+    #Publish twist message to servo server
+    twist = geometry_msgs.msg.TwistStamped()
+    twist.header = data.header
+    twist.header.frame_id = ''
+    twist.twist.linear.x = data.axes[1]
+    twist.twist.linear.y = data.axes[0]
+    #twist.twist.linear.z = data.axes[7]
+    if(data.axes[5] != 1.0):
+        twist.twist.linear.z = -(data.axes[5] - 1) / 2
+    else:
+        twist.twist.linear.z = (data.axes[2] - 1) / 2
+    twist.twist.angular.x = data.axes[3] * -5
+    twist.twist.angular.y = data.axes[4] * 5
+    twist.twist.angular.z = data.axes[6] * 5
+    twist_pub.publish(twist)
+
+
 
 def main():
-    rospy.sleep(10)
+    rospy.sleep(5)
     robot = moveit_commander.RobotCommander()
     scene = moveit_commander.PlanningSceneInterface()
     arm_group = moveit_commander.MoveGroupCommander("robot_arm")
@@ -55,4 +77,8 @@ def main():
 if __name__ == '__main__':
     moveit_commander.roscpp_initialize(sys.argv)
     rospy.init_node('brc_arm_node')
+    global twist_pub
+    twist_pub = rospy.Publisher('/servo_server/delta_twist_cmds', geometry_msgs.msg.TwistStamped, queue_size=10)
+    rospy.Subscriber("/joy", Joy, joy_callback)
     main()
+    rospy.spin()
