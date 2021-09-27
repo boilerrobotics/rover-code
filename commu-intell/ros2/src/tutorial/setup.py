@@ -4,7 +4,7 @@ package_name = 'tutorial'
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='0.1.0',
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
@@ -14,13 +14,13 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='tam',
-    maintainer_email='tam@todo.todo',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    maintainer_email='thirawat.tam@gmail.com',
+    description='Tutorial for learning how to use ROS2',
+    license='MIT License',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'talker = tutorial.publisher_member_function:main',
+            'talker = tutorial.publisher:main',
         ],
     },
 )

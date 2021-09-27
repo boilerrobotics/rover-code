@@ -2,10 +2,10 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>tutorial</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="tam@todo.todo">tam</maintainer>
-  <license>TODO: License declaration</license>
+  <version>0.1.0</version>
+  <description>Tutorial for learning how to use ROS2</description>
+  <maintainer email="thirawat.tam@gmail.com">tam</maintainer>
+  <license>MIT License</license>
 
   <exec_depend>rclpy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
