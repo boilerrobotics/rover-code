@@ -61,8 +61,6 @@ def joy_callback(data):
     twist.twist.angular.z = data.axes[6] * 5
     twist_pub.publish(twist)
 
-
-
 def main():
     rospy.sleep(5)
     robot = moveit_commander.RobotCommander()
@@ -71,7 +69,7 @@ def main():
     # INSERT HOMING HERE!!
     move_to_named_position(arm_group, "front")
     switch_to_group_position_controller()
-     
+    
     moveit_commander.roscpp_shutdown()
 
 if __name__ == '__main__':
