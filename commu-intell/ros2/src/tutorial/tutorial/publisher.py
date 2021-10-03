@@ -5,7 +5,7 @@ Program Description
 
 Author:         Thirawat Bureetes(Thirawat.tam@gmail.com)
 Maintainer:     Thirawat Bureetes(Thirawat.tam@gmail.com)
-Update:         June 16, 2020
+Update:         September 27, 2021
 Version:        0.1.0
 ===============================================================================
 '''
@@ -14,8 +14,6 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from datetime import datetime
-
-
 class Publisher(Node):
 
     def __init__(self):

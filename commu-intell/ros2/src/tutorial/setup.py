@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'talker = tutorial.publisher:main',
+            'listener = tutorial.listener:main',
         ],
     },
 )
