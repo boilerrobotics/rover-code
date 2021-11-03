@@ -1,30 +1,16 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { MiniRoverComponent } from './mini-rover/mini-rover.component';
-
-import { IMqttServiceOptions, MqttModule } from "ngx-mqtt";
-import { environment as env } from '../environments/environment';
-import { MapComponent } from './map/map.component';
-
-const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
-  hostname: env.mqtt.server,
-  port: env.mqtt.port,
-  path: env.mqtt.path,
-};
 
 @NgModule({
   declarations: [
-    AppComponent,
-    MiniRoverComponent,
-    MapComponent
+    AppComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
-    MqttModule.forRoot(MQTT_SERVICE_OPTIONS)
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]
