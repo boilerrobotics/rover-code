@@ -22,6 +22,7 @@ setup(
         'console_scripts': [
             'talker = tutorial.publisher:main',
             'listener = tutorial.listener:main',
+            'service = tutorial.service:main',
         ],
     },
 )
