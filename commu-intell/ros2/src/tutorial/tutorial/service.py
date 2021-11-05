@@ -9,11 +9,10 @@ Update:         November 03, 2021
 Version:        0.1.0
 ===============================================================================
 '''
-from example_interfaces.srv import AddTwoInts
 
 import rclpy
 from rclpy.node import Node
-
+from example_interfaces.srv import AddTwoInts
 class AdditionService(Node):
 
     def __init__(self):
@@ -21,7 +20,8 @@ class AdditionService(Node):
         self.srv = self.create_service(
             AddTwoInts, 
             'add_two_ints',
-            self.add_two_ints_callback)
+            self.add_two_ints_callback
+        )
     
     def add_two_ints_callback(self, request, response):
         response.sum = request.a + request.b

@@ -23,6 +23,7 @@ setup(
             'talker = tutorial.publisher:main',
             'listener = tutorial.listener:main',
             'service = tutorial.service:main',
+            'client = tutorial.client:main',
         ],
     },
 )
