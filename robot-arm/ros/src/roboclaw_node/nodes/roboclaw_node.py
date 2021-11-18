@@ -245,13 +245,14 @@ class Node:
     def cmd_pos_callback(self, jointState):
         self.last_set_speed_time = rospy.get_rostime()
 
-        pos5Raw = jointState.position[5]
-        pos5Motor = int(pos5Raw/0.01 * 28) # Gantry Lift, not actual reduction
+        pos7Raw = jointState.position[7]
+        pos7Motor = int(pos7Raw/6.28 * 5281.1) # Gantry Lift, not actual reduction
 
-        rospy.logdebug("position 5 raw:%f, position 5 motor: %d", pos5Raw, pos5Motor)
+        rospy.logdebug("position 7 raw:%f, position 7 motor: %d", pos7Raw, pos7Motor)
 
         try:
-            self.roboclaw.SpeedAccelDeccelPositionM1(self.address, 10000, 1000000, 10000, pos5Motor, 1)
+            self.roboclaw.SpeedAccelDeccelPositionM1(self.address, 100, 10000, 100, pos7Motor, 0)
+            rospy.logwarn("motor 7 command senti, posraw: %d", pos7Raw)
         except OSError as e:
             rospy.logwarn("SpeedAccelDeccelPositionM1 OSError: %d", e.errno)
             rospy.logdebug(e)
@@ -280,10 +281,10 @@ class Node:
     def shutdown(self):
         rospy.loginfo("Shutting down")
         try:
-            status1, enc1, crc1 = self.roboclaw.ReadEncM1(self.address)
-            status2, enc2, crc2 = self.roboclaw.ReadEncM2(self.address)
-            self.roboclaw.SpeedAccelDeccelPositionM1(self.address, enc1,10000,1000000,10000,0)
-            self.roboclaw.SpeedAccelDeccelPositionM1(self.address, enc2,10000,1000000,10000,0)
+            #status1, enc1, crc1 = self.roboclaw.ReadEncM1(self.address)
+            #status2, enc2, crc2 = self.roboclaw.ReadEncM2(self.address)
+            #self.roboclaw.SpeedAccelDeccelPositionM1(self.address, enc1,10000,1000000,10000,0)
+            #self.roboclaw.SpeedAccelDeccelPositionM1(self.address, enc2,10000,1000000,10000,0)
             self.roboclaw.ForwardM1(self.address, 0)
             self.roboclaw.ForwardM2(self.address, 0)
         except OSError:
