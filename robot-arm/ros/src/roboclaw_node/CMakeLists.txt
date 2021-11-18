@@ -11,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   tf
-  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -48,11 +47,11 @@ catkin_python_setup()
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
- add_message_files(
-   FILES
-   MotorPosition.msg
-   EncoderValues.msg
- )
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -69,12 +68,10 @@ catkin_python_setup()
 # )
 
 ## Generate added messages and services with any dependencies listed here
- generate_messages(
-   DEPENDENCIES
-   geometry_msgs
-   nav_msgs
-   std_msgs
- )
+# generate_messages(
+#   DEPENDENCIES
+#   geometry_msgs#   nav_msgs#   std_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -84,7 +81,13 @@ catkin_python_setup()
 ## package, follow these steps:
 ## * In the file package.xml:
 ##   * add a build_depend and a run_depend tag for "dynamic_reconfigure"
-## * ICATKIN_PACKAGEnerate dynamic reconfigure parameters in the 'cfg' folder
+## * In this file (CMakeLists.txt):
+##   * add "dynamic_reconfigure" to
+##     find_package(catkin REQUIRED COMPONENTS ...)
+##   * uncomment the "generate_dynamic_reconfigure_options" section below
+##     and list every .cfg file to be processed
+
+## Generate dynamic reconfigure parameters in the 'cfg' folder
 # generate_dynamic_reconfigure_options(
 #   cfg/DynReconf1.cfg
 #   cfg/DynReconf2.cfg
@@ -100,10 +103,10 @@ catkin_python_setup()
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  # INCLUDE_DIRS include
-  # LIBRARIES roboclaw_node
-  CATKIN_DEPENDS geometry_msgs nav_msgs roscpp rospy std_msgs tf message_runtime
-  # DEPENDS system_lib
+#  INCLUDE_DIRS include
+#  LIBRARIES roboclaw_node
+#  CATKIN_DEPENDS geometry_msgs nav_msgs roscpp rospy std_msgs tf
+#  DEPENDS system_lib
 )
 
 ###########
