@@ -221,6 +221,7 @@ class Node:
 
             try:
                 status1, enc1, crc1 = self.roboclaw.ReadEncM1(self.address)
+                rospy.logwarn("EncM1 Reading: %d",enc1)
             except ValueError:
                 pass
             except OSError as e:
@@ -248,11 +249,11 @@ class Node:
         pos7Raw = jointState.position[7]
         pos7Motor = int(pos7Raw/6.28 * 5281.1) # Gantry Lift, not actual reduction
 
-        rospy.logdebug("position 7 raw:%f, position 7 motor: %d", pos7Raw, pos7Motor)
+        rospy.logwarn("position 7 raw:%f, position 7 motor: %d", pos7Raw, pos7Motor)
 
         try:
             self.roboclaw.SpeedAccelDeccelPositionM1(self.address, 100, 10000, 100, pos7Motor, 0)
-            rospy.logwarn("motor 7 command senti, posraw: %d", pos7Raw)
+            rospy.logwarn("motor 7 command sent, posraw: %d", pos7Motor)
         except OSError as e:
             rospy.logwarn("SpeedAccelDeccelPositionM1 OSError: %d", e.errno)
             rospy.logdebug(e)
