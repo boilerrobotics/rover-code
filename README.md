@@ -1,4 +1,4 @@
-# brc 2019-2020
+# BRC
 
 # For Communication and Intellgence 
 ### Setup ROS Melodic on Ubuntu 18.03 follwing this link: http://wiki.ros.org/melodic/Installation/Ubuntu 
