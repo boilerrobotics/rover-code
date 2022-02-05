@@ -7,7 +7,7 @@ from roboclaw_3 import Roboclaw
 import rospy
 import tf
 from geometry_msgs.msg import Quaternion, Twist
-from sensor_msgs.msg import JointState
+from roboclaw_node.msg import MotorPosition, EncoderValues
 from nav_msgs.msg import Odometry
 
 __author__ = "bwbazemore@uga.edu (Brad Bazemore)"
@@ -174,7 +174,8 @@ class Node:
             rospy.logwarn("Could not get version from roboclaw")
         else:
             rospy.logdebug(repr(version[1]))
-
+        
+        # BAD
         self.roboclaw.SpeedM1M2(self.address, 0, 0)
         self.roboclaw.ResetEncoders(self.address)
 
@@ -185,7 +186,8 @@ class Node:
         self.encodm = EncoderOdom(self.TICKS_PER_METER, self.BASE_WIDTH)
         self.last_set_speed_time = rospy.get_rostime()
 
-        rospy.Subscriber("brc_arm/joint_states", JointState, self.cmd_pos_callback)
+        rospy.Subscriber("/brc_arm/motor_commands", MotorPosition, self.cmd_pos_callback)
+        rospy.Subscriber("/brc_arm/homeStatus", homeStatus, self.home_callback)
 
         rospy.sleep(1)
 
@@ -243,20 +245,24 @@ class Node:
                 self.updater.update()
             r_time.sleep()
 
-    def cmd_pos_callback(self, jointState):
+    def cmd_pos_callback(self, data):
         self.last_set_speed_time = rospy.get_rostime()
 
-        pos7Raw = jointState.position[7]
-        pos7Motor = int(pos7Raw/6.28 * 5281.1) # Gantry Lift, not actual reduction
+        pos2Raw = data.angle[2]
+        pos2Motor = int(pos2Raw/6.28 * 5281.1 *5) # Gantry Lift, not actual reduction
 
-        rospy.logwarn("position 7 raw:%f, position 7 motor: %d", pos7Raw, pos7Motor)
+        rospy.logwarn("position 2 raw:%f, position 2 motor: %d", pos2Raw, pos2Motor)
 
         try:
-            self.roboclaw.SpeedAccelDeccelPositionM1(self.address, 100, 10000, 100, pos7Motor, 0)
-            rospy.logwarn("motor 7 command sent, posraw: %d", pos7Motor)
+            self.roboclaw.SpeedAccelDeccelPositionM1(self.address, 100, 10000, 100, pos2Motor, 0)
+            rospy.logwarn("motor 2 command sent, posraw: %d", pos2Motor)
         except OSError as e:
             rospy.logwarn("SpeedAccelDeccelPositionM1 OSError: %d", e.errno)
             rospy.logdebug(e)
+
+    # Homing Function
+    def home_callback(self, data):
+        rospy.logwarn("homing")
 
     # TODO: Need to make this work when more than one error is raised
     def check_vitals(self, stat):
