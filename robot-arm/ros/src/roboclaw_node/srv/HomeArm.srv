@@ -1,0 +1,3 @@
+int32[] motor_number
+---
+int32[] status

@@ -3,12 +3,15 @@ from __future__ import print_function
 
 import sys
 import copy
+from turtle import home
 import rospy
 import moveit_commander
 import moveit_msgs.msg
 import geometry_msgs.msg
 from sensor_msgs.msg import Joy
+from roboclaw_node.srv import HomeArm
 from controller_manager_msgs.srv import SwitchController
+
 
 def move_to_coord(move_group, x, y, z):
     pose_goal = geometry_msgs.msg.Pose()
@@ -32,20 +35,38 @@ def move_to_named_position(group, pos_name):
     group.stop()
     group.clear_pose_targets()
 
+
+def home_arm(joints):
+    rospy.wait_for_service('/brc_arm/home_arm')
+    try:
+        home_arm = rospy.ServiceProxy('/brc_arm/home_arm', HomeArm)
+        ret = home_arm(joints)
+    except rospy.ServiceException as e:
+        rospy.logerr("Service call failed: %s"%e)
+    for i in range(0, len(joints)):
+        if joints[i] == 1 & ret.status[i] == 0:
+            rospy.logerr("Failed to home joint: %d", i)
+            return 0
+    return 1
+
+
 def switch_to_group_position_controller():
     rospy.wait_for_service('/brc_arm/controller_manager/switch_controller')
     try:
-        switch_controller = rospy.ServiceProxy('/brc_arm/controller_manager/switch_controller', SwitchController)
+        switch_controller = rospy.ServiceProxy(
+            '/brc_arm/controller_manager/switch_controller', SwitchController)
         #ret = switch_controller(['/brc_arm/controller/position'], ['/brc_arm/controller/trajectory'], 2)
-        ret = switch_controller(['/brc_arm/controller/position'], ['/brc_arm/controller/trajectory'], 2, False, 0.0)
-    except rospy.ServiceException:
-        print("Service call failed")
+        ret = switch_controller(['/brc_arm/controller/position'],
+                                ['/brc_arm/controller/trajectory'], 2, False, 0.0)
+    except rospy.ServiceException as e:
+        rospy.logerr("Service call failed: %s"%e)
+
 
 def joy_callback(data):
     axes = data.axes
     buttons = data.buttons
-    #print(axes)
-    #Publish twist message to servo server
+    # print(axes)
+    # Publish twist message to servo server
     twist = geometry_msgs.msg.TwistStamped()
     twist.header = data.header
     twist.header.frame_id = ''
@@ -61,22 +82,27 @@ def joy_callback(data):
     twist.twist.angular.z = data.axes[6] * 5
     twist_pub.publish(twist)
 
+
 def main():
     rospy.sleep(5)
     robot = moveit_commander.RobotCommander()
     scene = moveit_commander.PlanningSceneInterface()
     arm_group = moveit_commander.MoveGroupCommander("robot_arm")
-    # INSERT HOMING HERE!!
+
+    home_arm([1, 1, 1, 1, 1])
+
     move_to_named_position(arm_group, "front")
     switch_to_group_position_controller()
-    
+
     moveit_commander.roscpp_shutdown()
+
 
 if __name__ == '__main__':
     moveit_commander.roscpp_initialize(sys.argv)
     rospy.init_node('brc_arm_node')
     global twist_pub
-    twist_pub = rospy.Publisher('/servo_server/delta_twist_cmds', geometry_msgs.msg.TwistStamped, queue_size=10)
+    twist_pub = rospy.Publisher(
+        '/servo_server/delta_twist_cmds', geometry_msgs.msg.TwistStamped, queue_size=10)
     rospy.Subscriber("/joy", Joy, joy_callback)
     main()
     rospy.spin()

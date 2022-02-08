@@ -4,18 +4,20 @@
     <arg name="dev" default="/dev/ttyACM0"/>
     <arg name="baud" default="115200"/>
     <arg name="address" default="128"/>
-    <arg name="max_speed" default="2.0"/>
-    <arg name="ticks_per_meter" default="4342.2"/>
-    <arg name="base_width" default="0.315"/>
+    <arg name="joint1" default="0"/>
+    <arg name="joint2" default="1"/>
+    <arg name="reduction1" default="5281.1"/>
+    <arg name="reduction2" default="5281.1"/>
     <arg name="run_diag" default="true"/>
 
-    <node if="$(arg run_diag)" pkg="roboclaw_node" type="roboclaw_node_code.py" name="roboclaw_node">
+    <node if="$(arg run_diag)" pkg="roboclaw_node" type="roboclaw_node_code.py" name="roboclaw_node" output="screen">
         <param name="~dev" value="$(arg dev)"/>
         <param name="~baud" value="$(arg baud)"/>
         <param name="~address" value="$(arg address)"/>
-        <param name="~max_speed" value="$(arg max_speed)"/>
-        <param name="~ticks_per_meter" value="$(arg ticks_per_meter)"/>
-        <param name="~base_width" value="$(arg base_width)"/>
+        <param name="~joint1" value="$(arg joint1)"/>
+        <param name="~joint2" value="$(arg joint2)"/>
+        <param name="~reduction1" value="$(arg reduction1)"/>
+        <param name="~reduction2" value="$(arg reduction2)"/>
     </node>
 
     <node pkg="diagnostic_aggregator" type="aggregator_node"
