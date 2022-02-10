@@ -9,9 +9,9 @@ from roboclaw_node.srv import HomeArm
 
 def callback(data):
     global pub
-    # rospy.loginfo(str(data))
-    # encoder_values = data.angle
-    # pub.publish(encoder_values)
+    rospy.logdebug(str(data))
+    encoder_values = data.angle
+    pub.publish(encoder_values)
 
 
 def handle_home_arm(req):
