@@ -514,7 +514,7 @@
       velocity="10" />
     <mimic
       joint="RLink1J"
-      multiplier="-1"
+      multiplier="1"
       offset="0" />
   </joint>
   <link
@@ -637,8 +637,8 @@
       effort="0"
       velocity="10" />
     <mimic
-      joint="LLink1J"
-      multiplier="-1"
+      joint="RLink1J"
+      multiplier="1"
       offset="0" />
   </joint>
 </robot>
