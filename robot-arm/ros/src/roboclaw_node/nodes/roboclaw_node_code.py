@@ -77,21 +77,16 @@ class Node:
             rospy.logdebug(repr(version[1]))
 
         rospy.loginfo("Connected to Roboclaw at %d", self.address)
+        PID = self.roboclaw.ReadM1PositionPID(self.address)
+        rospy.loginfo(len(PID))
+        #self.roboclaw.SetM1PositionPID(self.address,PID[1],PID[2],PID[3],PID,[4],PID[5],-(2^16),2^16)
         
-        # BAD
-        self.roboclaw.SpeedM1M2(self.address, 0, 0)
-        self.roboclaw.ResetEncoders(self.address)
-
         self.joint1 = int(rospy.get_param("~joint1", "0"))
         self.joint2 = int(rospy.get_param("~joint2", "1"))
-        self.reduction1 = float(rospy.get_param("~reduction1", "5281.1"))
+        self.reduction1 = float(rospy.get_param("~reduction1", "5281.1")) * 6.25
         self.reduction2 = float(rospy.get_param("~reduction2", "5281.1"))
 
         self.last_command_time = rospy.get_rostime()
-
-        self.pub = rospy.Publisher('/brc_arm/motor_positions',EncoderValues, queue_size=10)
-        rospy.Subscriber("/brc_arm/motor_commands", MotorPosition, self.cmd_pos_callback)
-        self.homeArm = rospy.Service('/brc_arm/home_arm', HomeArm, self.handle_home_arm)
 
         rospy.sleep(1)
 
@@ -103,10 +98,14 @@ class Node:
         rospy.logdebug("reduction1 %d", self.reduction1)
         rospy.logdebug("reduction2 %d", self.reduction2)
 
+        self.pub = rospy.Publisher('/brc_arm/motor_positions',EncoderValues, queue_size=10)
+        #self.sub = rospy.Subscriber("/brc_arm/motor_commands", MotorPosition, self.cmd_pos_callback)
+        self.homeArm = rospy.Service('/brc_arm/home_arm', HomeArm, self.handle_home_arm)
+
     def run(self):
         if not rospy.is_shutdown():
             rospy.loginfo("Starting motor drive")
-            r_time = rospy.Rate(10)
+            r_time = rospy.Rate(100)
 
             # Jank way to "home"
             self.roboclaw.SetEncM1(self.address, 0)
@@ -114,10 +113,11 @@ class Node:
 
             while not rospy.is_shutdown():
                 if (rospy.get_rostime() - self.last_command_time).to_sec() > 1:
-                    rospy.loginfo("Did not get command for 1 second, stopping")
+                    #rospy.loginfo("Did not get command for 1 second, stopping")
                     try:
-                        self.roboclaw.ForwardM1(self.address, 0)
-                        self.roboclaw.ForwardM2(self.address, 0)
+                        #self.roboclaw.ForwardM1(self.address, 0)
+                        #self.roboclaw.ForwardM2(self.address, 0)
+                        self.roboclaw.BackwardM1(self.address, 63)
                     except OSError as e:
                         rospy.logerr("Could not stop")
                         rospy.logdebug(e)
@@ -126,30 +126,35 @@ class Node:
     
     # Only homes two motors right now and is likely broken
     def handle_home_arm(self, req):
-        r_time = rospy.Rate(10)
+        self.sub.unregister()
         status = [0] * len(req.motor_number)
         for i in range(0, len(req.motor_number)):
-            rospy.loginfo("Homing joint: %d", i)
             if req.motor_number[i] == 1:
                 if i == self.joint1:
+                    rospy.loginfo("Homing joint: %d", i)
                     self.roboclaw.BackwardM1(self.address, 63)
-                    while self.roboclaw.ReadError != 4194304:
+                    err = self.roboclaw.ReadError(self.address)
+                    while err[1] != 0x400000:
+                        err = self.roboclaw.ReadError(self.address)
+                        rospy.loginfo(err)
                         r_time.sleep()
                 elif i == self.joint2:
                     self.roboclaw.BackwardM2(self.address, 63)
                     while self.roboclaw.ReadError != 4194304:
                         r_time.sleep()
                 status[i] = req.motor_number[i]
+        self.sub = rospy.Subscriber("/brc_arm/motor_commands", MotorPosition, self.cmd_pos_callback)
         return [status]
 
     def publish_encoder(self, angles):
+        rospy.logwarn(angles)
         # TODO need find solution to the OSError11 looks like sync problem with serial
         status1, enc1, crc1 = None, None, None
         status2, enc2, crc2 = None, None, None
 
         try:
             status1, enc1, crc1 = self.roboclaw.ReadEncM1(self.address)
-            rospy.logwarn("EncM1 Reading: %d",enc1)
+            rospy.loginfo("EncM1 Reading: %d",enc1)
         except ValueError:
             pass
         except OSError as e:
@@ -161,15 +166,14 @@ class Node:
         except ValueError:
             pass
         except OSError as e:
-            rospy.logwarn("ReadEncM2 OSError: %d", e.errno)
+            rospy.loginfo("ReadEncM2 OSError: %d", e.errno)
             rospy.logdebug(e)
 
         if ('enc1' in vars()) and ('enc2' in vars()):
-            rospy.loginfo(" Encoders %d %d" % (enc1, enc2))
             self.updater.update()
 
-            angles[self.joint1] = enc1 / self.reduction1 * 6.28
-            angles[self.joint2] = enc2 / self.reduction2 * 6.28
+            angles[self.joint1] = float(enc1) / self.reduction1 * 6.28
+            #angles[self.joint2] = enc2 / self.reduction2 * 6.28
         
         self.pub.publish(angles)
     
@@ -178,27 +182,27 @@ class Node:
 
         pos1Raw = data.angle[self.joint1]
         pos1Motor = int(pos1Raw/6.28 * self.reduction1) # not actual reduction
-        pos2Raw = data.angle[self.joint2]
-        pos2Motor = int(pos2Raw/6.28 * self.reduction2) # not actual reduction
+        #pos2Raw = data.angle[self.joint2]
+        #pos2Motor = int(pos2Raw/6.28 * self.reduction2) # not actual reduction
 
         # rospy.logdebug("Joint %d raw:%f, Joint %d motor: %d", self.joint1, pos1Raw, self.joint1, pos1Motor)
         # rospy.logdebug("Joint %d raw:%f, Joint %d motor: %d", self.joint2, pos2Raw, self.joint2, pos2Motor)
 
         try:
-            self.roboclaw.SpeedAccelDeccelPositionM1(self.address, 100, 10000, 100, pos1Motor, 0)
-            rospy.loginfo("Joint %d command sent, posraw: %d", self.joint1, pos1Motor)
+            self.roboclaw.SpeedAccelDeccelPositionM1(self.address, 10000, 100000, 10000, pos1Motor, 1)
+            rospy.loginfo("Joint %d command sent, posmotor: %d", self.joint1, pos1Motor)
         except OSError as e:
             rospy.logwarn("SpeedAccelDeccelPositionM1 OSError: %d", e.errno)
             rospy.logdebug(e)
 
-        try:
-            self.roboclaw.SpeedAccelDeccelPositionM2(self.address, 100, 10000, 100, pos2Motor, 0)
-            rospy.loginfo("Joint %d command sent, posraw: %d", self.joint2, pos2Motor)
-        except OSError as e:
-            rospy.logwarn("SpeedAccelDeccelPositionM2 OSError: %d", e.errno)
-            rospy.logdebug(e)
+        #try:
+        #    self.roboclaw.SpeedAccelDeccelPositionM2(self.address, 100, 10000, 100, pos2Motor, 0)
+        #    rospy.loginfo("Joint %d command sent, posmotor: %d", self.joint2, pos2Motor)
+        #except OSError as e:
+        #    rospy.logwarn("SpeedAccelDeccelPositionM2 OSError: %d", e.errno)
+        #    rospy.logdebug(e)
 
-        self.publish_encoder(data.angles)
+        self.publish_encoder(list(data.angle))
 
     # TODO: Need to make this work when more than one error is raised
     def check_vitals(self, stat):
