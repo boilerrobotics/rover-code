@@ -901,12 +901,12 @@ class Roboclaw:
 		return (0,0,0)
 
 	def SetM1PositionPID(self,address,kp,ki,kd,kimax,deadzone,min,max):
-#		return self._write4444444(address,self.Cmd.SETM1POSPID,long(kd*1024),long(kp*1024),long(ki*1024),kimax,deadzone,min,max)
-		return self._write4444444(address,self.Cmd.SETM1POSPID,kd*1024,kp*1024,ki*1024,kimax,deadzone,min,max)
+		return self._write4444444(address,self.Cmd.SETM1POSPID,int(kd*1024),int(kp*1024),int(ki*1024),kimax,deadzone,min,max)
+		#return self._write4444444(address,self.Cmd.SETM1POSPID,kd*1024,kp*1024,ki*1024,kimax,deadzone,min,max)
 
 	def SetM2PositionPID(self,address,kp,ki,kd,kimax,deadzone,min,max):
-#		return self._write4444444(address,self.Cmd.SETM2POSPID,long(kd*1024),long(kp*1024),long(ki*1024),kimax,deadzone,min,max)
-		return self._write4444444(address,self.Cmd.SETM2POSPID,kd*1024,kp*1024,ki*1024,kimax,deadzone,min,max)
+		return self._write4444444(address,self.Cmd.SETM2POSPID,int(kd*1024),int(kp*1024),int(ki*1024),kimax,deadzone,min,max)
+		#return self._write4444444(address,self.Cmd.SETM2POSPID,kd*1024,kp*1024,ki*1024,kimax,deadzone,min,max)
 
 	def ReadM1PositionPID(self,address):
 		data = self._read_n(address,self.Cmd.READM1POSPID,7)

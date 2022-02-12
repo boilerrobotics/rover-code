@@ -6,7 +6,7 @@
     <arg name="address" default="128"/>
     <arg name="joint1" default="2"/>
     <arg name="joint2" default="1"/>
-    <arg name="reduction1" default="5281.1"/>
+    <arg name="reduction1" default="33006.875"/>
     <arg name="reduction2" default="5281.1"/>
     <arg name="run_diag" default="true"/>
 
