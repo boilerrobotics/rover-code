@@ -42,7 +42,7 @@ def home_arm(joints):
         home_arm = rospy.ServiceProxy('/brc_arm/home_arm', HomeArm)
         ret = home_arm(joints)
         for i in range(0, len(joints)):
-            if joints[i] == 1 & ret.status[i] == 0:
+            if joints[i] == 1 and ret.status[i] == 0:
                 rospy.logerr("Failed to home joint: %d", i)
                 return 0
     except rospy.ServiceException as e:
@@ -89,9 +89,9 @@ def main():
     scene = moveit_commander.PlanningSceneInterface()
     arm_group = moveit_commander.MoveGroupCommander("robot_arm")
 
-    rospy.sleep(5)
+    rospy.sleep(2)
     rospy.loginfo("Homing!")
-    #home_arm([0, 0, 1, 0, 0])
+    home_arm([0, 0, 1, 0, 0])
 
     move_to_named_position(arm_group, "front")
     #switch_to_group_position_controller()

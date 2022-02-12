@@ -78,7 +78,7 @@
 	<!--node pkg="tf" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0 0 0 0 odom_combined base_link 100" /-->
 
 
-	<node pkg="motor_simulator" name="motor_simulator_node" type="motor_simulator.py" respawn="false" output="screen"/>
+	<!-- <node pkg="motor_simulator" name="motor_simulator_node" type="motor_simulator.py" respawn="false" output="screen"/> -->
 
 	<node pkg="brc_arm_tools" name="brc_arm_node" type="brc_arm_node.py" respawn="false" output="screen"/>
 
