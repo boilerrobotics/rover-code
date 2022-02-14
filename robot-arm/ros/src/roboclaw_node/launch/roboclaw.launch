@@ -1,29 +1,13 @@
 <?xml version="1.0"?>
 <launch>
-
-    <arg name="dev" default="/dev/ttyACM0"/>
-    <arg name="baud" default="115200"/>
-    <arg name="address" default="128"/>
-    <arg name="joint1" default="2"/>
-    <arg name="joint2" default="1"/>
-    <arg name="reduction1" default="33006.875"/>
-    <arg name="reduction2" default="5281.1"/>
     <arg name="run_diag" default="true"/>
 
     <node if="$(arg run_diag)" pkg="roboclaw_node" type="roboclaw_node_code.py" name="roboclaw_node" output="screen">
-        <param name="~dev" value="$(arg dev)"/>
-        <param name="~baud" value="$(arg baud)"/>
-        <param name="~address" value="$(arg address)"/>
-        <param name="~joint1" value="$(arg joint1)"/>
-        <param name="~joint2" value="$(arg joint2)"/>
-        <param name="~reduction1" value="$(arg reduction1)"/>
-        <param name="~reduction2" value="$(arg reduction2)"/>
+        <rosparam command="load" file="$(find roboclaw_node)/config/roboclaw_config.yaml"/>
     </node>
 
-    <node pkg="diagnostic_aggregator" type="aggregator_node"
-          name="diagnostic_aggregator">
-        <rosparam command="load"
-                  file="$(find roboclaw_node)/config/roboclaw_diag.yaml"/>
+    <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator">
+        <rosparam command="load" file="$(find roboclaw_node)/config/roboclaw_diag.yaml"/>
     </node>
 
 </launch>

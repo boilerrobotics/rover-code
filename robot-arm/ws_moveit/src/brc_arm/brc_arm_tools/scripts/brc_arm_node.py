@@ -29,6 +29,8 @@ def move_to_coord(move_group, x, y, z):
     move_group.clear_pose_targets()
 
 # front, default, or pickup
+
+
 def move_to_named_position(group, pos_name):
     group.set_named_target(pos_name)
     plan = group.go(wait=True)
@@ -46,7 +48,7 @@ def home_arm(joints):
                 rospy.logerr("Failed to home joint: %d", i)
                 return 0
     except rospy.ServiceException as e:
-        rospy.logerr("Service call failed: %s"%e)
+        rospy.logerr("Service call failed: %s" % e)
     return 1
 
 
@@ -59,7 +61,7 @@ def switch_to_group_position_controller():
         ret = switch_controller(['/brc_arm/controller/position'],
                                 ['/brc_arm/controller/trajectory'], 2, False, 0.0)
     except rospy.ServiceException as e:
-        rospy.logerr("Service call failed: %s"%e)
+        rospy.logerr("Service call failed: %s" % e)
 
 
 def joy_callback(data):
@@ -94,7 +96,7 @@ def main():
     home_arm([0, 0, 1, 0, 0])
 
     move_to_named_position(arm_group, "front")
-    #switch_to_group_position_controller()
+    # switch_to_group_position_controller()
 
     moveit_commander.roscpp_shutdown()
 
