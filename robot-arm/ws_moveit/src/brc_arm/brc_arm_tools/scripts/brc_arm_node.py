@@ -93,7 +93,7 @@ def main():
 
     rospy.sleep(2)
     rospy.loginfo("Homing!")
-    home_arm([0, 0, 1, 0, 0])
+    home_arm([0, 1, 0, 0, 0])
 
     move_to_named_position(arm_group, "front")
     # switch_to_group_position_controller()

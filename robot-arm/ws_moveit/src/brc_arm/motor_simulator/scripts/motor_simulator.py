@@ -9,23 +9,23 @@ from roboclaw_node.srv import HomeArm
 
 def callback(data):
     global pub
-    #rospy.logdebug(str(data))
+    rospy.logdebug(str(data))
     encoder_values = data.angle
-    #pub.publish(encoder_values)
+    pub.publish(encoder_values)
 
 
 def handle_home_arm(req):
-    status = [0] * len(req.motor_number)
-    for i in range(0, len(req.motor_number)):
+    status = [0] * len(req.to_home)
+    for i in range(0, len(req.to_home)):
         rospy.loginfo("Homing joint: %d", i)
-        status[i] = req.motor_number[i]
+        status[i] = req.to_home[i]
     return [status]
 
 
 def listener():
     rospy.init_node('motor_simulator', anonymous=True)
     rospy.Subscriber("/brc_arm/motor_commands", MotorPosition, callback)
-    # homeArm = rospy.Service('/brc_arm/home_arm', HomeArm, handle_home_arm)
+    homeArm = rospy.Service('/brc_arm/home_arm', HomeArm, handle_home_arm)
 
     global pub
     pub = rospy.Publisher('/brc_arm/motor_positions',EncoderValues, queue_size=10)
