@@ -24,18 +24,14 @@ class Joint:
             return
         self.motorNum = rospy.get_param("/roboclaw_node/joints/" + name + "/motor_num")
         self.reduction = rospy.get_param("/roboclaw_node/joints/" + name + "/reduction")
-        self.name = rospy.get_param("/roboclaw_node/joints/" + name + "/speed")
+        self.speed = rospy.get_param("/roboclaw_node/joints/" + name + "/speed")
         self.is_homed = False
 
         PID = rospy.get_param("/roboclaw_node/joints/" + name + "/PIDMM")
         try:
             if self.motorNum == 1:
-                PID = self.roboclaw.ReadM1PositionPID(self.address)
-                rospy.loginfo(PID)
                 self.roboclaw.SetM1PositionPID(self.address, PID[1], PID[2], PID[3], PID[4], 0, 0, 100000)
             elif self.motorNum == 2:
-                PID = self.roboclaw.ReadM2PositionPID(self.address)
-                rospy.loginfo(PID)
                 self.roboclaw.SetM2PositionPID(self.address, PID[1], PID[2], PID[3], PID[4], 0, 0, 100000)
         except OSError as e:
             rospy.logwarn("Joint %s:\t PID Error: OSError: %d", self.name, e.errno)
@@ -84,10 +80,10 @@ class Joint:
         rospy.loginfo("Homing joint %s", self.name)
         try:
             if self.motorNum == 1:
-                self.roboclaw.BackwardM1(self.address, 63)
+                self.roboclaw.BackwardM1(self.address, 20)
                 error_code = 0x400000
             elif self.motorNum == 2:
-                self.roboclaw.BackwardM2(self.address, 63)
+                self.roboclaw.BackwardM2(self.address, 20)
                 error_code = 0x800000
             while self.roboclaw.ReadError(self.address)[1] != error_code:
                 if loops >= timeout * 10:
@@ -102,7 +98,7 @@ class Joint:
         self.is_homed = True
         return True
 
-    def move_to_position(self, rawPos):
+    def go_to_position(self, rawPos):
         position = int(rawPos / 6.28 * self.reduction)
 
         try:
@@ -117,9 +113,9 @@ class Joint:
 
     def stop(self):
         if self.motorNum == 1:
-            self.roboclaw.FowardM1(self.address, 0)
+            self.roboclaw.ForwardM1(self.address, 0)
         elif self.motorNum == 2:
-            self.roboclaw.FowardM2(self.address, 0)
+            self.roboclaw.ForwardM2(self.address, 0)
 
 
 class Node:
@@ -150,7 +146,7 @@ class Node:
         joint_params = rospy.get_param("/roboclaw_node/joints")
         self.joints = [None] * len(joint_params)
 
-        joint_num = 0
+        joint_num = 1 # Change to 0 when including GL
         for controller in roboclaws:
             dev_name = roboclaws[controller]['dev']
             baud_rate = roboclaws[controller]['baud']
@@ -167,7 +163,7 @@ class Node:
                 return
 
             try:
-                version = roboclaw.ReadVersion(self.address)
+                version = roboclaw.ReadVersion(address)
             except AttributeError as e:
                 rospy.logfatal("Could not connect to Roboclaw at %d", address)
                 rospy.logdebug(e)
@@ -185,10 +181,11 @@ class Node:
                 rospy.logdebug(repr(version[1]))
 
             rospy.loginfo("Connected to Roboclaw at %d", address)
-            self.roboclaw.SetPinFunctions(self.address, 0x00, 0x62, 0x62)
+            roboclaw.SetPinFunctions(address, 0x00, 0x62, 0x62)
 
             for joint in roboclaws[controller]['joints']:
                 self.joints[joint_num] = Joint(joint, roboclaw, address)
+                joint_num += 1
 
         # Diagnostic Stuff
         # self.updater = diagnostic_updater.Updater()
@@ -199,7 +196,7 @@ class Node:
         self.is_homing = False
 
         # Allow motor simulation:
-        self.simulate = [0, 1, 3, 4]
+        self.simulate = [0, 2, 3, 4, 5, 6]
 
         rospy.sleep(2)
 
@@ -216,7 +213,7 @@ class Node:
                 if self.is_homing == False and (rospy.get_rostime() - self.last_command_time).to_sec() > 1:
                     try:
                         # rospy.loginfo("Did not get command for 1 second, stopping")
-                        for joint in self.joints:
+                        for joint in self.joints[1:]:
                             joint.stop()
                     except OSError as e:
                         rospy.logerr("Could not stop")
@@ -227,12 +224,13 @@ class Node:
     def handle_home_arm(self, req):
         homing_order = [0, 1, 2, 3, 4]  # In order of joints to home
         self.is_homing = True
+        rospy.sleep(0.5)
 
         status = [0] * len(homing_order)
         for i in homing_order:
-            if req.to_home[i] == 1:
-                if i == homing_order[0] or self.joints[i-1].is_homed:
-                    if self.joints[i].home_arm():
+            if i not in self.simulate and req.to_home[i] == 1:
+                if i == homing_order[0] or i == homing_order[1] or self.joints[i-1].is_homed:
+                    if self.joints[i].home_joint():
                         status[i] = 1
                     else:
                         rospy.logwarn("Could not home joint %d, previous joint has not been homed", i)
@@ -240,18 +238,18 @@ class Node:
         return [status]
 
     # TODO need find solution to the OSError11 looks like sync problem with serial
-    def publish_encoder(self, angles):
-        for i in range(0, len(self.joints)):
+    def publish_encoder(self, angle):
+        for i in range(0, len(angle)):
             if i not in self.simulate:
-                angles[i] = self.joints[i].read_enc()
+                angle[i] = self.joints[i].read_enc()
 
-        self.pub.publish(angles)
+        self.pub.publish(angle)
 
     def cmd_pos_callback(self, data):
         if self.is_homing == False:
             self.last_command_time = rospy.get_rostime()
 
-            for i in range(0, len(self.joints)):
+            for i in range(0, len(data.angle)):
                 if i not in self.simulate:
                     self.joints[i].go_to_position(data.angle[i])
 
@@ -282,12 +280,12 @@ class Node:
     def shutdown(self):
         rospy.loginfo("Shutting down")
         try:
-            for joint in self.joints:
+            for joint in self.joints[1:]:
                 joint.stop()
         except Exception as e:
             rospy.logerr("Shutdown did not work trying again")
             try:
-                for joint in self.joints:
+                for joint in self.joints[1:]:
                     joint.stop()
             except Exception as e:
                 rospy.logerr("Could not shutdown motors!!!!")
