@@ -40,7 +40,7 @@
 #include <brc_arm_hardware_interface/brc_arm_hardware_interface.h>
 #include <sstream>
 
-#define NUM_ARM_JOINTS 6
+#define NUM_ARM_JOINTS 7
 
 namespace brc_arm_hardware_interface
 {
@@ -54,7 +54,6 @@ BRCArmHardwareInterface::BRCArmHardwareInterface(ros::NodeHandle& nh, urdf::Mode
   //ros::Publisher motor_pub = nh.advertise<roboclaw_node::MotorPosition>("motor_commands", 20);
   //motor_sub = nh.subscribe("\\brc_arm\\motor_positions", 10, BRCArmHardwareInterface::positionCallback);
   motor_sub = nh.subscribe("motor_positions", 10, &BRCArmHardwareInterface::positionCallback, this);
-  claw_sub = nh.subscribe("claw_position", 10, &BRCArmHardwareInterface::clawPositionCallback, this);
   ROS_INFO_NAMED("brc_arm_hardware_interface", "BRCArmHardwareInterface Ready.");
 }
 
@@ -164,11 +163,6 @@ void BRCArmHardwareInterface::positionCallback(const roboclaw_node::EncoderValue
    joint_position_[joint_id] = msg->angles.at(joint_id);
    //ROS_INFO_NAMED("controller", "%f", joint_position_command_[0]);
   }
-}
-
-void BRCArmHardwareInterface::clawPositionCallback(const std_msgs::Float32::ConstPtr& msg) {
-  joint_position_[NUM_ARM_JOINTS] = msg->data;
-  joint_position_[NUM_ARM_JOINTS+1] = msg->data;
 }
 
 }  // namespace brc_arm_hardware_interface

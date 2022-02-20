@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from shutil import move
 
 import sys
 import copy
@@ -9,7 +10,7 @@ import moveit_commander
 import moveit_msgs.msg
 import geometry_msgs.msg
 from sensor_msgs.msg import Joy
-from roboclaw_node.srv import HomeArm
+from roboclaw_node.srv import HomeArm, MoveClaw
 from controller_manager_msgs.srv import SwitchController
 
 
@@ -49,6 +50,21 @@ def home_arm(joints):
                 return 0
     except rospy.ServiceException as e:
         rospy.logerr("Service call failed: %s" % e)
+        return 0
+    return 1
+
+
+def move_claw(goal_state):
+    rospy.wait_for_service('/brc_arm/move_claw')
+    try:
+        move_claw = rospy.ServiceProxy('/brc_arm/move_claw', MoveClaw)
+        ret = move_claw(goal_state)
+        if goal_state != ret.current_state:
+            rospy.logerr("Failed to move EE.")
+            return 0
+    except rospy.ServiceException as e:
+        rospy.logerr("Service call failed: %s" % e)
+        return 0
     return 1
 
 
@@ -93,9 +109,16 @@ def main():
 
     rospy.sleep(2)
     rospy.loginfo("Homing!")
-    home_arm([0, 1, 0, 0, 0])
+    home_arm([0, 1, 0, 0, 0, 0])
 
     move_to_named_position(arm_group, "front")
+
+    # rospy.sleep(1)
+    # move_claw(1)
+    # rospy.sleep(1)
+    # move_claw(0)
+    # rospy.sleep(1)
+    # move_claw(1)
     # switch_to_group_position_controller()
 
     moveit_commander.roscpp_shutdown()

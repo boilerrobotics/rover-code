@@ -22,33 +22,38 @@ joints:
     speed: [10000,1000000,10000]
     motor_num: 1
     PIDMM: [1,1,1,1,0,0,100000]
+    type: arm
   midarm1:
     reduction: 5255.871815
     speed: [10000,1000000,10000]
     motor_num: 1
     PIDMM: [1,1,1,1,0,0,100000]
+    type: arm
   midarm2:
     reduction: 5255.871815
     speed: [10000,1000000,10000]
     motor_num: 2
     PIDMM: [1,1,1,1,0,0,100000]
+    type: arm
   wrist1:
     reduction: 30273.82166
     speed: [10000,1000000,10000]
     motor_num: 1
     PIDMM: [1,1,1,1,0,0,100000]
+    type: arm
   wrist2:
     reduction: 81.52866242
     speed: [10000,1000000,10000]
     motor_num: 2
     PIDMM: [1,1,1,1,0,0,100000]
+    type: arm
   EEbase:
     reduction: 163.0573248
     speed: [10000,1000000,10000]
     motor_num: 1
     PIDMM: [1,1,1,1,0,0,100000]
+    type: arm
   RLink1:
-    reduction: 1
-    speed: [10000,1000000,10000]
-    motor_num: 1
-    PIDMM: [1,1,1,1,0,0,100000]
+    current_limit: 1.5
+    motor_num: 2
+    type: EE

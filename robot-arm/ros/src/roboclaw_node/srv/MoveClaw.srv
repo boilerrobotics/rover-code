@@ -1,0 +1,3 @@
+int32 goal_state
+---
+int32 current_state

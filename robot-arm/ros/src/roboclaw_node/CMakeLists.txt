@@ -58,6 +58,7 @@ add_message_files(
 add_service_files(
   FILES
   HomeArm.srv
+  MoveClaw.srv
 )
 
 ## Generate actions in the 'action' folder

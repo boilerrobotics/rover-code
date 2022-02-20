@@ -69,12 +69,8 @@ public:
 
   virtual void positionCallback(const roboclaw_node::EncoderValues::ConstPtr& msg);
 
-  virtual void clawPositionCallback(const std_msgs::Float32::ConstPtr& msg);
-
   ros::Publisher motor_pub;
   ros::Subscriber motor_sub;
-
-  ros::Subscriber claw_sub;
 
 };  // class
 
