@@ -54,6 +54,7 @@ joints:
     PIDMM: [1,1,1,1,0,0,100000]
     type: arm
   RLink1:
-    current_limit: 1.5
+    current_limit: 0.4
     motor_num: 2
     type: EE
+

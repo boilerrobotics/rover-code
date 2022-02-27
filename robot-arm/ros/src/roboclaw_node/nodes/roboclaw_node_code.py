@@ -127,22 +127,24 @@ class EEJoint:
             rospy.logfatal("Address out of range")
             rospy.signal_shutdown("Address out of range")
             return
-        self.currentLimit = rospy.get_param("/roboclaw_node/joints/" + name + "/current_limit")
+        self.currentLimit = int(rospy.get_param("/roboclaw_node/joints/" + name + "/current_limit") * 100.0)
         self.motorNum = rospy.get_param("/roboclaw_node/joints/" + name + "/motor_num")
         self.status = 0  # 0 = open, 1 = closed
 
         try:
             if self.motorNum == 1:
                 self.roboclaw.SetM1MaxCurrent(self.address, self.currentLimit)
+                #rospy.loginfo(self.roboclaw.ReadM1MaxCurrent(self.address))
             elif self.motorNum == 2:
                 self.roboclaw.SetM2MaxCurrent(self.address, self.currentLimit)
+                #rospy.loginfo(self.roboclaw.ReadM2MaxCurrent(self.address))
         except OSError as e:
             rospy.logwarn("Joint %s:\t Current limit error: OSError: %d", self.name, e.errno)
             rospy.logdebug(e)
 
     def open_claw(self):
         rate = 10
-        timeout = 10
+        timeout = 6
 
         r_time = rospy.Rate(rate)
         loops = 0
@@ -151,14 +153,15 @@ class EEJoint:
         rospy.loginfo("Opening joint %s", self.name)
         try:
             if self.motorNum == 1:
-                self.roboclaw.BackwardM1(self.address, 20)
+                self.roboclaw.BackwardM1(self.address, 127)
                 error_code = 0x400000
             elif self.motorNum == 2:
-                self.roboclaw.BackwardM2(self.address, 20)
+                self.roboclaw.BackwardM2(self.address, 127)
                 error_code = 0x800000
             while self.roboclaw.ReadError(self.address)[1] != error_code:
                 if loops >= timeout * 10:
                     rospy.logwarn("Opening joint %s failed, took longer than %ds", self.name, timeout)
+                    self.stop()
                     return False
                 loops += 1
                 r_time.sleep()
@@ -166,12 +169,13 @@ class EEJoint:
             rospy.logwarn("Opening joint %s error: %d", self.name, e.errno)
             rospy.logdebug(e)
             return False
+        rospy.loginfo("Opening joint %s success", self.name)
         self.status = False
         return True
 
     def close_claw(self):
         rate = 10
-        timeout = 10
+        timeout = 12
 
         r_time = rospy.Rate(rate)
         loops = 0
@@ -180,21 +184,26 @@ class EEJoint:
         rospy.loginfo("Closing joint %s", self.name)
         try:
             if self.motorNum == 1:
-                self.roboclaw.ForwardM1(self.address, 20)
-                error_code = 0x001000
+                self.roboclaw.ForwardM1(self.address, 127)
+                error_code = 0x010000
             elif self.motorNum == 2:
-                self.roboclaw.ForwardM2(self.address, 20)
-                error_code = 0x002000
-            while self.roboclaw.ReadError(self.address)[1] != error_code:
+                self.roboclaw.ForwardM2(self.address, 127)
+                error_code = 0x020000
+            error = self.roboclaw.ReadError(self.address)[1]
+            while error != error_code:
+                rospy.loginfo(self.roboclaw.ReadCurrents(self.address))
                 if loops >= timeout * 10:
                     rospy.logwarn("Closing joint %s failed, took longer than %ds", self.name, timeout)
+                    self.stop()
                     return False
                 loops += 1
+                error = self.roboclaw.ReadError(self.address)[1]
                 r_time.sleep()
         except OSError as e:
             rospy.logwarn("Opening joint %s error: %d", self.name, e.errno)
             rospy.logdebug(e)
             return False
+        rospy.loginfo("Closing joint %s success", self.name)
         self.status = True
         return True
 
@@ -203,7 +212,6 @@ class EEJoint:
             self.roboclaw.ForwardM1(self.address, 0)
         elif self.motorNum == 2:
             self.roboclaw.ForwardM2(self.address, 0)
-
 
 class Node:
     def __init__(self):
@@ -235,7 +243,6 @@ class Node:
 
         joint_num = 1  # Change to 0 when including GL
         for controller in roboclaws:
-            type = roboclaws[controller]['type']
             dev_name = roboclaws[controller]['dev']
             baud_rate = roboclaws[controller]['baud']
             address = roboclaws[controller]['address']
@@ -307,7 +314,8 @@ class Node:
                     try:
                         # rospy.loginfo("Did not get command for 1 second, stopping")
                         for joint in self.joints[1:]:
-                            joint.stop()
+                           #joint.stop()
+                           dumb = 0
                     except OSError as e:
                         rospy.logerr("Could not stop")
                         rospy.logdebug(e)
