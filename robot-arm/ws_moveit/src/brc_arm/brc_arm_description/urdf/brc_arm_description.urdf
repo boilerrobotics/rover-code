@@ -152,7 +152,7 @@
     type="revolute">
     <origin
       xyz="0 0 0.1"
-      rpy="0 0.5236 0" />
+      rpy="0 0.2932 0" />
     <parent
       link="carriage" />
     <child
@@ -210,7 +210,7 @@
     type="revolute">
     <origin
       xyz="-0.35 0 0"
-      rpy="0 -0.43633 0" />
+      rpy="0 -0.9826 0" />
     <parent
       link="midarm1" />
     <child
@@ -219,7 +219,7 @@
       xyz="0 -1 0" />
     <limit
       lower="0"
-      upper="4.8945"
+      upper="4.1887"
       effort="0"
       velocity="10" />
   </joint>
