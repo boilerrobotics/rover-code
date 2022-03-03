@@ -1,0 +1,60 @@
+motor_controllers:
+  roboclaw1:
+    dev: /dev/ttyACM0
+    baud: 115200
+    address: 128
+    joints: [midarm1,midarm2]
+  roboclaw2:
+    dev: /dev/ttyACM1
+    baud: 115200
+    address: 129
+    joints: [wrist1,wrist2]
+  roboclaw3:
+    dev: /dev/ttyACM2
+    baud: 115200
+    address: 130
+    joints: [EEbase,RLink1]
+
+# Must be in order as listed in motor controllers
+joints:
+  gantry:
+    reduction: 1863.512284
+    speed: [10000,1000000,10000]
+    motor_num: 1
+    PIDMM: [1,1,1,1,0,0,100000]
+    type: arm
+  midarm1:
+    reduction: 5255.871815
+    speed: [10000,1000000,10000]
+    motor_num: 1
+    PIDMM: [1,1,1,1,0,0,100000]
+    type: arm
+  midarm2:
+    reduction: 5255.871815
+    speed: [10000,1000000,10000]
+    motor_num: 2
+    PIDMM: [1,1,1,1,0,0,100000]
+    type: arm
+  wrist1:
+    reduction: 30273.82166
+    speed: [10000,1000000,10000]
+    motor_num: 1
+    PIDMM: [1,1,1,1,0,0,100000]
+    type: arm
+  wrist2:
+    reduction: 81.52866242
+    speed: [10000,1000000,10000]
+    motor_num: 2
+    PIDMM: [1,1,1,1,0,0,100000]
+    type: arm
+  EEbase:
+    reduction: 163.0573248
+    speed: [10000,1000000,10000]
+    motor_num: 1
+    PIDMM: [1,1,1,1,0,0,100000]
+    type: arm
+  RLink1:
+    current_limit: 0.4
+    motor_num: 2
+    type: EE
+

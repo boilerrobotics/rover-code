@@ -4,4 +4,6 @@ moveit_msgs/
 moveit_resources/
 moveit_visual_tools/
 rviz_visual_tools/
+moveit_tutorials/
+panda_moveit_config/
 

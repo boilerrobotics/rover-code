@@ -1,6 +1,6 @@
 brc_arm:
   hardware_interface:
-    loop_hz: 10 #hz
+    loop_hz: 60 #hz
     joints_list:
       - carriageJ
       - midarm1J
