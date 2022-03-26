@@ -1,0 +1,2 @@
+gpiozero==1.6.2
+adafruit-circuitpython-pca9685==3.4.1
