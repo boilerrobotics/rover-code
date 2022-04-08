@@ -10,6 +10,13 @@ import cv2.aruco as aruco
 
 # import cv_bridge.aruco as aruco
 
+def parse_coords(corners):
+    coords = []
+    for cd in corners:
+        x = int(str(cd[0]).split('.')[0])
+        y = int(str(cd[1]).split('.')[0])
+        coords.append([x, y])
+    return coords
 cap = cv2.VideoCapture(0)
 detected_dict = {}
 id_set = list()
@@ -43,12 +50,51 @@ while (True):
     # rotM = np.zeros(shape=(3,3))
     # cv2.Rodrigues(rvec[i-1], rotM, jacobian = 0)
     # ypr = cv2.RQDecomp3x3(rotM)
+
     if ids is not None:
         ids = tuple(ids.tolist())
+        coords = parse_coords(list(tuple(corners)[0][0]))
+        # print(coords)
+        tagmid = (coords[0][0] + coords[1][0] + coords[2][0] + coords[3][0]) / 4
+        print(tagmid)
         if ids not in id_set:
-            id_set.append(ids)
-            corner_set.append(tuple(corners))
-
+            if(tagmid >= 220 and tagmid < 440):
+                id_set.append(ids)
+                corner_set.append(tuple(corners))
+        if tagmid < 220:
+            seg = -1
+            print(f"ID: {ids[0][0]}\nCoords: {coords}\nSegment: {seg}")
+        elif (tagmid >= 220 and tagmid < 440):
+            widthperc1 = (abs(coords[0][1] - coords[1][1]) / coords[0][1] + abs(coords[0][1] - coords[1][1]) / coords[1][1]) / 2
+            widthperc2 = (abs(coords[2][1] - coords[3][1]) / coords[2][1] + abs(coords[2][1] - coords[3][1]) / coords[3][1]) / 2
+            heightperc1 = (abs(coords[0][0] - coords[3][0]) / coords[0][0] + abs(coords[0][0] - coords[3][0]) /
+                          coords[3][0]) / 2
+            heightperc2 = (abs(coords[1][0] - coords[2][0]) / coords[1][0] + abs(coords[1][0] - coords[2][0]) /
+                          coords[2][0]) / 2
+            try:
+                genperc1 = (abs(abs(coords[0][0] - coords[1][0]) - abs(coords[0][1] - coords[3][1])) / abs(coords[0][0] - coords[1][0]) + abs(abs(coords[0][0] - coords[1][0]) - abs(coords[0][1] - coords[3][1])) / abs(coords[0][1] - coords[3][1])) / 2
+            except ZeroDivisionError:
+                genperc1 = 0
+            try:
+                genperc2 = (abs(abs(coords[2][0] - coords[3][0]) - abs(coords[1][1] - coords[2][1])) / abs(
+                    coords[2][0] - coords[3][0]) + abs(
+                    abs(coords[2][0] - coords[3][0]) - abs(coords[1][1] - coords[2][1])) / abs(
+                    coords[1][1] - coords[2][1])) / 2
+            except ZeroDivisionError:
+                genperc2 = 0
+            seg = 0
+            if all(x < 0.05 for x in [widthperc1, widthperc2, heightperc1, heightperc2, genperc1, genperc2]):
+                tagside = 5 # cm
+                tagarea = tagside**2
+                captureside = abs(coords[0][0] - coords[1][0]) * 0.0264583333
+                coeff = tagside * 18.1 - 6
+                distance = coeff / captureside
+                print(f"ID: {ids[0][0]}\nCoords: {coords}\nSegment: {seg}\nDistance: {distance} cm")
+            else:
+                print(f"ID: {ids[0][0]}\nCoords: {coords}\nSegment: {seg}")
+        else:
+            seg = 1
+            print(f"ID: {ids[0][0]}\nCoords: {coords}\nSegment: {seg}")
     if len(id_set) == 5:
         break
 
