@@ -23,7 +23,7 @@ class Motor:
     '''
 
     MAX_SCALE = (2**16) - 1 
-    SPEED_RATIO = 0.5
+    SPEED_RATIO = 0.6
     
     def __init__(self, pca, forward, backward):
         '''
@@ -82,7 +82,7 @@ class MiniRover(Node):
 
     def cmd_callback(self, cmd):
 
-        speed_diff = cmd.angular.z / 3
+        speed_diff = cmd.angular.z / 2
 
         left_speed = self.clamp(cmd.linear.x - speed_diff, -1, 1)
         right_speed = self.clamp(cmd.linear.x + speed_diff, -1, 1)
