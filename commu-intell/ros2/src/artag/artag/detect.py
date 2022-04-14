@@ -15,26 +15,23 @@ from rclpy.node import Node
 import cv2 as cv
 import cv2.aruco as aruco
 
-def parse_coords(corners):
-    coords = []
-    for cd in corners:
-        x = int(str(cd[0]).split('.')[0])
-        y = int(str(cd[1]).split('.')[0])
-        coords.append([x, y])
-    return coords
+class ARTagDetector(Node):
+    def __init__(self, interval) -> None:
+        super().__init__('ardectector')
+        self.timer = self.create_timer(interval, self.detect)
+        self.camera = cv.VideoCapture(0)
 
+    def parse_coords(self, corners):
+        coords = []
+        for cd in corners:
+            x = int(str(cd[0]).split('.')[0])
+            y = int(str(cd[1]).split('.')[0])
+            coords.append([x, y])
+        return coords
 
-
-
-def main(args=None):
-    rclpy.init(args=args)
-
-    cap = cv.VideoCapture(0)
-
-    while (True):
-        # Capture frame-by-frame
-        ret, frame = cap.read()
-        # Our operations on the frame come here
+    def detect(self):
+        print('Callback start.')
+        _, frame = self.camera.read()
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50)
         parameters = aruco.DetectorParameters_create()
@@ -42,7 +39,7 @@ def main(args=None):
         if ids is not None:
             print('------------')
             ids = tuple(ids.tolist())
-            coords = parse_coords(list(tuple(corners)[0][0]))
+            coords = self.parse_coords(list(tuple(corners)[0][0]))
             tagmid = (coords[0][0] + coords[1][0] + coords[2][0] + coords[3][0]) / 4
             if tagmid < 220:
                 seg = -1
@@ -79,6 +76,13 @@ def main(args=None):
                 seg = 1
                 print(f"ID: {ids[0][0]}\nCoords: {coords}\nSegment: {seg}")
 
+
+def main(args=None):
+    rclpy.init(args=args)
+  
+    detector = ARTagDetector(0.5)
+    rclpy.spin(detector)
+    detector.destroy_node()
     rclpy.shutdown()
 
 
