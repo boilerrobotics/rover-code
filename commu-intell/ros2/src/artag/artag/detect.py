@@ -12,6 +12,7 @@ Version:        0.1.0
 
 import rclpy
 from rclpy.node import Node
+from geometry_msgs.msg import Twist
 import cv2 as cv
 import cv2.aruco as aruco
 
@@ -19,6 +20,7 @@ class ARTagDetector(Node):
     def __init__(self, interval) -> None:
         super().__init__('ardectector')
         self.timer = self.create_timer(interval, self.detect)
+        self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
         self.camera = cv.VideoCapture(0)
 
     def parse_coords(self, corners):
@@ -30,7 +32,7 @@ class ARTagDetector(Node):
         return coords
 
     def detect(self):
-        print('Callback start.')
+        # print('callback start!')
         _, frame = self.camera.read()
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50)
@@ -76,11 +78,20 @@ class ARTagDetector(Node):
                 seg = 1
                 print(f"ID: {ids[0][0]}\nCoords: {coords}\nSegment: {seg}")
 
+            command = Twist()
+            command.linear.x = 0.8
+            if seg == -1:
+                command.angular.z = -0.5
+            else:
+                command.angular.z = 0.5
+
+            self.publisher_.publish(command)
+
 
 def main(args=None):
     rclpy.init(args=args)
   
-    detector = ARTagDetector(0.5)
+    detector = ARTagDetector(0.1)
     rclpy.spin(detector)
     detector.destroy_node()
     rclpy.shutdown()
