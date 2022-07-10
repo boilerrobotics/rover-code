@@ -1,22 +1,20 @@
-#!/usr/bin/env python3
-
-"""
+'''
 ===============================================================================
 Program Description 
-	This program send the command to drive the motors.
-Author:         Thirawat Bureetes(Thirawat.tam@gmail.com), 
-                Ben Sukboontip, Pum Khai, Bryan Yakimisky, 
-                Preston Rahim
-Maintainer:     Thirawat Bureetes(Thirawat.tam@gmail.com)
-Version:        November 9, 2020
-Status:         In progress
-===============================================================================
-"""
+	The driver program for minirover.
 
-import rospy
-from minirover.msg import WheelSpeed
-from board import SCL, SDA
+Author:         Thirawat Bureetes(Thirawat.tam@gmail.com)
+Maintainer:     Thirawat Bureetes(Thirawat.tam@gmail.com)
+Update:         March 21, 2022
+Version:        0.1.0
+===============================================================================
+'''
+
+import rclpy
 import busio
+from rclpy.node import Node
+from geometry_msgs.msg import Twist
+from board import SCL, SDA
 from adafruit_pca9685 import PCA9685
 
 class Motor:
@@ -25,7 +23,7 @@ class Motor:
     '''
 
     MAX_SCALE = (2**16) - 1 
-    SPEED_RATIO = 0.5
+    SPEED_RATIO = 0.6
     
     def __init__(self, pca, forward, backward):
         '''
@@ -50,9 +48,19 @@ class Motor:
             self.forward.duty_cycle = 0
             self.backward.duty_cycle = 0
 
-class Minirover:
+class MiniRover(Node):
 
-    def __init__(self):
+    def __init__(self) -> None:
+        super().__init__('minirover')
+        # ros topic for command from teleop keyboard package
+        self.cmd = self.create_subscription(
+            Twist,
+            'cmd_vel',
+            self.cmd_callback,
+            10)
+        self.cmd  # prevent unused variable warning
+
+        # motor objects
         self.i2c_bus = busio.I2C(SCL, SDA)
         self.pca = PCA9685(self.i2c_bus)
         self.pca.frequency = 200
@@ -69,14 +77,17 @@ class Minirover:
             Motor(self.pca, 14, 15)
         ]
 
-        rospy.init_node('minirover_driver', anonymous=True)
-        rospy.Subscriber('wheel_speed', WheelSpeed, self.callback)
-        rospy.spin()
+    def clamp(self, num, min_value, max_value):
+        return max(min(num, max_value), min_value)
 
-    def callback(self, payload):
-        
-        left_speed = payload.left
-        right_speed = payload.right
+    def cmd_callback(self, cmd):
+
+        speed_diff = cmd.angular.z / 2
+
+        left_speed = self.clamp(cmd.linear.x - speed_diff, -1, 1)
+        right_speed = self.clamp(cmd.linear.x + speed_diff, -1, 1)
+
+        self.get_logger().info(f'Left Speed: {left_speed} Right Speed: {right_speed}')
 
         for wheel in self.left_wheels:
             wheel.set_speed(left_speed)
@@ -84,6 +95,16 @@ class Minirover:
         for wheel in self.right_wheels:
             wheel.set_speed(right_speed)
 
-if __name__ == '__main__':
+
+def main(args=None):
+    rclpy.init(args=args)
     
-    rover = Minirover()
+    rover = MiniRover()
+    rclpy.spin(rover)
+    rover.destroy_node()
+
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()

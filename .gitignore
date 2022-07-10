@@ -1,2 +1,3 @@
 .vscode/
 *.jpeg
+venv/

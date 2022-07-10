@@ -3,17 +3,18 @@
 """
 ===============================================================================
 Program Description 
-	This program will process gps raw data and genetare command to turning robot.
+	This program will process gps raw data and generate command to turning robot.
 
 Author:         Thirawat Bureetes(Thirawat.tam@gmail.com)
 Maintainer:     Thirawat Bureetes(Thirawat.tam@gmail.com)
-Version:        June 18, 2020
+Version:        November 10, 2020
 Status:         In progress
 ===============================================================================
 """
 
 import rospy
 from gps_pose.msg import GpsPose
+from minirover.msg import WheelSpeed
 
 import math
 import datetime
@@ -24,7 +25,6 @@ from dateutil.parser import parse
 class GpsNavigation:
 
     RADIAS = 6371000  # meters
-    # DTFORMAT = ''
 
     def __init__(self, dest_lat, dest_long):
         self.destination = GpsPose()
@@ -34,6 +34,7 @@ class GpsNavigation:
         self.prev_coordinate = None
 
         self.gps_data = GpsPose()
+        self.pub = rospy.Publisher('wheel_speed', WheelSpeed, queue_size=1)
         rospy.init_node('gps_pid_navigation', anonymous=True)
         rospy.Subscriber('gps_raw', GpsPose, self.gps_raw_callback)
         rospy.spin()
@@ -70,6 +71,8 @@ class GpsNavigation:
         print('Current Direction: {:.2f} degrees CCW'.format(
             current_direction))   
 
+        self.compute_next_commend(distance, target_direction, current_direction)
+
         print('---------------------------------------')
 
         self.prev_coordinate = self.gps_data
@@ -100,6 +103,24 @@ class GpsNavigation:
             heading += 360
 
         return heading
+    
+    def compute_next_commend(distance, target_direction, current_direction):
+        speed = WheelSpeed()
+        if distance < 5:    
+            WheelSpeed.left = 0
+            WheelSpeed.right = 0
+        
+        else:
+            diff_heading = target_direction - current_direction
+            if diff_heading > 0:
+                WheelSpeed.left = 0.6
+                WheelSpeed.right = 0.3
+            else:
+                WheelSpeed.left = 0.3
+                WheelSpeed.right = 0.6
+
+        self.pub.publish(speed)
+
 
 if __name__ == '__main__':
     destination_latitute = 30.46422
