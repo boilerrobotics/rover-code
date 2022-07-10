@@ -1,0 +1,28 @@
+Project specific style guide in addition to the PEP 8 standard
+
+"""
+===============================================================================
+Program Description 
+	This program takes input from the joystick and returns normalised speeds 
+    for each driving motor
+
+Author:         Jehan Shah, jehan.shah8@gmail.com
+Maintainer:     Jehan Shah, jehan.shah8@gmail.com
+Version:        March 31, 2020
+Status:         In progress
+===============================================================================
+"""
+
+def do_something(arg):
+    """
+    This function does ...
+    
+    Args:
+        arg (int): Meaningful description
+        
+    Returns:
+        list: my_list [1,6]
+    """
+    #Write your code here
+    
+    return my_list

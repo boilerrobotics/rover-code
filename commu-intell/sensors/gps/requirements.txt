@@ -1,0 +1,1 @@
+adafruit-circuitpython-gps==3.9.2

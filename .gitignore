@@ -1,2 +1,3 @@
-.vscode/settings.json
-venv
+.vscode/
+*.jpeg
+venv/

@@ -1,4 +1,5 @@
 Header Header
 string latitude
 string longitude
-float32 altitude
+string last_update
+float32 raw_speed
