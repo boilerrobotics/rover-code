@@ -1,4 +1,4 @@
-# BRC
+# Out of date. Ubuntu 22.04 and ROS2 version instruction will be released soon. 
 
 # For Communication and Intellgence 
 ### Setup ROS Melodic on Ubuntu 18.03 follwing this link: http://wiki.ros.org/melodic/Installation/Ubuntu 
@@ -7,5 +7,3 @@
 ### Run catkin_make 
 ### Run setup.bash 
 
-# You are good to go 
-#edit readme, testing testing
