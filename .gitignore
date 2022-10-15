@@ -1,3 +1,6 @@
 .vscode/
 *.jpeg
 venv/
+commu-intell/build
+commu-intell/install
+commu-intell/log
