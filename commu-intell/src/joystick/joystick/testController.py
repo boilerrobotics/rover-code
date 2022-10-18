@@ -7,12 +7,14 @@ import rclpy
 from rclpy.node import Node
 
 from example_interfaces.msg import Float64MultiArray
+
+
 class MyPublisher(Node):
 
     def __init__(self):
         super().__init__("myPublisher")
         self.publisher_ = self.create_publisher(Float64MultiArray, 'demo', 10)
-        timerPeriod = .5
+        timerPeriod = .1
         self.timer = self.create_timer(timerPeriod, self.timerCallback)
         self.i = 0
         self.message = ''
@@ -53,12 +55,18 @@ class MyPublisher(Node):
                 #         joyInputs[1] = 0
                 if event.axis == 1:
                     if abs(event.value) > 0.05:
-                        self.joyInputs[0] = -event.value 
+                        if abs(event.value) > 1:
+                            self.joyInputs[0] = float(round(event.value))
+                        else:
+                            self.joyInputs[0] = -event.value 
                     else: 
                         self.joyInputs[0] = 0.0
                 if event.axis == 4:
                     if abs(event.value) > 0.05:
-                        self.joyInputs[1] = -event.value 
+                        if abs(event.value) > 1:
+                            self.joyInputs[1] = float(round(event.value))
+                        else:
+                            self.joyInputs[1] = -event.value 
                     else: 
                         self.joyInputs[1] = 0.0
 
