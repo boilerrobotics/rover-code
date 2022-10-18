@@ -6,20 +6,21 @@ from pygame.locals import *
 import rclpy
 from rclpy.node import Node
 
-from std_msgs.msg import String
-
+from example_interfaces.msg import Float64MultiArray
 class MyPublisher(Node):
 
     def __init__(self):
         super().__init__("myPublisher")
-        self.publisher_ = self.create_publisher(String, 'demo', 10)
+        self.publisher_ = self.create_publisher(Float64MultiArray, 'demo', 10)
         timerPeriod = .5
         self.timer = self.create_timer(timerPeriod, self.timerCallback)
         self.i = 0
         self.message = ''
+        self.joyInputs = [0.0, 0.0]
     
     def timerCallback(self):
-        msg = String()
+        msg = Float64MultiArray()
+
 
         for event in pygame.event.get():
 
@@ -40,10 +41,30 @@ class MyPublisher(Node):
             #     self.get_logger().info(f'Publishing: "{msg.data}"')
 
             if event.type == JOYAXISMOTION:
-                if abs(event.value) > 0.1:
-                    msg.data = str(event.value)
-                    self.publisher_.publish(msg)
-                    self.get_logger().info(f'Publishing: "{msg.data}"')
+                # if event.axis == 0:
+                #     if abs(event.value) > 0.1:
+                #         joyInputs[0] = event.value 
+                #     else: 
+                #         joyInputs[0] = 0
+                # if event.axis == 3:
+                #     if abs(event.value) > 0.1:
+                #         joyInputs[1] = event.value 
+                #     else: 
+                #         joyInputs[1] = 0
+                if event.axis == 1:
+                    if abs(event.value) > 0.05:
+                        self.joyInputs[0] = -event.value 
+                    else: 
+                        self.joyInputs[0] = 0.0
+                if event.axis == 4:
+                    if abs(event.value) > 0.05:
+                        self.joyInputs[1] = -event.value 
+                    else: 
+                        self.joyInputs[1] = 0.0
+
+        msg.data = self.joyInputs
+        self.publisher_.publish(msg)
+        self.get_logger().info(f'Publishing: "{msg.data}"')
 
 
             # if event.type == JOYHATMOTION:
@@ -52,19 +73,6 @@ class MyPublisher(Node):
             #     self.publisher_.publish(msg)
             #     self.get_logger().info(f'Publishing: "{msg.data}"')
 
-            if event.type == QUIT:
-
-                pygame.quit()
-
-                sys.exit()
-
-            if event.type == KEYDOWN:
-
-                if event.key == K_ESCAPE:
-
-                    pygame.quit()
-
-                    sys.exit()
 
 pygame.init() 
 
