@@ -6,79 +6,47 @@ from pygame.locals import *
 import rclpy
 from rclpy.node import Node
 
-from example_interfaces.msg import Float64MultiArray
-
+from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Vector3
 
 class MyPublisher(Node):
 
     def __init__(self):
-        super().__init__("myPublisher")
-        self.publisher_ = self.create_publisher(Float64MultiArray, 'demo', 10)
+        super().__init__("joystick")
+        self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
         timerPeriod = .1
         self.timer = self.create_timer(timerPeriod, self.timerCallback)
-        self.joyInputs = [0.0, 0.0]
-    
-    def timerCallback(self):
-        msg = Float64MultiArray()
+        self.leftInputs = Vector3()
+        self.rightInputs = Vector3()
 
+
+    def timerCallback(self):
+        msg = Twist()
 
         for event in pygame.event.get():
 
-            # msg.data = str(event)
-            # self.publisher_.publish(msg)
-            # self.get_logger().info(f'Publishing: "{msg.data}"')
-
-            # if event.type == JOYBUTTONDOWN:
-
-            #     msg.data = str(event)
-            #     self.publisher_.publish(msg)
-            #     self.get_logger().info(f'Publishing: "{msg.data}"')
-
-            # if event.type == JOYBUTTONUP:
-
-            #     msg.data = str(event)
-            #     self.publisher_.publish(msg)
-            #     self.get_logger().info(f'Publishing: "{msg.data}"')
-
             if event.type == JOYAXISMOTION:
-                # if event.axis == 0:
-                #     if abs(event.value) > 0.1:
-                #         joyInputs[0] = event.value 
-                #     else: 
-                #         joyInputs[0] = 0
-                # if event.axis == 3:
-                #     if abs(event.value) > 0.1:
-                #         joyInputs[1] = event.value 
-                #     else: 
-                #         joyInputs[1] = 0
                 if event.axis == 1:
                     if abs(event.value) > 0.05:
                         if abs(event.value) > 1:
-                            self.joyInputs[0] = float(round(-event.value))
+                            self.leftInputs.x = float(round(-event.value))
                         else:
-                            self.joyInputs[0] = -event.value 
+                            self.leftInputs.x = -event.value 
                     else: 
-                        self.joyInputs[0] = 0.0
+                        self.leftInputs.x = 0.0
                 if event.axis == 4:
                     if abs(event.value) > 0.05:
                         if abs(event.value) > 1:
-                            self.joyInputs[1] = float(round(-event.value))
+                            self.rightInputs.z = float(round(-event.value))
                         else:
-                            self.joyInputs[1] = -event.value 
+                            self.rightInputs.z = -event.value 
                     else: 
-                        self.joyInputs[1] = 0.0
+                        self.rightInputs.z = 0.0
 
-        msg.data = self.joyInputs
+        msg.linear = self.leftInputs
+        msg.angular = self.rightInputs
         self.publisher_.publish(msg)
-        self.get_logger().info(f'Publishing: "{msg.data}"')
-
-
-            # if event.type == JOYHATMOTION:
-
-            #     msg.data = str(event)
-            #     self.publisher_.publish(msg)
-            #     self.get_logger().info(f'Publishing: "{msg.data}"')
-
+        self.get_logger().info(f'Publishing: "{msg}"')
 
 pygame.init() 
 

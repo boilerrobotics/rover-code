@@ -82,10 +82,8 @@ class MiniRover(Node):
 
     def cmd_callback(self, cmd):
 
-        speed_diff = cmd.angular.z / 2
-
-        left_speed = self.clamp(cmd.linear.x - speed_diff, -1, 1)
-        right_speed = self.clamp(cmd.linear.x + speed_diff, -1, 1)
+        left_speed = self.clamp(cmd.linear.x, -1, 1)
+        right_speed = self.clamp(cmd.angular.z, -1, 1)
 
         self.get_logger().info(f'Left Speed: {left_speed} Right Speed: {right_speed}')
 
