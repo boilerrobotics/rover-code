@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'joystick = joystick.testController:main',
+            'listener = joystick.mySubscriber:main',
         ],
     },
 )

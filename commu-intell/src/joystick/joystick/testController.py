@@ -16,8 +16,6 @@ class MyPublisher(Node):
         self.publisher_ = self.create_publisher(Float64MultiArray, 'demo', 10)
         timerPeriod = .1
         self.timer = self.create_timer(timerPeriod, self.timerCallback)
-        self.i = 0
-        self.message = ''
         self.joyInputs = [0.0, 0.0]
     
     def timerCallback(self):
@@ -56,7 +54,7 @@ class MyPublisher(Node):
                 if event.axis == 1:
                     if abs(event.value) > 0.05:
                         if abs(event.value) > 1:
-                            self.joyInputs[0] = float(round(event.value))
+                            self.joyInputs[0] = float(round(-event.value))
                         else:
                             self.joyInputs[0] = -event.value 
                     else: 
@@ -64,7 +62,7 @@ class MyPublisher(Node):
                 if event.axis == 4:
                     if abs(event.value) > 0.05:
                         if abs(event.value) > 1:
-                            self.joyInputs[1] = float(round(event.value))
+                            self.joyInputs[1] = float(round(-event.value))
                         else:
                             self.joyInputs[1] = -event.value 
                     else: 
@@ -103,3 +101,6 @@ def main(args = None):
 
     myPublisher.destroy_node()
     rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
