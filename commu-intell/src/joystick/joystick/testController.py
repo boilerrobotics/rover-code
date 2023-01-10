@@ -29,17 +29,17 @@ class MyPublisher(Node):
                 if event.axis == 1:
                     if abs(event.value) > 0.05:
                         if abs(event.value) > 1:
-                            self.leftInputs.x = float(round(-event.value))
+                            self.leftInputs.x = float(round(event.value))
                         else:
-                            self.leftInputs.x = -event.value 
+                            self.leftInputs.x = event.value 
                     else: 
                         self.leftInputs.x = 0.0
-                if event.axis == 4:
+                if event.axis == 3:
                     if abs(event.value) > 0.05:
                         if abs(event.value) > 1:
-                            self.rightInputs.z = float(round(-event.value))
+                            self.rightInputs.z = float(round(event.value))
                         else:
-                            self.rightInputs.z = -event.value 
+                            self.rightInputs.z = event.value 
                     else: 
                         self.rightInputs.z = 0.0
 
