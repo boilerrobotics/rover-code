@@ -1,3 +1,0 @@
-<launch>
-    <node name="usb_cam_window" pkg="rqt_image_view" type="rqt_image_view" args="/usb_cam/image_raw"/>
-</launch>
