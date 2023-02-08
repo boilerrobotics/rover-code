@@ -1,3 +1,10 @@
 .vscode/
 *.jpeg
 venv/
+commu-intell/build
+commu-intell/install
+commu-intell/log
+build
+install
+commu-intell/src/test_cam/
+log/
