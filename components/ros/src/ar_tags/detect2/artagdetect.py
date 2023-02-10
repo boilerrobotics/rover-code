@@ -17,8 +17,7 @@ def parse_coords(corners):
         y = int(str(cd[1]).split('.')[0])
         coords.append([x, y])
     return coords
-
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 detected_dict = {}
 id_set = list()
 corner_set = list()
@@ -40,8 +39,8 @@ while (True):
         '''
 
     # lists of ids and the corners beloning to each id
-    corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict, parameters=parameters) 
-    # frame_markers = aruco.drawDetectedMarkers(frame.copy(), corners, ids)
+    corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+    frame_markers = aruco.drawDetectedMarkers(frame.copy(), corners, ids)
     # For a single marker
     # markerLength = 1
     # rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners, markerLength, camera_matrix, dist_coeffs)
@@ -53,16 +52,17 @@ while (True):
     # ypr = cv2.RQDecomp3x3(rotM)
 
     if ids is not None:
-        print('------------')
         ids = tuple(ids.tolist())
         coords = parse_coords(list(tuple(corners)[0][0]))
         # print(coords)
         tagmid = (coords[0][0] + coords[1][0] + coords[2][0] + coords[3][0]) / 4
-        # print(tagmid)
-        # if ids not in id_set:
-        #     if(tagmid >= 220 and tagmid < 440):
-        #         id_set.append(ids)
-        #         corner_set.append(tuple(corners))
+
+        print("********************************")
+        print(tagmid)
+        if ids not in id_set:
+            if(tagmid >= 220 and tagmid < 440):
+                id_set.append(ids)
+                corner_set.append(tuple(corners))
         if tagmid < 220:
             seg = -1
             print(f"ID: {ids[0][0]}\nCoords: {coords}\nSegment: {seg}")
@@ -86,7 +86,8 @@ while (True):
                 genperc2 = 0
             seg = 0
             if all(x < 0.05 for x in [widthperc1, widthperc2, heightperc1, heightperc2, genperc1, genperc2]):
-                tagside = 5 # cm
+                tagside = 20 # cm
+                # URC regulated dimension of tag is 20cm x 20cm
                 tagarea = tagside**2
                 captureside = abs(coords[0][0] - coords[1][0]) * 0.0264583333
                 coeff = tagside * 18.1 - 6
@@ -97,14 +98,15 @@ while (True):
         else:
             seg = 1
             print(f"ID: {ids[0][0]}\nCoords: {coords}\nSegment: {seg}")
-    # if len(id_set) == 5:
-    #     break
+        print("********************************\n")
+    if len(id_set) == 5:
+        break
 
-    # # print(ids)
-    # # print(corners)
-    # # print(x)
-    # # print(y)
-    # # print(ypr)
+    # print(ids)
+    # print(corners)
+    # print(x)
+    # print(y)
+    # print(ypr)
 
     gray = aruco.drawDetectedMarkers(gray, corners)
 
