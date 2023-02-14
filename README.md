@@ -1,9 +1,12 @@
-# Out of date. Ubuntu 22.04 and ROS2 version instruction will be released soon. 
-
 # For Communication and Intellgence 
-### Setup ROS Melodic on Ubuntu 18.03 follwing this link: http://wiki.ros.org/melodic/Installation/Ubuntu 
-### Clone this project into your machine 
-### Go to commu-intell -> ros 
-### Run catkin_make 
-### Run setup.bash 
+
+
+### Make sure to work on branches instead of master. 
+
+<ul>
+    <li> <b>components.</b> This folder is for individual parts, components, or experiments
+    <li> <b>rover.</b> This folder contains the code that will be running on the rover. It is ROS2 base. 
+    <li> <b>base-station.</b> This is a folder for base station including GUI.
+</ul>
+
 
