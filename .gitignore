@@ -8,3 +8,4 @@ build
 install
 commu-intell/src/test_cam/
 log/
+rover/python=3.8/
