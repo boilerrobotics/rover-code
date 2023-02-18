@@ -16,7 +16,8 @@ class MotorDriver(Node):
             10)
         self.my_drive = odrive.find_any()
         self.my_drive.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
-        self.vel_lim = self.my_drive.axis0.controller.config.vel_limit - .2
+        print(f'Connected to ODrive serial {self.my_drive.serial_number}')
+        self.vel_lim = self.my_drive.axis0.controller.config.vel_limit - 0.2
 
         self.cmd  # prevent unused variable warning
 
@@ -25,7 +26,9 @@ class MotorDriver(Node):
         left_speed = cmd.linear.x
         right_speed = cmd.angular.z
 
-        self.get_logger().info(f'Left Speed: {left_speed} Right Speed: {right_speed}')
+        self.get_logger().info(
+            f'Left Speed: {left_speed} Right Speed: {right_speed}'
+        )
 
         self.my_drive.axis0.controller.input_vel = left_speed * self.vel_lim
 
