@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'motortest = motortest.subscriber_member_function:main',
+            'motortest = motortest.motortest:main',
         ],
     },
 )

@@ -14,15 +14,14 @@ class MotorDriver(Node):
             'cmd_vel',
             self.cmd_callback,
             10)
-        self.my_drive = odrive.find_any()
-        self.my_drive.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
-        print(f'Connected to ODrive serial {self.my_drive.serial_number}')
-        self.vel_lim = self.my_drive.axis0.controller.config.vel_limit - 0.2
-
-        self.cmd  # prevent unused variable warning
+        self.driver = odrive.find_any()
+        self.driver.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
+        print(f'Connected to ODrive serial {self.driver.serial_number}')
+        self.vel_lim = self.driver.axis0.controller.config.vel_limit - 0.2
+        print(f'Speeed limit: {self.vel_lim} rpm')
+        # self.cmd  # prevent unused variable warning
 
     def cmd_callback(self, cmd):
-
         left_speed = cmd.linear.x
         right_speed = cmd.angular.z
 
@@ -30,7 +29,7 @@ class MotorDriver(Node):
             f'Left Speed: {left_speed} Right Speed: {right_speed}'
         )
 
-        self.my_drive.axis0.controller.input_vel = left_speed * self.vel_lim
+        self.driver.axis0.controller.input_vel = left_speed * self.vel_lim
 
 def main(args=None):
     rclpy.init(args=args)

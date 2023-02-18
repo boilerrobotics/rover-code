@@ -46,13 +46,17 @@ class MyPublisher(Node):
         msg.linear = self.leftInputs
         msg.angular = self.rightInputs
         self.publisher_.publish(msg)
-        self.get_logger().info(f'Publishing: "{msg}"')
+        self.get_logger().info(
+            f'Publishing: Linear: {msg.linear.x} Angular: {msg.angular.z}'
+        )
 
 pygame.init() 
 
 pygame.joystick.init()
 
-joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
+joysticks = [
+    pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())
+]
 
 for joystick in joysticks:
 
