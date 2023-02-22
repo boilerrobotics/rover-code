@@ -14,7 +14,13 @@ class MotorDriver(Node):
             'cmd_vel',
             self.cmd_callback,
             10)
-        self.driver = odrive.find_any()
+        self.driver = odrive.find_any(serial_number="208E31834E53")
+
+        #Right: 206737A14152
+        #35627687035218
+        #Left: 208E31834E53
+        #35795088133715
+
         self.driver.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
         print(f'Connected to ODrive serial {self.driver.serial_number}')
         self.vel_lim = self.driver.axis0.controller.config.vel_limit - 0.2

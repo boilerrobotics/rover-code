@@ -4,14 +4,30 @@ import time
 
 # Find a connected ODrive (this will block until you connect one)
 print("finding an odrive...")
-my_drive = odrive.find_any()
+left = odrive.find_any(serial_number="208E31834E53")
+print("finding another odrive...")
+right = odrive.find_any(serial_number="206737A14152")
 
-print(f'Axis error code = {my_drive.axis0.error}')
-print(f'Encoder error code = {my_drive.axis0.encoder.error}')
+#Right: 206737A14152
+#35627687035218
+#Left: 208E31834E53
+#35795088133715
 
-my_drive.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
+# print(f'Axis error code = {my_drive.axis0.error}')
+# print(f'Encoder error code = {my_drive.axis0.encoder.error}')
 
-my_drive.axis0.controller.input_vel = 2
+left.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
+right.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
+left.axis1.requested_state = AxisState.CLOSED_LOOP_CONTROL
+right.axis1.requested_state = AxisState.CLOSED_LOOP_CONTROL
+
+
+left.axis0.controller.input_vel = 2
+right.axis0.controller.input_vel = 2
+left.axis1.controller.input_vel = 2
+right.axis1.controller.input_vel = 2
 time.sleep(3)
-my_drive.axis0.controller.input_vel = 0
-
+left.axis0.controller.input_vel = 0
+right.axis0.controller.input_vel = 0
+left.axis1.controller.input_vel = 0
+right.axis1.controller.input_vel = 0
