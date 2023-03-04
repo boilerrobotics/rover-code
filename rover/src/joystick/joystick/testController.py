@@ -34,7 +34,7 @@ class MyPublisher(Node):
                             self.leftInputs.x = event.value 
                     else: 
                         self.leftInputs.x = 0.0
-                if event.axis == 3:
+                if event.axis == 4:
                     if abs(event.value) > 0.05:
                         if abs(event.value) > 1:
                             self.rightInputs.z = float(round(event.value))
