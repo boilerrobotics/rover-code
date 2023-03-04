@@ -11,7 +11,7 @@ print(my_drive.vbus_voltage)
 
 print(f'Axis error code = {my_drive.axis0.error}')
 print(f'Encoder error code = {my_drive.axis0.encoder.error}')
-with open('pre-cal.txt', 'x') as f:
+with open('pre-cal.txt', 'w') as f:
     f.write(f'Axis: \n')
     f.write(str(my_drive.axis0.config))
     f.write('\n\n---------------------------\n\n')
@@ -30,7 +30,7 @@ while AxisState(my_drive.axis0.current_state) != AxisState.IDLE:
 
 print(f'Axis error code = {my_drive.axis0.error}')
 print(f'Encoder error code = {my_drive.axis0.encoder.error}')
-with open('post-cal.txt', 'x') as f:
+with open('post-cal.txt', 'w') as f:
     f.write(f'Axis: \n')
     f.write(str(my_drive.axis0.config))
     f.write('\n\n---------------------------\n\n')
@@ -42,6 +42,7 @@ with open('post-cal.txt', 'x') as f:
 
 my_drive.axis0.requested_state = AxisState.CLOSED_LOOP_CONTROL
 
+my_drive.axis0.controller.config.vel_limit = 10
 my_drive.axis0.controller.input_vel = 2
 time.sleep(3)
 my_drive.axis0.controller.input_vel = 0
