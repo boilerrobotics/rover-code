@@ -41,7 +41,7 @@ client.on_connect = on_connect
 client.on_disconnect = on_disconnect
 client.on_publish = on_publish
 # Start connection with non-blocking. The process will go on
-client.connect_async("localhost", 1883, 60) 
+client.connect_async('66.253.158.154', 1883, 60) 
 client.loop_start()
 attemp = 0
 while not client.is_connected() and attemp < 15: # Verify the connection
