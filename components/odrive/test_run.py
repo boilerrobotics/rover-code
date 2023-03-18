@@ -3,7 +3,6 @@ This code is for testing odrive functionality.
 ** Need to impliment using async **
 '''
 import time
-
 import utils
 from odrive.enums import *
 
