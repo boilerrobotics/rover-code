@@ -9,6 +9,19 @@ def dump_config(odrv, filename) -> None:
     '''
     with open(filename, 'w+') as fp:
         print(str(odrv), file=fp)
+        print(f'{"---"*10}odrive config{"---"*10}', file=fp)
+        print(str(odrv.config), file=fp)
+        for i, axis in enumerate([odrv.axis0, odrv.axis1]):
+            print(f'{"---"*10}odrive axis{i}{"---"*10}', file=fp)
+            print(str(axis), file=fp)
+            print(f'{"---"*10}odrive axis{i} config{"---"*10}', file=fp)
+            print(str(axis.config), file=fp)
+            print(f'{"---"*10}odrive axis{i} controller config{"---"*10}', file=fp)
+            print(str(axis.controller.config), file=fp)
+            print(f'{"---"*10}odrive axis{i} motor config{"---"*10}', file=fp)
+            print(str(axis.motor.config), file=fp)
+            print(f'{"---"*10}odrive axis{i} encoder config{"---"*10}', file=fp)
+            print(str(axis.encoder.config), file=fp)
 
 def config_controler(controller) -> None:
     controller.config.control_mode = ControlMode.VELOCITY_CONTROL
@@ -29,7 +42,7 @@ def config_encoder(encoder) -> None:
     encoder.config.cpr = 42
     encoder.config.pre_calibrated = True
     encoder.config.bandwidth = 100
-    encoder.config.calib_scan_distance = 300
+    encoder.config.calib_scan_distance = 100
 
 odrvs = utils.find_odrvs()
 for section, odrv in odrvs.items(): 
