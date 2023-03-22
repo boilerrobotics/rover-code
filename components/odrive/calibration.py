@@ -23,7 +23,7 @@ def dump_config(odrv, filename) -> None:
             print(f'{"---"*10}odrive axis{i} encoder config{"---"*10}', file=fp)
             print(str(axis.encoder.config), file=fp)
 
-def config_controler(controller) -> None:
+def config_controller(controller) -> None:
     controller.config.control_mode = ControlMode.VELOCITY_CONTROL
     controller.config.vel_limit = 10
 
@@ -50,7 +50,7 @@ for section, odrv in odrvs.items():
     dump_config(odrv, filename=f'{section}-precal.txt')
     print(f'Calicating {section}...')    
     for axis in [odrv.axis0, odrv.axis1]:
-        config_controler(axis.controller)
+        config_controller(axis.controller)
         config_motor(axis.motor)
         config_encoder(axis.encoder)
         axis.requested_state = AxisState.FULL_CALIBRATION_SEQUENCE

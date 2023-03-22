@@ -1,8 +1,33 @@
+#Motors run fine initially before hitting a current limit error :(
+
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 import odrive
 from odrive.enums import *
+import yaml
+
+def find_odrvs() -> dict:
+    '''
+    This function will find ODrive that serial numbers are list
+    in the config.yml. Need to improve to async operation.
+    '''
+    with open('src/motortest/motortest/config.yml') as fp:
+        config = yaml.safe_load(fp) 
+
+    print("finding odrives...")
+    odrvs = {} # Looking for avaiable ODrive
+    for section, serial in config['serial'].items():
+        print(f'searching for serial number {serial}...')
+        try: 
+            odrv = odrive.find_any(serial_number=serial, timeout=10)
+            odrvs[section] = odrv
+            print(f'-> assign odrive {serial} to {section} section')
+        except TimeoutError as e:
+            print(f'error: Cannot find serial {serial} !!')
+    print('--------------------------------------')
+
+    return odrvs
 
 class MotorDriver(Node):
 
@@ -14,30 +39,26 @@ class MotorDriver(Node):
             'cmd_vel',
             self.cmd_callback,
             10)
-        print("finding odrives...")
-        right_serial = "206737A14152"
-        left_serial = "208E31834E53"
-        front_serial = "2071316B4E53"
+        self.odrvs = find_odrvs()
 
-        #Right: 206737A14152
-        #35627687035218
-        #Left: 208E31834E53
-        #35795088133715
-
-        #self.right_drive = odrive.find_any(serial_number = right_serial)
-        #self.left_drive = odrive.find_any(serial_number = left_serial)
-        self.front_drive = odrive.find_any(serial_number = front_serial)
-        self.axes = [self.front_drive.axis0, self.front_drive.axis1]#[self.right_drive.axis0, self.right_drive.axis1, self.left_drive.axis0, self.left_drive.axis1, self.front_drive.axis0, self.front_drive.axis1]
-        self.left_motors = [self.front_drive.axis0]#[self.right_drive.axis0, self.right_drive.axis1, self.front_drive.axis0] #Assumes front 0 is on the right
-        self.right_motors = [self.front_drive.axis1]#[self.left_drive.axis0, self.left_drive.axis1, self.front_drive.axis1]
-
-        self.drives = [self.front_drive]#[self.right_drive, self.left_drive, self.front_drive]
-        for axis in self.axes:
+        self.left_motors = []
+        self.right_motors = []
+        for section, odrv in self.odrvs.items(): 
+            if section == 'front':
+                self.left_motors.append(odrv.axis0)
+                self.right_motors.append(odrv.axis1)
+            elif section == 'left':
+                self.left_motors.extend([odrv.axis0, odrv.axis1])
+            elif section == 'right':
+                self.right_motors.extend([odrv.axis0, odrv.axis1])
+ 
+        for axis in self.right_motors:
             axis.requested_state = AxisState.CLOSED_LOOP_CONTROL
-        for drive in self.drives:
-            print(f'Connected to ODrive serial {drive.serial_number}')
-        self.vel_lim = self.front_drive.axis0.controller.config.vel_limit - 0.5
-        print(f'Speeed limit: {self.vel_lim} rpm')
+        for axis in self.left_motors:
+            axis.requested_state = AxisState.CLOSED_LOOP_CONTROL
+        self.vel_lim = self.odrvs['right'].axis0.controller.config.vel_limit - 1
+        print(self.right_motors)
+        print(f'Speed limit: {self.vel_lim} rpm')
         # self.cmd  # prevent unused variable warning
 
     def cmd_callback(self, cmd):
@@ -51,6 +72,7 @@ class MotorDriver(Node):
             motor.controller.input_vel = -left_speed * self.vel_lim
         for motor in self.right_motors:
             motor.controller.input_vel = right_speed * self.vel_lim
+            print(motor.controller.input_vel)
 
 def main(args=None):
     rclpy.init(args=args)

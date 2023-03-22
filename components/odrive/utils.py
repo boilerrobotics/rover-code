@@ -17,7 +17,7 @@ def find_odrvs() -> dict:
     This function will find ODrive that serial numbers are list
     in the config.yml. Need to improve to async operation.
     '''
-    with open('config.yml') as fp:
+    with open('components/odrive/config.yml') as fp:
         config = yaml.safe_load(fp) 
 
     print("finding odrives...")
@@ -25,7 +25,7 @@ def find_odrvs() -> dict:
     for section, serial in config['serial'].items():
         print(f'searching for serial number {serial}...')
         try: 
-            odrv = odrive.find_any(serial_number=serial, timeout=1)
+            odrv = odrive.find_any(serial_number=serial, timeout=10)
             odrvs[section] = odrv
             print(f'-> assign odrive {serial} to {section} section')
             print(f'-> ', end='')
