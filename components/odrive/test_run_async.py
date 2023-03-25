@@ -9,7 +9,7 @@ import asyncio
 from utils import check_version
 from odrive.enums import *
 
-def find_odrvs() -> dict:
+async def find_odrvs() -> dict:
     '''
     This function will find ODrive that serial numbers are list
     in the config.yml. Need to improve to async operation.
@@ -22,12 +22,15 @@ def find_odrvs() -> dict:
     for section, serial in config['serial'].items():
         print(f'searching for serial number {serial}...')
         try: 
-            odrv = odrive.find_any_async(serial_number=serial)
+            odrv = await asyncio.wait_for(
+                odrive.find_any_async(serial_number=serial),
+                timeout=5 # Wait for 5 seconds
+            )
             odrvs[section] = odrv
             print(f'-> assign odrive {serial} to {section} section')
             print(f'-> ', end='')
             check_version(odrv)
-        except TimeoutError as e:
+        except asyncio.TimeoutError as e:
             print(f'error: Cannot find serial {serial} !!')
     print('--------------------------------------')
 
@@ -78,5 +81,5 @@ def test_run(odrvs, running_time=5, running_speed=3) -> None:
 -------------------------------------------------------------------------------
 '''
 if __name__ == '__main__':
-    odrvs = utils.find_odrvs()
+    odrvs = asyncio.run(find_odrvs())
     test_run(odrvs, running_time=5, running_speed=3) # Call test run fucntion
