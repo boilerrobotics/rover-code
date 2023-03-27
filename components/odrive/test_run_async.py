@@ -9,7 +9,7 @@ import asyncio
 from utils import check_version
 from odrive.enums import *
 
-async def find_odrvs() -> dict:
+def find_odrvs() -> dict:
     '''
     This function will find ODrive that serial numbers are list
     in the config.yml. Need to improve to async operation.
@@ -22,15 +22,12 @@ async def find_odrvs() -> dict:
     for section, serial in config['serial'].items():
         print(f'searching for serial number {serial}...')
         try: 
-            odrv = await asyncio.wait_for(
-                odrive.find_any_async(serial_number=serial),
-                timeout=5 # Wait for 5 seconds
-            )
+            odrv = odrive.find_any_async(serial_number=serial)
             odrvs[section] = odrv
             print(f'-> assign odrive {serial} to {section} section')
             print(f'-> ', end='')
             check_version(odrv)
-        except asyncio.TimeoutError as e:
+        except TimeoutError as e:
             print(f'error: Cannot find serial {serial} !!')
     print('--------------------------------------')
 
@@ -69,17 +66,18 @@ def run_seconds(odrv, running_time: int, running_speed: int = 3,
         utils.print_voltage_current(odrv)
         time.sleep(debug_interval)
 
-def test_run(odrvs, running_time=5, running_speed=3) -> None:
+async def test_run(odrv, running_time=5, running_speed=3) -> None:
     '''
-    Take a dictionary of section:odrive and perform test run.
+    Test run asynchronously. Take one odrive at a time
     '''
-    for section, odrv in odrvs.items(): 
-        utils.check_error(odrv, section) # Checking errors
-        print(f'Test run {section}...')    
-        run_seconds(odrv, running_time, running_speed) # Test run
+    utils.check_error(odrv) # Checking errors
+    run_seconds(odrv, running_time, running_speed) # Test run
+    
 ''' 
 -------------------------------------------------------------------------------
 '''
 if __name__ == '__main__':
-    odrvs = asyncio.run(find_odrvs())
+    odrvs = utils.find_odrvs()
+    # Need to find a way to execute only avialable odrive
+    # print(f'Test run {section}...')   
     test_run(odrvs, running_time=5, running_speed=3) # Call test run fucntion
