@@ -57,7 +57,6 @@ class MotorDriver(Node):
         for axis in self.left_motors:
             axis.requested_state = AxisState.CLOSED_LOOP_CONTROL
         self.vel_lim = self.odrvs['right'].axis0.controller.config.vel_limit - 1
-        print(self.right_motors)
         print(f'Speed limit: {self.vel_lim} rpm')
         # self.cmd  # prevent unused variable warning
 
