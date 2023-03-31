@@ -9,19 +9,23 @@ import { Subscription } from 'rxjs';
 })
 export class AppComponent implements OnDestroy{
   title = 'Boiler Robotics';
-  private subscription!: Subscription;
+  private forDebug!: Subscription; // For print out all incoming messages 
   public message!: string;
 
+  // Need to use onConnect to check connection status
+
   constructor(private _mqttService: MqttService) { 
-    this.subscription = this._mqttService.observe('brc')
+    this.forDebug = this._mqttService.observe('brc/#')
     .subscribe((message: IMqttMessage) => {
-      this.message = message.payload.toString();
-      console.log(this.message);
+      this.message = message.payload.toString();    
+      console.log(`Recieved ${this.message} from topic` +
+        `${message.topic.toString()}`
+      );
     });
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.forDebug.unsubscribe();
   }
 
 }
