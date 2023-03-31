@@ -6,8 +6,8 @@ import { AppComponent } from './app.component';
 
 import { MqttModule, IMqttServiceOptions } from 'ngx-mqtt';
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
-  hostname: 'broker.mqttdashboard.com',
-  port: 8000,
+  hostname: '66.253.158.154',
+  port: 9001,
   protocol: 'ws',
   path: '/mqtt'
 }
