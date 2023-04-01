@@ -16,15 +16,16 @@ def dump_config(odrv, filename) -> None:
             print(str(axis), file=fp)
             print(f'{"---"*10}odrive axis{i} config{"---"*10}', file=fp)
             print(str(axis.config), file=fp)
-            print(f'{"---"*10}odrive axis{i} controller config{"---"*10}', file=fp)
+            print(f'{"---"*10}odrive axis{i} controller{"---"*10}', file=fp)
             print(str(axis.controller.config), file=fp)
-            print(f'{"---"*10}odrive axis{i} motor config{"---"*10}', file=fp)
+            print(f'{"---"*10}odrive axis{i} motor{"---"*10}', file=fp)
             print(str(axis.motor.config), file=fp)
-            print(f'{"---"*10}odrive axis{i} encoder config{"---"*10}', file=fp)
+            print(f'{"---"*10}odrive axis{i} encoder{"---"*10}', file=fp)
             print(str(axis.encoder.config), file=fp)
 
 def config_controller(controller) -> None:
     controller.config.control_mode = ControlMode.VELOCITY_CONTROL
+    controller.config.pos_gain = 1
     controller.config.vel_limit = 10
 
 def config_motor(motor) -> None:
@@ -40,15 +41,16 @@ def config_motor(motor) -> None:
 def config_encoder(encoder) -> None:
     encoder.config.mode = EncoderMode.HALL
     encoder.config.cpr = 42
-    encoder.config.pre_calibrated = True
+    encoder.config.pre_calibrated = False
     encoder.config.bandwidth = 100
-    encoder.config.calib_scan_distance = 100
+    encoder.config.calib_scan_distance = 150
 
 odrvs = utils.find_odrvs()
 for section, odrv in odrvs.items(): 
     utils.check_error(odrv, section) # Checking errors
     dump_config(odrv, filename=f'{section}-precal.txt')
     print(f'Calicating {section}...')    
+    odrv.config.brake_resistance = 0.5
     for axis in [odrv.axis0, odrv.axis1]:
         config_controller(axis.controller)
         config_motor(axis.motor)
@@ -57,7 +59,8 @@ for section, odrv in odrvs.items():
         while axis.current_state != AxisState.IDLE:
             utils.print_voltage_current(odrv)
             time.sleep(1)
-        utils.check_error(odrv, section) # Check error again 
+        utils.check_error(odrv, section) # Check error again
+    odrv.save_configuration() 
     dump_config(odrv, filename=f'{section}-postcal.txt')
     print(f'Section {section} calibration completed')
 print('Test run ...')

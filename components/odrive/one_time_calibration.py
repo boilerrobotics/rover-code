@@ -7,14 +7,10 @@ import time
 odrvs = utils.find_odrvs()
 
 for section, odrv in odrvs.items(): 
-    utils.check_error(odrv, section) # Checking errors
-    print(f'Calicating {section}...')    
+    utils.check_error(odrv, section)
+    print(f'Calibating {section}...')    
 
     for axis in [odrv.axis0, odrv.axis1]:
-        #print(f"Calibrating {axis}")
-        print(f'Axis error code = {axis.error}')
-        print(f'Encoder error code = {axis.encoder.error}')
-
         axis.encoder.config.use_index = True
         axis.requested_state = AxisState.ENCODER_INDEX_SEARCH
         while axis.current_state != AxisState.IDLE:
@@ -26,4 +22,5 @@ for section, odrv in odrvs.items():
             time.sleep(1)
         axis.encoder.config.pre_calibrated = True
         axis.motor.config.pre_calibrated = True
+        utils.check_error(odrv, section)
     odrv.save_configuration()
