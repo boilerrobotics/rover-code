@@ -10,3 +10,4 @@ commu-intell/src/test_cam/
 log/
 *.txt
 *.pyc
+components/odrive/temp.py
