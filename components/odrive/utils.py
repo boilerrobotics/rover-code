@@ -39,19 +39,21 @@ def find_odrvs() -> dict:
 
 def check_error(odrv, name: str | None = None) -> None:
     '''
-    This function will print the error. Need to print texts instead of numbers.
+    This function will print the error
     '''
     if name is not None: 
         print(f'{name} odrive checking...') 
     print_voltage_current(odrv)
     print(f'  {"error code:":<12}axis0{" "*27}| axis1')
-    # How can we get error code from enum
-    print(f'  {"controller":<10}  {ControllerError(odrv.axis0.controller.error).name:31} | '
-        f'{ControllerError(odrv.axis1.controller.error).name:15}')
-    print(f'  {"encoder":<10}  {EncoderError(odrv.axis0.encoder.error).name:31} | '
-        f'{EncoderError(odrv.axis1.encoder.error).name:15}')
-    print(f'  {"motor":<10}  {MotorError(odrv.axis0.motor.error).name:31} | '
-        f'{MotorError(odrv.axis1.motor.error).name:15}')
+    print(f'  {"controller":<10}  '
+          f'{ControllerError(odrv.axis0.controller.error).name:31} | '
+          f'{ControllerError(odrv.axis1.controller.error).name:15}')
+    print(f'  {"encoder":<10}  '
+          f'{EncoderError(odrv.axis0.encoder.error).name:31} | '
+          f'{EncoderError(odrv.axis1.encoder.error).name:15}')
+    print(f'  {"motor":<10}  '
+          f'{MotorError(odrv.axis0.motor.error).name:31} | '
+          f'{MotorError(odrv.axis1.motor.error).name:15}')
     print('--------------------------------------')
 
 def check_version(odrv) -> None:
