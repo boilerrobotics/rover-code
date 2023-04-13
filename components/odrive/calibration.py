@@ -45,7 +45,33 @@ def config_encoder(encoder) -> None:
     encoder.config.bandwidth = 100
     encoder.config.calib_scan_distance = 150
 
-def run_calib(odrvs):
+def pre_calibration_on(odrvs):
+    '''
+    Set configuration to use pre-calibration profile.
+    '''
+    for section, odrv in odrvs.items(): 
+        utils.check_error(odrv, section)
+        print(f'Calibating {section}...')    
+
+        for axis in [odrv.axis0, odrv.axis1]:
+            axis.encoder.config.use_index = True
+            axis.requested_state = AxisState.ENCODER_INDEX_SEARCH
+            while axis.current_state != AxisState.IDLE:
+                utils.print_voltage_current(odrv)
+                time.sleep(1)
+            axis.requested_state = AxisState.ENCODER_OFFSET_CALIBRATION
+            while axis.current_state != AxisState.IDLE:
+                utils.print_voltage_current(odrv)
+                time.sleep(1)
+            axis.encoder.config.pre_calibrated = True
+            axis.motor.config.pre_calibrated = True
+            utils.check_error(odrv, section)
+        odrv.save_configuration()
+
+def full_calibration(odrvs):
+    '''
+    Full calibration sequence.
+    '''
     for section, odrv in odrvs.items(): 
         utils.check_error(odrv, section) # Checking errors
         dump_config(odrv, filename=f'{section}-precal.txt')
@@ -66,5 +92,12 @@ def run_calib(odrvs):
 
 if __name__ == '__main__':
     odrvs = utils.find_odrvs()
-    run_calib(odrvs)
+    print('Running Calibration ...')
+    full_calibration(odrvs)
+    print('Test run ...')
+    test_run.test_run(odrvs, running_time=5, running_speed=3)
+    print('Setting pre-calibration ...')
+    pre_calibration_on(odrvs)
+    print('Test run ...')
+    test_run.test_run(odrvs, running_time=5, running_speed=3)
 
