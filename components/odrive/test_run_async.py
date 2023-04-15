@@ -9,10 +9,10 @@ import asyncio
 from utils import check_version
 from odrive.enums import *
 
-def find_odrvs() -> dict:
+async def find_odrvs() -> dict:
     '''
     This function will find ODrive that serial numbers are list
-    in the config.yml. Need to improve to async operation.
+    in the config.yml
     '''
     with open('config.yml') as fp:
         config = yaml.safe_load(fp) 
@@ -22,13 +22,18 @@ def find_odrvs() -> dict:
     for section, serial in config['serial'].items():
         print(f'searching for serial number {serial}...')
         try: 
-            odrv = odrive.find_any_async(serial_number=serial)
+            odrv = await asyncio.wait_for(
+                odrive.find_any_async(serial_number=serial),
+                timeout=5
+            )
             odrvs[section] = odrv
             print(f'-> assign odrive {serial} to {section} section')
             print(f'-> ', end='')
             check_version(odrv)
-        except TimeoutError as e:
-            print(f'error: Cannot find serial {serial} !!')
+        except asyncio.exceptions.TimeoutError as e:
+            print(f'Timeout: Cannot find serial {serial} !!')
+        except asyncio.exceptions.CancelledError as e:
+            print(f'Cancel: Cannot find serial {serial} !!')
     print('--------------------------------------')
 
     return odrvs
@@ -72,12 +77,17 @@ async def test_run(odrv, running_time=5, running_speed=3) -> None:
     '''
     utils.check_error(odrv) # Checking errors
     run_seconds(odrv, running_time, running_speed) # Test run
+
+async def main():
+    odrvs = await find_odrvs()
+    print(len(odrvs))
     
 ''' 
 -------------------------------------------------------------------------------
 '''
 if __name__ == '__main__':
-    odrvs = utils.find_odrvs()
+    # odrvs = utils.find_odrvs()
     # Need to find a way to execute only avialable odrive
     # print(f'Test run {section}...')   
-    test_run(odrvs, running_time=5, running_speed=3) # Call test run fucntion
+    asyncio.run(main())
+    # test_run(odrvs, running_time=5, running_speed=3) # Call test run fucntion
