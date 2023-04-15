@@ -4,39 +4,8 @@ This code is for testing odrive functionality.
 import time
 import utils
 import yaml
-import odrive
 import asyncio
-from utils import check_version
 from odrive.enums import *
-
-async def find_odrvs() -> dict:
-    '''
-    This function will find ODrive that serial numbers are list
-    in the config.yml
-    '''
-    with open('config.yml') as fp:
-        config = yaml.safe_load(fp) 
-
-    print("finding odrives...")
-    odrvs = {} # Looking for avaiable ODrive
-    for section, serial in config['serial'].items():
-        print(f'searching for serial number {serial}...')
-        try: 
-            odrv = await asyncio.wait_for(
-                odrive.find_any_async(serial_number=serial),
-                timeout=5
-            )
-            odrvs[section] = odrv
-            print(f'-> assign odrive {serial} to {section} section')
-            print(f'-> ', end='')
-            check_version(odrv)
-        except asyncio.exceptions.TimeoutError as e:
-            print(f'Timeout: Cannot find serial {serial} !!')
-        except asyncio.exceptions.CancelledError as e:
-            print(f'Cancel: Cannot find serial {serial} !!')
-    print('--------------------------------------')
-
-    return odrvs
 
 def run_seconds(odrv, running_time: int, running_speed: int = 3, 
                 delay_time: int = 3, debug_interval: int = 1) -> None:
@@ -79,15 +48,18 @@ async def test_run(odrv, running_time=5, running_speed=3) -> None:
     run_seconds(odrv, running_time, running_speed) # Test run
 
 async def main():
-    odrvs = await find_odrvs()
-    print(len(odrvs))
-    
+    with open('config.yml') as fp:
+        config = yaml.safe_load(fp) 
+    print("finding odrives...")
+    odrvs = await asyncio.gather( # Find all ODrive at the same time
+        *[utils.find_odrv(section, serial) 
+          for section, serial in config['serial'].items()]
+    )
+    odrvs = [odrv for odrv in odrvs if odrv] # Filter None out
+    print(len(odrvs)) # Check how many ODrives are found
+
 ''' 
 -------------------------------------------------------------------------------
 '''
 if __name__ == '__main__':
-    # odrvs = utils.find_odrvs()
-    # Need to find a way to execute only avialable odrive
-    # print(f'Test run {section}...')   
     asyncio.run(main())
-    # test_run(odrvs, running_time=5, running_speed=3) # Call test run fucntion
