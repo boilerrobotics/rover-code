@@ -1,27 +1,30 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { IMqttMessage, MqttService } from 'ngx-mqtt';
 import { Subscription } from 'rxjs';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  standalone: true,
+  imports: [RouterOutlet],
 })
-export class AppComponent implements OnDestroy{
-  title = 'Boiler Robotics';
-  private subscription!: Subscription;
+export class AppComponent implements OnDestroy {
+  private _title = 'Boiler Robotics';
+  private _subscription!: Subscription;
   public message!: string;
 
-  constructor(private _mqttService: MqttService) { 
-    this.subscription = this._mqttService.observe('brc')
-    .subscribe((message: IMqttMessage) => {
-      this.message = message.payload.toString();
-      console.log(this.message);
-    });
+  constructor(private _mqttService: MqttService) {
+    this._subscription = this._mqttService
+      .observe('brc')
+      .subscribe((message: IMqttMessage) => {
+        this.message = message.payload.toString();
+        console.log(this.message);
+      });
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this._subscription.unsubscribe();
   }
-
 }
