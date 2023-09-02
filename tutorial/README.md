@@ -93,3 +93,8 @@ export ROS_DOMAIN_ID=<your_domain_id>
 where your_domain_id is any integer between 0 and 101. Once you have your domain id set, make sure that you consistently use the same number for other instances that you want to work together.
 
 A workspace is the directory you have ROS 2 packages in. A package is an organizational unit for your code, which allows it to be run as a node and work with other ROS features. To start, you'll want to make and enter a directory for your workspace.
+```
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+```
+Feel free to name your workspace folder whatever you would like, but make sure that it still contains the src folder, which is very important to a lot of ROS functionality.
