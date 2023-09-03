@@ -42,7 +42,7 @@ You will need this password to install software packages later.
 
 <li> Follow this tutorial to install ROS: https://docs.ros.org/en/iron/Installation/Ubuntu-Install-Debians.html
 
-<li> You can choose either (but not both) `desktop` or `base`. 
+<li> You can choose either (but not both) "desktop" or "base". 
 The base version has everything we are using right now. 
 The desktop version has tools that could be benefitial but we don't use it often. 
 If you choose to install the base version, keep in mind that you might not be able to run some commands.
@@ -72,7 +72,7 @@ This tutorial will only cover the VS Code option.
 First, copy the source code URL from GitHub.
 ![github-url](./img/github-url.png)
 
-On the VS Code, click View -> Command Pallete (Ctrl + Shift + P) then type "git: clone".
+On the VS Code, click View -> Command Pallete (Ctrl + Shift + P) then type `git: clone`.
 ![gitclone](./img/gitclone.png)
 
 VS Code will ask for the URL.
@@ -82,21 +82,28 @@ Select the location that you want to keep the source code. Then you have a sourc
 
 ## ROS 2 Basics
 
-This section will cover most of what you will need to set up a publisher and subscriber through ROS2. If you ever want additional information on what other things can be done with ROS or want to check some information, their documentation can be found [here](https://docs.ros.org/en/iron/Tutorials.html). The goal of this tutorial is to familiarize you with the fundamentals of ROS communication. This is primarily done by several "nodes" (essentially single pieces of independent code) sending and receiving messages.
+This section will cover most of what you will need to set up a publisher and subscriber through ROS2. If you ever want additional information on what other things can be done with ROS or want to check some information, their documentation can be found [here](https://docs.ros.org/en/iron/Tutorials.html).
+
+The goal of this tutorial is to familiarize you with the fundamentals of ROS communication. This is primarily done by several "nodes" (essentially single pieces of independent code) sending and receiving messages.
+
 
 ### Creating a ROS 2 workspace
 
-In order to start working with nodes through ROS, you will first need to create the workspace that they will run in. Whenever working with multiple nodes, you will want to start by setting a value called your ROS Domain ID. This eesentially sets your ROS up so that nodes will be able to communicate with each other but it will ignore unrelated nodes on the same network. Each time you open a terminal, you can set this by running the command
+In order to start working with nodes through ROS, you will first need to create the workspace that they will run in. Whenever working with multiple nodes, you will want to start by setting a value called your ROS Domain ID. This esentially sets your ROS up so that nodes will be able to communicate with each other but it will ignore unrelated nodes on the same network. Each time you open a terminal, you can set this by running the command
+
 ```
 export ROS_DOMAIN_ID=<your_domain_id>
 ```
+
 where your_domain_id is any integer between 0 and 101. Once you have your domain id set, make sure that you consistently use the same number for other instances that you want to work together.
 
 A workspace is the directory you have ROS 2 packages in. A package is an organizational unit for your code, which allows it to be run as a node and work with other ROS features. To start, you'll want to make and enter a directory for your workspace.
+
 ```
 mkdir -p ~/ros2_ws/src
 cd ~/ros2_ws/src
 ```
+
 Feel free to name your workspace folder whatever you would like, but make sure that it still contains the src folder, which is very important to a lot of ROS functionality.
 
 ## Writing Publisher and Subscriber Nodes
