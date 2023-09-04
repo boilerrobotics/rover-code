@@ -80,6 +80,15 @@ VS Code will ask for the URL.
 
 Select the location that you want to keep the source code. Then you have a source code in your local machine.
 
+## Git 101
+
+Check out Git Cheat Sheet [here](https://education.github.com/git-cheat-sheet-education.pdf).
+Fortunately, we can do most of the tasks in VS Code. 
+In the "Source Control" tab, you will find all Git commands.
+
+![vscode-git](./img/vscode-git.png)
+
+
 ## ROS 2 Basics
 
 This section will cover most of what you will need to set up a publisher and subscriber through ROS2. If you ever want additional information on what other things can be done with ROS or want to check some information, their documentation can be found [here](https://docs.ros.org/en/iron/Tutorials.html).
