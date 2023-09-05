@@ -83,18 +83,31 @@ Select the location that you want to keep the source code. Then you have a sourc
 ## Git 101
 
 Check out Git Cheat Sheet [here](https://education.github.com/git-cheat-sheet-education.pdf).
-Fortunately, we can do most of the tasks in VS Code. 
+Fortunately, we can do most of the tasks in VS Code.
 In the "Source Control" tab, you will find all Git commands.
 
 ![vscode-git](./img/vscode-git.png)
 
+Everytime before making any commits, make sure that you are working in the correct branch.
+By default, you will be in the main (or master) branch.
+This branch is protected.
+You cannot make any chances to on this branch directly.
+You will need to create another branches then submiting a pull request after you finish the task.
+
+Making commit is a two-steps process.
+First, you will need to stage "changes".
+It means you will need to tell Git which files you want to include in this commit.
+Next, you will write a commit message then commit.
+At this point, the commit is made in your local machine.
+You can either push the commit(s) to GitHub.
+Note that you can undo your local commits.
+But once you push to GitHub, it is irreversible.
 
 ## ROS 2 Basics
 
 This section will cover most of what you will need to set up a publisher and subscriber through ROS2. If you ever want additional information on what other things can be done with ROS or want to check some information, their documentation can be found [here](https://docs.ros.org/en/iron/Tutorials.html).
 
 The goal of this tutorial is to familiarize you with the fundamentals of ROS communication. This is primarily done by several "nodes" (essentially single pieces of independent code) sending and receiving messages.
-
 
 ### Creating a ROS 2 workspace
 
