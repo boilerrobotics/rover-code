@@ -53,6 +53,12 @@ If you choose to install the base version, keep in mind that you might not be ab
 echo "source /opt/ros/iron/setup.bash" >> ~/.bashrc
 ```
 
+<li> Install "colcon". It is a package manager.
+
+```bash
+sudo apt install python3-colcon-common-extensions
+```
+
 </ol>
 
 ### Visual Studio Code and GitHub
@@ -146,7 +152,6 @@ You will also need to change your network settings in VirtualBox. Under Network,
 
 Now that you can communicate between different machines, it's time to apply that to something more like the rover. This is in the form of the "minirover" which is a small 6 wheel robot with a RaspberryPi. The Pi will be running a node that subscribes to the topic "cmd_vel" and then sets motor speeds based on the information it receives from there. The minirover code can be found [here](https://github.com/boilerrobotics/rover-code/blob/master/rover/src/minirover/minirover/driver.py).
 
-
 The Minirover takes in a different kind of message than the publisher and subscriber you have worked with so far. Instead of a string, this topic uses something called a Twist. A twist is essentially a special data type with 2 categories: linear and angular. Each of these contain the variables x, y, and z. For the minirover, we only care about the x value from linear and the z value from angular, which control the speeds of the left and right sides of the rover, respectively.
 
-Your task is to write a node that sends a command to control the minirover. You must use Twist message type and send the command to "cmd_vel" topic. Other than that, you have freedom on designing your node. 
+Your task is to write a node that sends a command to control the minirover. You must use Twist message type and send the command to "cmd_vel" topic. Other than that, you have freedom on designing your node.
