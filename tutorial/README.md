@@ -3,8 +3,8 @@
 ## Install Software
 
 Our core software framwork is Robot Operating System or [ROS](https://www.ros.org/).
-There are legacy ROS which is no longer actively developed. T
-he latest version (Noetic Ninjemys) will reach End of Life in May 2025.
+There are legacy ROS which is no longer actively developed. <a href="https://www.ros.org/" target="_blank">ROS</a>
+The latest version (Noetic Ninjemys) will reach End of Life in May 2025.
 Therefore, we will use ROS 2 instead.
 The latest ROS 2 release is Iron Irwini (May 2023).
 We will use ROS or ROS2 interchangeably and it will always refer to ROS Iron Irwini.
@@ -132,7 +132,7 @@ Feel free to name your workspace folder whatever you would like, but make sure t
 
 The simplest form of communication between nodes is a publisher and subscriber setup. One node will write a message to a specific topic (basically just a named place where the value will exist) and another node repeatedly checks that topic to see if anything has been sent. This kind of system is very useful for much of what we need for the rover. For example, one node can constantly publish the state of a joystick and another node can read this in and convert it to motor outputs.
 
-Please go through the [talker and listener tutorial] (https://docs.ros.org/en/iron/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html) provided in the ROS 2 documentation. This tutorial is very thorough and we strongly recommend that you do the entire process and read it carefully, particularly the section describing how the talker and listener code actually works, as this will be critical to understanding rover communication.
+Please go through the [talker and listener tutorial](https://docs.ros.org/en/iron/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html) provided in the ROS 2 documentation. This tutorial is very thorough and we strongly recommend that you do the entire process and read it carefully, particularly the section describing how the talker and listener code actually works, as this will be critical to understanding rover communication.
 
 ## Communicating Across Machines
 
