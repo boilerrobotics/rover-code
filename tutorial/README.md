@@ -2,8 +2,8 @@
 
 ## Install Software
 
-Our core software framwork is Robot Operating System or [ROS](https://www.ros.org/){:target="_blank"}.
-There are legacy ROS which is no longer actively developed. <a href="https://www.ros.org/" target="_blank">ROS</a>
+Our core software framwork is Robot Operating System or [ROS](https://www.ros.org/).
+There are legacy ROS which is no longer actively developed.
 The latest version (Noetic Ninjemys) will reach End of Life in May 2025.
 Therefore, we will use ROS 2 instead.
 The latest ROS 2 release is Iron Irwini (May 2023).
