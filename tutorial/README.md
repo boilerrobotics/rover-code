@@ -107,7 +107,7 @@ But once you push to GitHub, it is irreversible.
 
 This section will cover most of what you will need to set up a publisher and subscriber through ROS2. If you ever want additional information on what other things can be done with ROS or want to check some information, their documentation can be found [here](https://docs.ros.org/en/iron/Tutorials.html).
 
-The goal of this tutorial is to familiarize you with the fundamentals of ROS communication. This is primarily done by several "nodes" (essentially single pieces of independent code) sending and receiving messages.
+The goal of this tutorial is to familiarize you with the fundamentals of ROS communication. This is primarily done by several "nodes" (essentially single pieces of independent code) sending and receiving messages. For more details on ROS concepts, check this [tutorial](https://docs.ros.org/en/iron/Concepts/Basic.html).
 
 ### Creating a ROS 2 workspace
 
@@ -148,3 +148,5 @@ Now that you can communicate between different machines, it's time to apply that
 
 
 The Minirover takes in a different kind of message than the publisher and subscriber you have worked with so far. Instead of a string, this topic uses something called a Twist. A twist is essentially a special data type with 2 categories: linear and angular. Each of these contain the variables x, y, and z. For the minirover, we only care about the x value from linear and the z value from angular, which control the speeds of the left and right sides of the rover, respectively.
+
+Your task is to write a node that sends a command to control the minirover. You must use Twist message type and send the command to "cmd_vel" topic. Other than that, you have freedom on designing your node. 
