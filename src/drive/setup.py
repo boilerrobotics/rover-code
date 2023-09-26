@@ -1,11 +1,11 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 
-package_name = 'joystick'
+package_name = 'drive'
 
 setup(
     name=package_name,
     version='0.0.0',
-    packages=[package_name],
+    packages=find_packages(exclude=['test']),
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
@@ -13,14 +13,13 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='obishop',
-    maintainer_email='obishop@todo.todo',
-    description='TODO: Package description',
+    maintainer='kevin',
+    maintainer_email='yu1271@purdue.edu',
+    description='Drive controls for the rover.',
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'joystick = joystick.testController:main',
         ],
     },
 )
