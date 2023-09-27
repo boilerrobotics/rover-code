@@ -13,7 +13,7 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='kevin',
+    maintainer='Kevin Yu',
     maintainer_email='yu1271@purdue.edu',
     description='Drive controls for the rover.',
     license='TODO: License declaration',

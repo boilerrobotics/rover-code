@@ -3,8 +3,8 @@
 <package format="3">
   <name>drive</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="kevin@todo.todo">kevin</maintainer>
+  <description>Drive controls for the rover.</description>
+  <maintainer email="yu1271@purdue.edu">Kevin Yu</maintainer>
   <license>TODO: License declaration</license>
 
   <test_depend>ament_copyright</test_depend>

@@ -9,6 +9,8 @@ from shared_msgs.msg import DriveCommandMsg
 
 
 class DriveSubscriberNode(Node):
+    MAX_VEL = 20  # TODO; turns/s?
+
     RIGHT_SERIAL = "206737A14152"
     LEFT_SERIAL = "208E31834E53"
     FRONT_SERIAL = "2071316B4E53"
@@ -17,7 +19,7 @@ class DriveSubscriberNode(Node):
         super().__init__('drive_subscriber')
         self.subscription = self.create_subscription(
             DriveCommandMsg,
-            'cmd_vel',
+            'drive_powers',
             self.command_callback,
             qos_profile_system_default
         )
@@ -30,14 +32,14 @@ class DriveSubscriberNode(Node):
         self.right_axes = [self.front_drive.axis1, self.right_drive.axis0, self.right_drive.axis1]
 
     def command_callback(self, message: DriveCommandMsg):
-        # Run axes from drive command
+        # Run axes from drive command [-1.0, 1.0] powers
         for axis in self.left_axes:
             axis.requested_state = AxisState.CLOSED_LOOP_CONTROL
-            axis.controller.input_vel = message.left
+            axis.controller.input_vel = message.left * self.MAX_VEL
 
         for axis in self.right_axes:
             axis.requested_state = AxisState.CLOSED_LOOP_CONTROL
-            axis.controller.input_vel = message.right
+            axis.controller.input_vel = message.right * self.MAX_VEL
 
         self.get_logger().info(f'Set powers l: {message.left}, r: {message.right}')
 

@@ -6,10 +6,10 @@ from sensor_msgs.msg import Joy
 from shared_msgs.msg import DriveCommandMsg
 
 
-class JoystickPublisher(Node):
+class TankDrivePublisherNode(Node):
 
     def __init__(self):
-        super().__init__('twist_publisher_middleman')
+        super().__init__('tank_drive_publisher')
         self.subscription = self.create_subscription(
             Joy,
             'joy',
@@ -18,7 +18,7 @@ class JoystickPublisher(Node):
         )
         self.publisher_ = self.create_publisher(
             DriveCommandMsg,
-            'cmd_vel',
+            'drive_powers',
             qos_profile_system_default
         )
 
@@ -55,10 +55,10 @@ def tank_drive(translational: float, angular: float) -> tuple[float, float]:
 def main(args=None):
     rclpy.init(args=args)
 
-    twist_publisher = JoystickPublisher()
-    rclpy.spin(twist_publisher)
+    tank_publisher = TankDrivePublisherNode()
+    rclpy.spin(tank_publisher)
 
-    twist_publisher.destroy_node()
+    tank_publisher.destroy_node()
     rclpy.shutdown()
 
 

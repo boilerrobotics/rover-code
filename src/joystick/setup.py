@@ -26,7 +26,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'joystick_publisher = joystick.joystick_publisher:main',
+            'tank_drive_publisher = joystick.tank_drive_publisher:main',
         ],
     },
 )
