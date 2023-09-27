@@ -5,7 +5,7 @@ from rclpy.qos import qos_profile_system_default, qos_profile_sensor_data
 import odrive
 from odrive.enums import AxisState
 
-from geometry_msgs.msg import Twist
+from shared_msgs.msg import DriveCommandMsg
 
 
 class DriveSubscriberNode(Node):
@@ -16,7 +16,7 @@ class DriveSubscriberNode(Node):
     def __init__(self):
         super().__init__('drive_subscriber')
         self.subscription = self.create_subscription(
-            Twist,
+            DriveCommandMsg,
             'cmd_vel',
             self.command_callback,
             qos_profile_system_default
@@ -29,21 +29,17 @@ class DriveSubscriberNode(Node):
         self.left_axes = [self.front_drive.axis0, self.left_drive.axis0, self.left_drive.axis1]
         self.right_axes = [self.front_drive.axis1, self.right_drive.axis0, self.right_drive.axis1]
 
-    def command_callback(self, message: Twist):
-        # Run motors from drive command
-        # TODO: custom message
-        left_pow = message.linear.x
-        right_pow = message.angular.z
-
+    def command_callback(self, message: DriveCommandMsg):
+        # Run axes from drive command
         for axis in self.left_axes:
             axis.requested_state = AxisState.CLOSED_LOOP_CONTROL
-            axis.controller.input_vel = left_pow  # TODO
+            axis.controller.input_vel = message.left
 
         for axis in self.right_axes:
             axis.requested_state = AxisState.CLOSED_LOOP_CONTROL
-            axis.controller.input_vel = right_pow  # TODO
+            axis.controller.input_vel = message.right
 
-        self.get_logger().info(f'Set powers l: {left_pow}, r: {right_pow}')
+        self.get_logger().info(f'Set powers l: {message.left}, r: {message.right}')
 
 
 def main(args=None):
