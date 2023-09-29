@@ -1,4 +1,5 @@
 .vscode/
+.idea
 *.jpeg
 venv/
 commu-intell/build
