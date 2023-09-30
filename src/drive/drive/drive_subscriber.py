@@ -39,7 +39,7 @@ class DriveSubscriberNode(Node):
 
         for axis in self.right_axes:
             axis.requested_state = AxisState.CLOSED_LOOP_CONTROL
-            axis.controller.input_vel = message.right * self.MAX_VEL
+            axis.controller.input_vel = -message.right * self.MAX_VEL
 
         self.get_logger().info(f'Set powers l: {message.left}, r: {message.right}')
 
