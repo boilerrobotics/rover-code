@@ -24,7 +24,7 @@ class TankDrivePublisherNode(Node):
 
     def controller_callback(self, message: Joy):
         # Read controller data, republishing it as drive powers using a simple tank drive control scheme.
-        left_pow, right_pow = tank_drive(message.axes[1], message.axes[2])
+        left_pow, right_pow = tank_drive(message.axes[1], message.axes[3])
 
         msg = DriveCommandMsg()
         msg.left = left_pow
