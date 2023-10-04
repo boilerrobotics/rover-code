@@ -20,7 +20,7 @@ def find_odrvs() -> dict[str, any]:
     This function will find ODrive that serial numbers are list
     in the config.yml. Need to improve to async operation.
     """
-    with open('components/odrive/config.yml') as fp:
+    with open('config.yml') as fp:
         config = yaml.safe_load(fp)
 
     print("finding odrives...")
