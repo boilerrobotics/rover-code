@@ -1,31 +1,34 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { IMqttMessage, MqttService } from 'ngx-mqtt';
 import { Subscription } from 'rxjs';
+import { RouterOutlet } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  standalone: true,
+  imports: [RouterOutlet],
 })
-export class AppComponent implements OnDestroy{
-  title = 'Boiler Robotics';
-  private forDebug!: Subscription; // For print out all incoming messages 
+export class AppComponent implements OnDestroy {
+  private _title = 'Boiler Robotics';
+  private _subscription!: Subscription;
   public message!: string;
 
   // Need to use onConnect to check connection status
 
-  constructor(private _mqttService: MqttService) { 
-    this.forDebug = this._mqttService.observe('brc/#')
-    .subscribe((message: IMqttMessage) => {
-      this.message = message.payload.toString();    
-      console.log(`Recieved ${this.message} from topic` +
-        `${message.topic.toString()}`
-      );
-    });
+  constructor(private _mqttService: MqttService, private _titleService: Title) {
+    this._titleService.setTitle(this._title)
+    this._subscription = this._mqttService
+      .observe('brc')
+      .subscribe((message: IMqttMessage) => {
+        this.message = message.payload.toString();
+        console.log(this.message);
+      });
   }
 
   ngOnDestroy(): void {
-    this.forDebug.unsubscribe();
+    this._subscription.unsubscribe();
   }
-
 }
