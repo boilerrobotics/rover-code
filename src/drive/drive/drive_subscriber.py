@@ -10,7 +10,7 @@ from shared_msgs.msg import DriveCommandMsg
 
 class DriveSubscriberNode(Node):
     MAX_VEL = 20  # TODO; turns/s?
-    MAX_ACCEL = 0.5
+    MAX_ACCEL = 20
 
     RIGHT_SERIAL = "206737A14152"
     LEFT_SERIAL = "208E31834E53"
