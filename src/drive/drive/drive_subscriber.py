@@ -5,6 +5,7 @@ from rclpy.qos import qos_profile_system_default, qos_profile_sensor_data
 import odrive
 from odrive.enums import AxisState
 
+from std_msgs.msg import Float32
 from shared_msgs.msg import DriveCommandMsg
 
 
@@ -17,10 +18,17 @@ class DriveSubscriberNode(Node):
 
     def __init__(self):
         super().__init__('drive_subscriber')
-        self.subscription = self.create_subscription(
+        self.drive_subscription = self.create_subscription(
             DriveCommandMsg,
             'drive_powers',
             self.command_callback,
+            qos_profile_system_default
+        )
+
+        self.vel_subscription = self.create_subscription(
+            Float32,
+            'drive_max_vel',
+            self.max_vel_callback,
             qos_profile_system_default
         )
 
@@ -42,6 +50,10 @@ class DriveSubscriberNode(Node):
             axis.controller.input_vel = -message.right * self.MAX_VEL
 
         self.get_logger().info(f'Set powers l: {message.left}, r: {message.right}')
+
+    def max_vel_callback(self, message: Float32):
+        self.MAX_VEL = message.data
+        self.get_logger().info(f'Set max vel: {message.data}')
 
 
 def main(args=None):
