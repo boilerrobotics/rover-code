@@ -6,7 +6,7 @@ import odrive
 from odrive.enums import AxisState, ControlMode, InputMode
 
 from std_msgs.msg import Float32
-from shared_msgs.msg import DriveCommandMsg
+from shared_msgs.msg import DriveCommandMsg, OdriveTelemetry, CombinedOdriveTelemetryMsg
 
 
 class DriveSubscriberNode(Node):
@@ -16,6 +16,8 @@ class DriveSubscriberNode(Node):
     RIGHT_SERIAL = "206737A14152"
     LEFT_SERIAL = "208E31834E53"
     FRONT_SERIAL = "2071316B4E53"
+
+    TELEMETRY_PERIOD = 0.2  # seconds
 
     def __init__(self):
         super().__init__('drive_subscriber')
@@ -33,6 +35,16 @@ class DriveSubscriberNode(Node):
             qos_profile_system_default
         )
 
+        # Telemetry publishing
+        self.telemetry_publisher = self.create_publisher(
+            CombinedOdriveTelemetryMsg,
+            'odrive_telemetry',
+            qos_profile_sensor_data
+        )
+        self.timer = self.create_timer(self.TELEMETRY_PERIOD, self.publish_telemetry)
+
+        # Find and initialize ODrives / axes
+        # TODO: better logging for finding odrives
         self.right_drive = odrive.find_any(serial_number=self.RIGHT_SERIAL)
         self.left_drive = odrive.find_any(serial_number=self.LEFT_SERIAL)
         self.front_drive = odrive.find_any(serial_number=self.FRONT_SERIAL)
@@ -66,6 +78,24 @@ class DriveSubscriberNode(Node):
     def max_vel_callback(self, message: Float32):
         self.MAX_VEL = message.data
         self.get_logger().info(f'Set max vel: {message.data}')
+
+    def publish_telemetry(self):
+        msg = CombinedOdriveTelemetryMsg()
+
+        msg.right = get_telemetry(self.right_drive)
+        msg.left = get_telemetry(self.left_drive)
+        msg.front = get_telemetry(self.front_drive)
+
+        self.telemetry_publisher.publish(msg)
+
+
+def get_telemetry(drive) -> OdriveTelemetry:
+    msg = OdriveTelemetry()
+
+    msg.voltage = drive.vbus_voltage
+    msg.current = drive.ibus
+
+    return msg
 
 
 def main(args=None):
