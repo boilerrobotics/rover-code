@@ -3,7 +3,7 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_system_default, qos_profile_sensor_data
 
 import odrive
-from odrive.enums import AxisState
+from odrive.enums import AxisState, ControlMode, InputMode
 
 from std_msgs.msg import Float32
 from shared_msgs.msg import DriveCommandMsg
@@ -11,6 +11,7 @@ from shared_msgs.msg import DriveCommandMsg
 
 class DriveSubscriberNode(Node):
     MAX_VEL = 20  # TODO; turns/s?
+    MAX_ACCEL = 20
 
     RIGHT_SERIAL = "206737A14152"
     LEFT_SERIAL = "208E31834E53"
@@ -38,6 +39,17 @@ class DriveSubscriberNode(Node):
 
         self.left_axes = [self.front_drive.axis0, self.left_drive.axis0, self.left_drive.axis1]
         self.right_axes = [self.front_drive.axis1, self.right_drive.axis0, self.right_drive.axis1]
+
+        # Config all axes for ramped velocity control
+        for axis in self.left_axes:
+            axis.controller.config.control_mode = ControlMode.VELOCITY_CONTROL
+            axis.controller.config.input_mode = InputMode.VEL_RAMP
+            axis.controller.config.vel_ramp_rate = self.MAX_ACCEL
+
+        for axis in self.right_axes:
+            axis.controller.config.control_mode = ControlMode.VELOCITY_CONTROL
+            axis.controller.config.input_mode = InputMode.VEL_RAMP
+            axis.controller.config.vel_ramp_rate = self.MAX_ACCEL
 
     def command_callback(self, message: DriveCommandMsg):
         # Run axes from drive command [-1.0, 1.0] powers
