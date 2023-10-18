@@ -6,7 +6,7 @@ import odrive
 from odrive.enums import AxisState, ControlMode, InputMode
 
 from std_msgs.msg import Float32
-from shared_msgs.msg import DriveCommandMsg, OdriveTelemetry, CombinedOdriveTelemetryMsg
+from shared_msgs.msg import DriveCommandMsg, OdriveTelemetry, OdriveAxisTelemetry, CombinedOdriveTelemetryMsg
 
 
 class DriveSubscriberNode(Node):
@@ -82,20 +82,35 @@ class DriveSubscriberNode(Node):
     def publish_telemetry(self):
         msg = CombinedOdriveTelemetryMsg()
 
-        msg.right = get_telemetry(self.right_drive)
-        msg.left = get_telemetry(self.left_drive)
-        msg.front = get_telemetry(self.front_drive)
+        msg.right = get_odrive_telemetry(self.right_drive)
+        msg.left = get_odrive_telemetry(self.left_drive)
+        msg.front = get_odrive_telemetry(self.front_drive)
 
         self.telemetry_publisher.publish(msg)
 
 
-def get_telemetry(drive) -> OdriveTelemetry:
-    msg = OdriveTelemetry()
+def get_odrive_telemetry(drive) -> OdriveTelemetry:
+    telemetry = OdriveTelemetry()
 
-    msg.voltage = drive.vbus_voltage
-    msg.current = drive.ibus
+    telemetry.voltage = drive.vbus_voltage
+    telemetry.current = drive.ibus
+    telemetry.misconfigured = drive.misconfigured
 
-    return msg
+    telemetry.axis0 = get_axis_telemetry(drive.axis0)
+    telemetry.axis1 = get_axis_telemetry(drive.axis1)
+
+    return telemetry
+
+
+def get_axis_telemetry(axis) -> OdriveAxisTelemetry:
+    telemetry = OdriveAxisTelemetry()
+
+    telemetry.input_vel = axis.controller.input_vel
+    telemetry.vel_setpoint = axis.controller.vel_setpoint
+
+    telemetry.vel_estimate = axis.encoder.vel_estimate
+
+    return telemetry
 
 
 def main(args=None):
