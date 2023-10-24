@@ -6,7 +6,9 @@ import odrive
 from odrive.enums import AxisState, ControlMode, InputMode
 
 from std_msgs.msg import Float32
-from shared_msgs.msg import DriveCommandMsg, OdriveTelemetry, OdriveAxisTelemetry, CombinedOdriveTelemetryMsg
+from shared_msgs.msg import DriveCommandMsg, CombinedOdriveTelemetryMsg
+
+from .telemetry import get_odrive_telemetry
 
 
 class DriveSubscriberNode(Node):
@@ -44,13 +46,22 @@ class DriveSubscriberNode(Node):
         self.timer = self.create_timer(self.TELEMETRY_PERIOD, self.publish_telemetry)
 
         # Find and initialize ODrives / axes
-        # TODO: better logging for finding odrives
-        self.right_drive = odrive.find_any(serial_number=self.RIGHT_SERIAL)
-        self.left_drive = odrive.find_any(serial_number=self.LEFT_SERIAL)
-        self.front_drive = odrive.find_any(serial_number=self.FRONT_SERIAL)
+        self.get_logger().info('Scanning for odrives...')
+        self.left_axes = []
+        self.right_axes = []
 
-        self.left_axes = [self.front_drive.axis0, self.left_drive.axis0, self.left_drive.axis1]
-        self.right_axes = [self.front_drive.axis1, self.right_drive.axis0, self.right_drive.axis1]
+        self.front_drive = self.find_odrive(self.FRONT_SERIAL)
+        if self.front_drive is not None:
+            self.left_axes += self.front_drive.axis0
+            self.right_axes += self.front_drive.axis1
+
+        self.left_drive = self.find_odrive(self.LEFT_SERIAL)
+        if self.left_drive is not None:
+            self.left_axes += [self.left_drive.axis0, self.left_drive.axis1]
+
+        self.right_drive = self.find_odrive(self.RIGHT_SERIAL)
+        if self.right_drive is not None:
+            self.right_axes += [self.right_drive.axis0, self.right_drive.axis1]
 
         # Config all axes for ramped velocity control
         for axis in self.left_axes:
@@ -62,6 +73,17 @@ class DriveSubscriberNode(Node):
             axis.controller.config.control_mode = ControlMode.VELOCITY_CONTROL
             axis.controller.config.input_mode = InputMode.VEL_RAMP
             axis.controller.config.vel_ramp_rate = self.MAX_ACCEL
+
+        self.get_logger().info('Initialized axes and subscribers')
+
+    def find_odrive(self, serial_number: str, timeout=2.0):
+        try:
+            drive = odrive.find_any(serial_number=serial_number, timeout=timeout)
+            self.get_logger().info(f'Found odrive with serial {serial_number}')
+            return drive
+        except TimeoutError:
+            self.get_logger().warn(f'Failed to find odrive with serial {serial_number}')
+            return None
 
     def command_callback(self, message: DriveCommandMsg):
         # Run axes from drive command [-1.0, 1.0] powers
@@ -87,30 +109,6 @@ class DriveSubscriberNode(Node):
         msg.front = get_odrive_telemetry(self.front_drive)
 
         self.telemetry_publisher.publish(msg)
-
-
-def get_odrive_telemetry(drive) -> OdriveTelemetry:
-    telemetry = OdriveTelemetry()
-
-    telemetry.voltage = drive.vbus_voltage
-    telemetry.current = drive.ibus
-    telemetry.misconfigured = drive.misconfigured
-
-    telemetry.axis0 = get_axis_telemetry(drive.axis0)
-    telemetry.axis1 = get_axis_telemetry(drive.axis1)
-
-    return telemetry
-
-
-def get_axis_telemetry(axis) -> OdriveAxisTelemetry:
-    telemetry = OdriveAxisTelemetry()
-
-    telemetry.input_vel = axis.controller.input_vel
-    telemetry.vel_setpoint = axis.controller.vel_setpoint
-
-    telemetry.vel_estimate = axis.encoder.vel_estimate
-
-    return telemetry
 
 
 def main(args=None):
