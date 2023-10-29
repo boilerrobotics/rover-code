@@ -39,13 +39,18 @@ Some packages have dependencies.
 We use `rosdep` to manage them.
 
 ```bash
+# run the following code only once
 sudo apt-get install python3-rosdep # install rosdep
 sudo rosdep init
 rosdep update
-rosdep install --from-paths src -y --ignore-src
 ```
 
-All dependencies should be mentioned in each package's `package.xml` whenever possible.
+All dependencies should be mentioned in each package's `package.xml` whenever possible. Use the following command for install dependencies.
+
+```bash
+# run this command from ROS workspace
+rosdep install --from-paths src -y --ignore-src
+```
 
 Use the following list and this [tutorial](https://docs.ros.org/en/iron/Tutorials/Intermediate/Rosdep.html).
 
