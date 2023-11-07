@@ -2,18 +2,18 @@
 
 ## Install Software
 
-Our core software framwork is Robot Operating System or [ROS](https://www.ros.org/).
-There are legacy ROS which is no longer actively developed.
+Our core software framework is Robot Operating System or [ROS](https://www.ros.org/).
+There are legacy versions of ROS which are no longer actively developed.
 The latest version (Noetic Ninjemys) will reach End of Life in May 2025.
 Therefore, we will use ROS 2 instead.
 The latest ROS 2 release is Iron Irwini (May 2023).
-We will use ROS or ROS2 interchangeably and it will always refer to ROS Iron Irwini.
-ROS can run on many operating systems but we highly recommend you to use it with Ubuntu.
-We also highly recommend to create a virtual machine and install ROS on it.
+We will use ROS or ROS2 interchangeably, but it will always refer to ROS Iron Irwini.
+ROS can run on many operating systems, but we highly recommend using it with Ubuntu.
+We also highly recommend creating a virtual machine and installing ROS on it.
 Therefore, you will not mess up with your host machine.
 The list below is software you need to install.
 
-1. Virtual Machine. We will need to install Ubunto in the machine.
+1. Virtual Machine. We will need to install Ubuntu in the machine.
    The recommendation is [Virtual Box](https://www.virtualbox.org/).
 
 2. [Ubuntu 22.04](https://ubuntu.com/download/desktop) (LTS - Long Term Support). This is a first tier support by ROS.
@@ -28,14 +28,14 @@ The list below is software you need to install.
 - Type: Linux
 - Version: Ubuntu (64-bit)
 - Memory: 4096 MB or more (Ff you local machine has less than 8GB of RAM, you may need to use lightweight Ubuntu instead)
-- Virtual Hard Drive: 25 GB or more (You will create a Dynamic VirtualBox Disk Image. It will take the actual space the VM use but not more than 25GB or at the capaticy you allow it to use)
+- Virtual Hard Drive: 25 GB or more (You will create a Dynamic VirtualBox Disk Image. It will take the actual space the VM use but not more than 25GB or at the capacity you allow it to use)
 
-<li> Mount the Ubuntu ISO that you download by clicking settings -> Stoage. Click on CD drive icon then choose the disk file.
+<li> Mount the Ubuntu ISO that you download by clicking settings -> Storage. Click on CD drive icon then choose the disk file.
 
 ![choose-iso](./img/select-iso.png)
 
 <li> Start the machine. You will follow the installation instruction. 
-Along the process, you will be a admin of this virtual machine. 
+Along the process, you will be an admin of this virtual machine. 
 The password that you choose for it is important. 
 If you forget the password, there is no way to recover it. 
 You will need this password to install software packages later.
@@ -44,7 +44,7 @@ You will need this password to install software packages later.
 
 <li> You can choose either (but not both) "desktop" or "base". 
 The base version has everything we are using right now. 
-The desktop version has tools that could be benefitial but we don't use it often. 
+The desktop version has tools that could be beneficial, but we don't use it often. 
 If you choose to install the base version, keep in mind that you might not be able to run some commands.
 
 <li> At the end, run the following command, it will add a script to activate ROS everytime you open the new terminal.
@@ -78,7 +78,7 @@ This tutorial will only cover the VS Code option.
 First, copy the source code URL from GitHub.
 ![github-url](./img/github-url.png)
 
-On the VS Code, click View -> Command Pallete (Ctrl + Shift + P) then type `git: clone`.
+On the VS Code, click View -> Command Palette (Ctrl + Shift + P) then type `git: clone`.
 ![gitclone](./img/gitclone.png)
 
 VS Code will ask for the URL.
@@ -94,13 +94,13 @@ In the "Source Control" tab, you will find all Git commands.
 
 ![vscode-git](./img/vscode-git.png)
 
-Everytime before making any commits, make sure that you are working in the correct branch.
+Every time before making any commits, make sure that you are working in the correct branch.
 By default, you will be in the main (or master) branch.
 This branch is protected.
 You cannot make any chances to on this branch directly.
-You will need to create another branches then submiting a pull request after you finish the task.
+You will need to create another branch and submit a pull request after you finish the task.
 
-Making commit is a two-steps process.
+Making a commit is a two-step process.
 First, you will need to stage "changes".
 It means you will need to tell Git which files you want to include in this commit.
 Next, you will write a commit message then commit.
@@ -117,7 +117,7 @@ The goal of this tutorial is to familiarize you with the fundamentals of ROS com
 
 ### Creating a ROS 2 workspace
 
-In order to start working with nodes through ROS, you will first need to create the workspace that they will run in. Whenever working with multiple nodes, you will want to start by setting a value called your ROS Domain ID. This esentially sets your ROS up so that nodes will be able to communicate with each other but it will ignore unrelated nodes on the same network. Each time you open a terminal, you can set this by running the command
+In order to start working with nodes through ROS, you will first need to create the workspace that they will run in. Whenever working with multiple nodes, you will want to start by setting a value called your ROS Domain ID. This essentially sets your ROS up so that nodes will be able to communicate with each other, but it will ignore unrelated nodes on the same network. Each time you open a terminal, you can set this by running the command
 
 ```
 export ROS_DOMAIN_ID=<your_domain_id>
@@ -142,7 +142,7 @@ Please go through the [talker and listener tutorial](https://docs.ros.org/en/iro
 
 ## Communicating Across Machines
 
-Now that you have made a publisher and subscriber, you've successfully gotten communication between 2 nodes running on the same machine. The next step is to do the same process between multiple computers. The goal of this step is to succesfully broadcast your name and have it appear on another computer.
+Now that you have made a publisher and subscriber, you've successfully gotten communication between 2 nodes running on the same machine. The next step is to do the same process between multiple computers. The goal of this step is to successfully broadcast your name and have it appear on another computer.
 
 In order to do this, you will first want to make a few changes to your publisher code. First of all, alter the message being sent so that it now says your name instead of constantly counting. Then, you will need to set the topic to "name". Your publisher's topic needs to match the topic of the subscriber, so this is what we will be using in this example.
 
