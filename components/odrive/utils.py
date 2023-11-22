@@ -4,6 +4,7 @@ Utility functions for ODrive calibration and test.
 
 import time
 import yaml
+import asyncio
 import odrive
 from odrive.enums import *
 from sensing import OdriveSensing
@@ -18,12 +19,34 @@ def print_voltage_current(odrv, connection: OdriveSensing | None = None) -> None
         connection.publish("brc/voltage", f"{odrv.vbus_voltage:5.2f}")
         connection.publish("brc/current", f"{odrv.ibus:7.5f}")
 
+async def find_odrv_async(section, serial) -> dict:
+    '''
+    This function will find ODrive with specific serial number asynchonously
+    '''   
+    print(f' searching for serial number {serial}...')
+    try: 
+        odrv = await asyncio.wait_for(
+            odrive.find_any_async(serial_number=serial),
+            timeout=5 # Try to find Odrive 
+        )
+    except asyncio.exceptions.TimeoutError as e:
+        print(f'Timeout: Cannot find serial {serial} !!')
+        return # If timeout, return None
+    # except asyncio.exceptions.CancelledError as e:
+    #     print(f'Cancel: Cannot find serial {serial} !!')
+    print(f'-> assign odrive {serial} to {section} section')
+    print(f'-> ', end='')
+    check_version(odrv)
+    print('--------------------------------------')
+
+    return {section, odrv}
 
 def find_odrvs() -> dict[str, any]:
     """
     This function will find ODrive that serial numbers are list
     in the config.yml. Need to improve to async operation.
     """
+    
     with open("config.yml") as fp:
         config = yaml.safe_load(fp)
 

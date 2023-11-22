@@ -19,6 +19,9 @@ find_package(std_msgs REQUIRED)
 
 set(msg_files
   "msg/DriveCommandMsg.msg"
+  "msg/OdriveAxisTelemetry.msg"
+  "msg/OdriveTelemetry.msg"
+  "msg/CombinedOdriveTelemetryMsg.msg"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
