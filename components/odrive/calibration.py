@@ -8,7 +8,7 @@ def dump_config(odrv, filename) -> None:
     """
     Dump all config profile for comparision
     """
-    with open(filename, 'w+') as fp:
+    with open(filename, "w+") as fp:
         print(str(odrv), file=fp)
         print(f'{"---" * 10}odrive config{"---" * 10}', file=fp)
         print(str(odrv.config), file=fp)
@@ -56,7 +56,7 @@ def pre_calibration_on(odrvs):
     """
     for section, odrv in odrvs.items():
         utils.check_error(odrv, section)
-        print(f'Calibating {section}...')
+        print(f"Calibating {section}...")
 
         for axis in [odrv.axis0, odrv.axis1]:
             axis.encoder.config.use_index = True
@@ -80,8 +80,8 @@ def full_calibration(odrvs):
     """
     for section, odrv in odrvs.items():
         utils.check_error(odrv, section)  # Checking errors
-        dump_config(odrv, filename=f'{section}-precal.txt')
-        print(f'Calibrating {section}...')
+        dump_config(odrv, filename=f"debug-{section}-precal.txt")
+        print(f"Calibrating {section}...")
         odrv.config.brake_resistance = 0.5
         for axis in [odrv.axis0, odrv.axis1]:
             config_controller(axis.controller)
@@ -93,17 +93,17 @@ def full_calibration(odrvs):
                 time.sleep(1)
             utils.check_error(odrv, section)  # Check error again
         odrv.save_configuration()
-        dump_config(odrv, filename=f'{section}-postcal.txt')
-        print(f'Section {section} calibration completed')
+        dump_config(odrv, filename=f"debug-{section}-postcal.txt")
+        print(f"Section {section} calibration completed")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     odrvs = utils.find_odrvs()
-    print('Running Calibration ...')
+    print("Running Calibration ...")
     full_calibration(odrvs)
-    print('Test run ...')
+    print("Test run ...")
     test_run(odrvs, running_time=5, running_speed=3)
-    print('Setting pre-calibration ...')
+    print("Setting pre-calibration ...")
     pre_calibration_on(odrvs)
-    print('Test run ...')
+    print("Test run ...")
     test_run(odrvs, running_time=5, running_speed=3)
