@@ -19,38 +19,52 @@ def print_voltage_current(odrv, connection: OdriveSensing | None = None) -> None
         connection.publish("brc/voltage", f"{odrv.vbus_voltage:5.2f}")
         connection.publish("brc/current", f"{odrv.ibus:7.5f}")
 
-async def find_odrv_async(section, serial) -> dict:
-    '''
-    This function will find ODrive with specific serial number asynchonously
-    '''   
-    print(f' searching for serial number {serial}...')
-    try: 
-        odrv = await asyncio.wait_for(
-            odrive.find_any_async(serial_number=serial),
-            timeout=5 # Try to find Odrive 
-        )
-    except asyncio.exceptions.TimeoutError as e:
-        print(f'Timeout: Cannot find serial {serial} !!')
-        return # If timeout, return None
-    # except asyncio.exceptions.CancelledError as e:
-    #     print(f'Cancel: Cannot find serial {serial} !!')
-    print(f'-> assign odrive {serial} to {section} section')
-    print(f'-> ', end='')
-    check_version(odrv)
-    print('--------------------------------------')
 
-    return {section, odrv}
+async def find_odrvs_async(timeout=3) -> dict[str, any]:
+    """
+    This function will find ODrives asynchronously
+    """
+    with open("config.yml") as fp:
+        config = yaml.safe_load(fp)
+
+    tasks = [
+        asyncio.create_task(
+            odrive.find_any_async(serial_number=serial),
+            name=f"{section}",
+        )
+        for section, serial in config["serial"].items()
+    ]
+    print("finding ODrives...")
+    done, pending = await asyncio.wait(
+        tasks, timeout=timeout, return_when=asyncio.ALL_COMPLETED
+    )
+
+    odrvs = {}
+    for task in tasks:
+        section = task.get_name()
+        if task in pending:
+            print(f"Warning! finding {section} ODrive failed")
+            task.cancel()
+        if task in done:
+            odrv = task.result()
+            odrvs[section] = odrv
+            print(f"-> found {section} ODrive")
+            print(f"-> ", end="")
+            check_version(odrv)
+
+    return odrvs
+
 
 def find_odrvs() -> dict[str, any]:
     """
     This function will find ODrive that serial numbers are list
     in the config.yml. Need to improve to async operation.
     """
-    
+
     with open("config.yml") as fp:
         config = yaml.safe_load(fp)
 
-    print("finding odrives...")
+    print("finding ODrives...")
     odrvs = {}  # Looking for available ODrive
     for section, serial in config["serial"].items():
         print(f"searching for serial number {serial}...")
