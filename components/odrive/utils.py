@@ -88,22 +88,29 @@ def check_error(odrv, name: str | None = None) -> None:
     if name is not None:
         print(f"{name} odrive checking...")
     print_voltage_current(odrv)
-    print(f'  {"error code:":<12} {"axis-0":^15} | {"axis-1":^15}')
+    print(f'  {"system error:":<12} {ODriveError(odrv.axis0.error).name:^25}')
+    print(f'  {"error code:":<12} {"axis-0":^25} | {"axis-1":^25}')
     print(
-        f'  {"controller":<12} '
-        f"{ControllerError(odrv.axis0.controller.error).name:^15} | "
-        f"{ControllerError(odrv.axis1.controller.error).name:^15}"
-    )
-    print(
-        f'  {"encoder":<12} '
-        f"{EncoderError(odrv.axis0.encoder.error).name:^15} | "
-        f"{EncoderError(odrv.axis1.encoder.error).name:^15}"
+        f'  {"axis":<12} '
+        f"{AxisError(odrv.axis0.error).name:^25} | "
+        f"{AxisError(odrv.axis1.error).name:^25}"
     )
     print(
         f'  {"motor":<12} '
-        f"{MotorError(odrv.axis0.motor.error).name:^15} | "
-        f"{MotorError(odrv.axis1.motor.error).name:^15}"
+        f"{MotorError(odrv.axis0.motor.error).name:^25} | "
+        f"{MotorError(odrv.axis1.motor.error).name:^25}"
     )
+    print(
+        f'  {"controller":<12} '
+        f"{ControllerError(odrv.axis0.controller.error).name:^25} | "
+        f"{ControllerError(odrv.axis1.controller.error).name:^25}"
+    )
+    print(
+        f'  {"encoder":<12} '
+        f"{EncoderError(odrv.axis0.encoder.error).name:^25} | "
+        f"{EncoderError(odrv.axis1.encoder.error).name:^25}"
+    )
+
     print("--------------------------------------")
 
 
