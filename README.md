@@ -1,4 +1,4 @@
-# For Communication and Intellgence
+# For Communication and Intelligence
 
 ### Make sure to work on branches instead of master.
 
@@ -51,3 +51,20 @@ Use the following list and this [tutorial](https://docs.ros.org/en/iron/Tutorial
 
 - [ROS base](https://github.com/ros/rosdistro/blob/master/rosdep/base.yaml)
 - [Python](https://github.com/ros/rosdistro/blob/master/rosdep/python.yaml)
+
+## ODrive
+
+Since we are using legacy ODrive, we need to upgrade firmware and matching Python module with the firmware version. 
+To upgrade firmware, see [this](./components/odrive/README.md).
+If the firmware is >0.5.5 and <0.6.0, there will be no precompiled package available from PyPi. 
+Therefore, we need to install from source. 
+First, clone or download the source code from [GitHub](https://github.com/odriverobotics/ODrive/tags).
+Next run the following command in `tools` folder.
+```bash
+python3 setup.py sdist
+```
+It will compile and generate a package in `dist/odrive-x.y.z.tar.gz`. 
+Lastly, install it by 
+```bash
+pip install dist/odrive-x.y.z.tar.gz
+```
