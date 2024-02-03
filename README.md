@@ -39,10 +39,10 @@ Some packages have dependencies.
 We use `rosdep` to manage them.
 
 ```bash
-sudo apt-get install python3-rosdep # install rosdep
+sudo apt-get install python3-rosdep
 sudo rosdep init
 rosdep update
-rosdep install --from-paths src -y --ignore-src
+rosdep install --from-paths src --ignore-src
 ```
 
 All dependencies should be mentioned in each package's `package.xml` whenever possible.
