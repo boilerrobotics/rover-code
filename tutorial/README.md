@@ -86,6 +86,16 @@ VS Code will ask for the URL.
 
 Select the location that you want to keep the source code. Then you have a source code in your local machine.
 
+### VS Code Extensions
+
+This is a list of recommended extenstions
+
+- [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+- [IntelliCode](https://marketplace.visualstudio.com/items?itemName=VisualStudioExptTeam.vscodeintellicode)
+- [Black Formatter](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter)
+- [ROS](https://marketplace.visualstudio.com/items?itemName=ms-iot.vscode-ros)
+- [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+
 ## Git 101
 
 Check out Git Cheat Sheet [here](https://education.github.com/git-cheat-sheet-education.pdf).
