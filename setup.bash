@@ -13,5 +13,5 @@ source install/setup.bash
 echo ' '
 echo 'installing packages...'
 cd "${cwd}"
-colcon build
+colcon build --base-paths src
 source install/setup.bash
