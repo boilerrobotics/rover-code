@@ -27,10 +27,21 @@ You will need firmware.bin for this operation.
 You can find binary firmware file up to version 0.5.4.
 Look at the `assets` of each release in [GitHub](https://github.com/odriverobotics/ODrive/releases).
 
-For version 0.5.5 and later, you must compile the firmware manually.
+For version 0.5.5 and later, you must compile the firmware manually. You will need following packages to compile.
 
-1. Clone or download the source code from [GitHub](https://github.com/odriverobotics/ODrive/tags)
-2. In `Firmware`, copy `tup.config.default` to `tup.config`
+```bash
+sudo apt install tup gcc-arm-none-eabi build-essential git-lfs openocd python3-yaml python3-jinja2 python3-jsonschema
+```
+
+And Python `cantools` version 38.0.2 or earlier. It is recommend to create an virtual environment.
+
+```bash
+pip install cantools==38.0.2
+```
+
+1. Clone or download the source code from [GitHub](https://github.com/odriverobotics/ODrive/tags). 
+Noted: if you clone, you will need to switch branch to the firmware version that you want to build.     
+2. In `Firmware`, change `tup.config.default` to `tup.config`
 3. In `tup.config`, specify the hardware variant. In our case, it is `v3.6-56v`
 4. Run `make` or `make -jx` where `x` is number of thread you want to assign for compiling
 5. New firmware will be in `build`
