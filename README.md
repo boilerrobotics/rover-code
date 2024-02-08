@@ -11,7 +11,9 @@ This is a main repo for communication & intelligence team. There are three sub-f
 ## Setup
 
 The folder [src](./src/) is the main folder to work with.
-It is already a ROS2 workspace. To run the code, you will need to compile and install.
+This ROS working space is tested on Ubuntu 22.04 LTS and ROS Iron. 
+Installation guide can be found in [tutorial](./tutorial/)
+To run the code, you will need to compile and install.
 To compile
 
 ```bash

@@ -18,7 +18,9 @@ The list below is software you need to install.
 
 2. [Ubuntu 22.04](https://ubuntu.com/download/desktop) (LTS - Long Term Support). This is a first tier support by ROS.
 
-3. ROS Iron.
+3. ROS Iron Iron Irwini.
+
+Noted: ROS Iron Irwini will reach EOL on November 2024. The new ROS Jazzy Jaliso will be release on May 2024. ROS Jazzy will likely to expect Ubuntu 24.04 (Noble Numbat) as first tier support which will be released on April 2024. The tutorial instruction will be updated to new version of ROS and Ubuntu once the code is tested. Until then, it is recommended to stay with Ubuntu 22.04 & ROS Iron.
 
 ### Installation Guide
 
