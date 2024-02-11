@@ -11,7 +11,7 @@ This is a main repo for communication & intelligence team. There are three sub-f
 ## Setup
 
 The folder [src](./src/) is the main folder to work with.
-This ROS working space is tested on Ubuntu 22.04 LTS and ROS Iron. 
+This ROS working space is tested on ROS Iron on Ubuntu 22.04 LTS and ROS Eloquent on Ubuntu 18.04 as it is a Jetson TX2 environment. 
 Installation guide can be found in [tutorial](./tutorial/)
 To run the code, you will need to compile and install.
 To compile
