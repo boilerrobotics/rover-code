@@ -2,7 +2,7 @@
 
 ## Install Software
 
-Our core software framwork is Robot Operating System or [ROS](https://www.ros.org/).
+Our core software framework is Robot Operating System or [ROS](https://www.ros.org/).
 There are legacy ROS which is no longer actively developed.
 The latest version (Noetic Ninjemys) will reach End of Life in May 2025.
 Therefore, we will use ROS 2 instead.
@@ -13,14 +13,23 @@ We also highly recommend to create a virtual machine and install ROS on it.
 Therefore, you will not mess up with your host machine.
 The list below is software you need to install.
 
-1. Virtual Machine. We will need to install Ubunto in the machine.
+1. Virtual Machine. We will need to install Ubuntu in the machine.
    The recommendation is [Virtual Box](https://www.virtualbox.org/).
 
 2. [Ubuntu 22.04](https://ubuntu.com/download/desktop) (LTS - Long Term Support). This is a first tier support by ROS.
+You are welcome to choose any [flavors](https://ubuntu.com/desktop/flavours) that you want.
 
 3. ROS Iron Iron Irwini.
 
-Noted: ROS Iron Irwini will reach EOL on November 2024. The new ROS Jazzy Jaliso will be release on May 2024. ROS Jazzy will likely to expect Ubuntu 24.04 (Noble Numbat) as first tier support which will be released on April 2024. The tutorial instruction will be updated to new version of ROS and Ubuntu once the code is tested. Until then, it is recommended to stay with Ubuntu 22.04 & ROS Iron.
+Note: ROS Iron Irwini will reach EOL on November 2024.
+The new ROS Jazzy Jaliso will be release on May 2024.
+ROS Jazzy will likely to expect Ubuntu 24.04 (Noble Numbat) as first tier support which will be released on April 2024.
+The tutorial instruction will be updated to new version of ROS and Ubuntu once the code is tested.
+Until then, it is recommended to stay with Ubuntu 22.04 & ROS Iron.
+
+Note 2: Jetson TX2 only cannot run JetPack SDK newer than version 4.
+The latest JetPack SDK 4 is 4.6.4 which derived from Ubuntu 18.04.
+If you prefer to dig into Jetson and JetPack SDK, you will need to install Ubuntu 18.04 (and ROS Dashing) instead of Ubuntu 22.04.
 
 ### Installation Guide
 
@@ -30,9 +39,9 @@ Noted: ROS Iron Irwini will reach EOL on November 2024. The new ROS Jazzy Jaliso
 - Type: Linux
 - Version: Ubuntu (64-bit)
 - Memory: 4096 MB or more (Ff you local machine has less than 8GB of RAM, you may need to use lightweight Ubuntu instead)
-- Virtual Hard Drive: 25 GB or more (You will create a Dynamic VirtualBox Disk Image. It will take the actual space the VM use but not more than 25GB or at the capaticy you allow it to use)
+- Virtual Hard Drive: 25 GB or more (You will create a Dynamic VirtualBox Disk Image. It will take the actual space the VM use but not more than 25GB or at the capacity you allow it to use)
 
-<li> Mount the Ubuntu ISO that you download by clicking settings -> Stoage. Click on CD drive icon then choose the disk file.
+<li> Mount the Ubuntu ISO that you download by clicking settings -> Storage. Click on CD drive icon then choose the disk file.
 
 ![choose-iso](./img/select-iso.png)
 
@@ -46,10 +55,10 @@ You will need this password to install software packages later.
 
 <li> You can choose either (but not both) "desktop" or "base". 
 The base version has everything we are using right now. 
-The desktop version has tools that could be benefitial but we don't use it often. 
+The desktop version has tools that could be beneficial but we don't use it often. 
 If you choose to install the base version, keep in mind that you might not be able to run some commands.
 
-<li> At the end, run the following command, it will add a script to activate ROS everytime you open the new terminal.
+<li> At the end, run the following command, it will add a script to activate ROS every time you open the new terminal.
 
 ```bash
 echo "source /opt/ros/iron/setup.bash" >> ~/.bashrc
@@ -80,20 +89,20 @@ This tutorial will only cover the VS Code option.
 First, copy the source code URL from GitHub.
 ![github-url](./img/github-url.png)
 
-On the VS Code, click View -> Command Pallete (Ctrl + Shift + P) then type `git: clone`.
-![gitclone](./img/gitclone.png)
+On the VS Code, click View -> Command Palette (Ctrl + Shift + P) then type `git: clone`.
+![git clone](./img/gitclone.png)
 
 VS Code will ask for the URL.
-![placeurl](./img/place-url.png)
+![place url](./img/place-url.png)
 
 Select the location that you want to keep the source code. Then you have a source code in your local machine.
 
 ### VS Code Extensions
 
-This is a list of recommended extenstions
+This is a list of recommended extensions
 
 - [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-- [IntelliCode](https://marketplace.visualstudio.com/items?itemName=VisualStudioExptTeam.vscodeintellicode)
+- [Intelli Code](https://marketplace.visualstudio.com/items?itemName=VisualStudioExptTeam.vscodeintellicode)
 - [Black Formatter](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter)
 - [ROS](https://marketplace.visualstudio.com/items?itemName=ms-iot.vscode-ros)
 - [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
@@ -106,11 +115,11 @@ In the "Source Control" tab, you will find all Git commands.
 
 ![vscode-git](./img/vscode-git.png)
 
-Everytime before making any commits, make sure that you are working in the correct branch.
+every time before making any commits, make sure that you are working in the correct branch.
 By default, you will be in the main (or master) branch.
 This branch is protected.
 You cannot make any chances to on this branch directly.
-You will need to create another branches then submiting a pull request after you finish the task.
+You will need to create another branches then submitting a pull request after you finish the task.
 
 Making commit is a two-steps process.
 First, you will need to stage "changes".
@@ -129,7 +138,7 @@ The goal of this tutorial is to familiarize you with the fundamentals of ROS com
 
 ### Creating a ROS 2 workspace
 
-In order to start working with nodes through ROS, you will first need to create the workspace that they will run in. Whenever working with multiple nodes, you will want to start by setting a value called your ROS Domain ID. This esentially sets your ROS up so that nodes will be able to communicate with each other but it will ignore unrelated nodes on the same network. Each time you open a terminal, you can set this by running the command
+In order to start working with nodes through ROS, you will first need to create the workspace that they will run in. Whenever working with multiple nodes, you will want to start by setting a value called your ROS Domain ID. This essentially sets your ROS up so that nodes will be able to communicate with each other but it will ignore unrelated nodes on the same network. Each time you open a terminal, you can set this by running the command
 
 ```
 export ROS_DOMAIN_ID=<your_domain_id>
@@ -154,16 +163,16 @@ Please go through the [talker and listener tutorial](https://docs.ros.org/en/iro
 
 ## Communicating Across Machines
 
-Now that you have made a publisher and subscriber, you've successfully gotten communication between 2 nodes running on the same machine. The next step is to do the same process between multiple computers. The goal of this step is to succesfully broadcast your name and have it appear on another computer.
+Now that you have made a publisher and subscriber, you've successfully gotten communication between 2 nodes running on the same machine. The next step is to do the same process between multiple computers. The goal of this step is to successfully broadcast your name and have it appear on another computer.
 
 In order to do this, you will first want to make a few changes to your publisher code. First of all, alter the message being sent so that it now says your name instead of constantly counting. Then, you will need to set the topic to "name". Your publisher's topic needs to match the topic of the subscriber, so this is what we will be using in this example.
 
 You will also need to change your network settings in VirtualBox. Under Network, you will just need to change from NAT to Bridged Adapter so that you can send and receive messages. Once you have done this and are connected to the same network as the subscriber node, make sure your domain id matches that of the receiving computer.
 
-## Minirover
+## Mini-rover
 
-Now that you can communicate between different machines, it's time to apply that to something more like the rover. This is in the form of the "minirover" which is a small 6 wheel robot with a RaspberryPi. The Pi will be running a node that subscribes to the topic "cmd_vel" and then sets motor speeds based on the information it receives from there. The minirover code can be found [here](https://github.com/boilerrobotics/rover-code/blob/master/rover/src/minirover/minirover/driver.py).
+Now that you can communicate between different machines, it's time to apply that to something more like the rover. This is in the form of the "mini-rover" which is a small 6 wheel robot with a RaspberryPi. The Pi will be running a node that subscribes to the topic "cmd_vel" and then sets motor speeds based on the information it receives from there. The mini-rover code can be found [here](https://github.com/boilerrobotics/rover-code/blob/master/rover/src/minirover/minirover/driver.py).
 
-The Minirover takes in a different kind of message than the publisher and subscriber you have worked with so far. Instead of a string, this topic uses something called a Twist. A twist is essentially a special data type with 2 categories: linear and angular. Each of these contain the variables x, y, and z. For the minirover, we only care about the x value from linear and the z value from angular, which control the speeds of the left and right sides of the rover, respectively.
+The mini-rover takes in a different kind of message than the publisher and subscriber you have worked with so far. Instead of a string, this topic uses something called a Twist. A twist is essentially a special data type with 2 categories: linear and angular. Each of these contain the variables x, y, and z. For the mini-rover, we only care about the x value from linear and the z value from angular, which control the speeds of the left and right sides of the rover, respectively.
 
-Your task is to write a node that sends a command to control the minirover. You must use Twist message type and send the command to "cmd_vel" topic. Other than that, you have freedom on designing your node.
+Your task is to write a node that sends a command to control the mini-rover. You must use Twist message type and send the command to "cmd_vel" topic. Other than that, you have freedom on designing your node.
