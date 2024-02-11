@@ -17,7 +17,7 @@ The list below is software you need to install.
    The recommendation is [Virtual Box](https://www.virtualbox.org/).
 
 2. [Ubuntu 22.04](https://ubuntu.com/download/desktop) (LTS - Long Term Support). This is a first tier support by ROS.
-You are welcome to choose any [flavors](https://ubuntu.com/desktop/flavours) that you want.
+   You are welcome to choose any [flavors](https://ubuntu.com/desktop/flavours) that you want.
 
 3. ROS Iron Iron Irwini.
 
@@ -29,7 +29,7 @@ Until then, it is recommended to stay with Ubuntu 22.04 & ROS Iron.
 
 Note 2: Jetson TX2 only cannot run JetPack SDK newer than version 4.
 The latest JetPack SDK 4 is 4.6.4 which derived from Ubuntu 18.04.
-If you prefer to dig into Jetson and JetPack SDK, you will need to install Ubuntu 18.04 (and ROS Dashing) instead of Ubuntu 22.04.
+If you prefer to dig into Jetson and JetPack SDK, you will need to install Ubuntu 18.04 (and ROS Eloquent) instead of Ubuntu 22.04.
 
 ### Installation Guide
 

@@ -9,6 +9,8 @@ Since Jetson TX2 has reached EOL, it could not run JetPack version newer than 4 
 The latest support version is 4.6.4.
 If you want need to install JetPack on Jetson, you will need to have Ubuntu 18.04 install as a host machine.
 
+Note: The latest VS Code version that can run on ubuntu 18.04 is version 1.85 ([November 2023](https://code.visualstudio.com/updates/v1_85)).
+
 ![JetPack Roadmap](https://developer.download.nvidia.com/embedded/images/jetson_roadmap/Jetson-JetPack_SW_Roadmap-2023-09-18.png)
 
 The latest JatPack version is 6 (released in 2024 - [roadmap](https://developer.nvidia.com/embedded/develop/roadmap)).
