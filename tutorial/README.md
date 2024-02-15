@@ -6,8 +6,7 @@ Our core software framework is Robot Operating System or [ROS](https://www.ros.o
 There are legacy ROS which is no longer actively developed.
 The latest version (Noetic Ninjemys) will reach End of Life in May 2025.
 Therefore, we will use ROS 2 instead.
-The latest ROS 2 release is Iron Irwini (May 2023).
-We will use ROS or ROS2 interchangeably and it will always refer to ROS Iron Irwini.
+We will use ROS or ROS 2 interchangeably and it will always refer to ROS 2.
 ROS can run on many operating systems but we highly recommend you to use it with Ubuntu.
 We also highly recommend to create a virtual machine and install ROS on it.
 Therefore, you will not mess up with your host machine.
@@ -19,7 +18,7 @@ The list below is software you need to install.
 2. [Ubuntu 22.04](https://ubuntu.com/download/desktop) (LTS - Long Term Support). This is a first tier support by ROS.
    You are welcome to choose any [flavors](https://ubuntu.com/desktop/flavours) that you want.
 
-3. ROS Iron Iron Irwini.
+3. [ROS 2 Iron Irwini](https://docs.ros.org/en/iron/Installation/Ubuntu-Install-Debians.html).
 
 Note: ROS Iron Irwini will reach EOL on November 2024.
 The new ROS Jazzy Jaliso will be release on May 2024.
@@ -101,10 +100,9 @@ Select the location that you want to keep the source code. Then you have a sourc
 
 This is a list of recommended extensions
 
-- [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+- [ROS](https://marketplace.visualstudio.com/items?itemName=ms-iot.vscode-ros)
 - [Intelli Code](https://marketplace.visualstudio.com/items?itemName=VisualStudioExptTeam.vscodeintellicode)
 - [Black Formatter](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter)
-- [ROS](https://marketplace.visualstudio.com/items?itemName=ms-iot.vscode-ros)
 - [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
 ## Git 101
