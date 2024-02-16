@@ -1,3 +1,10 @@
+# ODrive
+Current code is developed and tested on following environments
+- ODrive hw version 3.6 56V variant
+- ODrive fw version 0.5.4 ([docs](https://docs.odriverobotics.com/v/0.5.4/getting-started.html))
+- Python 3.10 
+- Odrive Python library version 0.6.8 ([package requirements](./requirements.txt))
+
 ## Upgrade Firmware
 
 The ODrive we have comes with firmware version 0.5.1, which is out of date.

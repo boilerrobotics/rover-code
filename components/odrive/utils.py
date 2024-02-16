@@ -22,7 +22,9 @@ def print_voltage_current(odrv, connection: OdriveSensing | None = None) -> None
 
 async def find_odrvs_async(timeout=3) -> dict[str, any]:
     """
-    This function will find ODrives asynchronously
+    This function will find ODrives asynchronously.
+    This function is not available on Odrive library version 0.5.4
+    as `odrive.find_any_async()` function was introduced in version 0.6
     """
     with open("config.yml") as fp:
         config = yaml.safe_load(fp)
@@ -58,7 +60,7 @@ async def find_odrvs_async(timeout=3) -> dict[str, any]:
 def find_odrvs() -> dict[str, any]:
     """
     This function will find ODrive that serial numbers are list
-    in the config.yml. Need to improve to async operation.
+    in the config.yml
     """
 
     with open("config.yml") as fp:
@@ -69,7 +71,7 @@ def find_odrvs() -> dict[str, any]:
     for section, serial in config["serial"].items():
         print(f"searching for serial number {serial}...")
         try:
-            odrv = odrive.find_any(serial_number=serial, timeout=3)
+            odrv = odrive.find_any(serial_number=serial, timeout=2)
             odrvs[section] = odrv
             print(f"-> assign odrive {serial} to {section} section")
             print(f"-> ", end="")
@@ -88,27 +90,27 @@ def check_error(odrv, name: str | None = None) -> None:
     if name is not None:
         print(f"{name} odrive checking...")
     print_voltage_current(odrv)
-    print(f'  {"system error:":<12} {ODriveError(odrv.axis0.error).name:^25}')
-    print(f'  {"error code:":<12} {"axis-0":^25} | {"axis-1":^25}')
+    print(f'  {"system error:":<12} {LegacyODriveError(odrv.error).name:^35}')
+    print(f'  {"error code:":<12} {"axis-0":^35} | {"axis-1":^35}')
     print(
         f'  {"axis":<12} '
-        f"{AxisError(odrv.axis0.error).name:^25} | "
-        f"{AxisError(odrv.axis1.error).name:^25}"
+        f"{AxisError(odrv.axis0.error).name:^35} | "
+        f"{AxisError(odrv.axis1.error).name:^35}"
     )
     print(
         f'  {"motor":<12} '
-        f"{MotorError(odrv.axis0.motor.error).name:^25} | "
-        f"{MotorError(odrv.axis1.motor.error).name:^25}"
+        f"{MotorError(odrv.axis0.motor.error).name:^35} | "
+        f"{MotorError(odrv.axis1.motor.error).name:^35}"
     )
     print(
         f'  {"controller":<12} '
-        f"{ControllerError(odrv.axis0.controller.error).name:^25} | "
-        f"{ControllerError(odrv.axis1.controller.error).name:^25}"
+        f"{ControllerError(odrv.axis0.controller.error).name:^35} | "
+        f"{ControllerError(odrv.axis1.controller.error).name:^35}"
     )
     print(
         f'  {"encoder":<12} '
-        f"{EncoderError(odrv.axis0.encoder.error).name:^25} | "
-        f"{EncoderError(odrv.axis1.encoder.error).name:^25}"
+        f"{EncoderError(odrv.axis0.encoder.error).name:^35} | "
+        f"{EncoderError(odrv.axis1.encoder.error).name:^35}"
     )
 
     print("--------------------------------------")
