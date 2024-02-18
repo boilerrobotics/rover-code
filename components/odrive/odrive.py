@@ -1,7 +1,7 @@
 import yaml
 import asyncio
 import odrive
-from enums import AxisError, ControllerError, EncoderError, MotorError, ODriveError
+from enums import ControllerError, EncoderError, MotorError, ODriveError
 from sensing import OdriveSensing
 from axis import Axis
 
@@ -32,6 +32,12 @@ class Odrive:
         self.axis0: Axis = odrv.axis0
         self.axis1: Axis = odrv.axis1
 
+    def get_error(self) -> str:
+        """
+        Return ODrive system error
+        """
+        return ODriveError(self.error).name
+
     def print_voltage_current(self, connection: OdriveSensing | None = None) -> None:
         """
         Print voltage and current for debugging.
@@ -43,37 +49,41 @@ class Odrive:
             connection.publish("brc/voltage", f"{self.vbus_voltage:5.2f}")
             connection.publish("brc/current", f"{self.ibus:7.5f}")
 
-    def check_error(self, name: str | None = None) -> None:
+    def check_errors(self, name: str | None = None) -> None:
         """
-        This function will print the error
+        This function will print the errors
         """
         if name is not None:
             print(f"{name} odrive checking...")
         self.print_voltage_current()
-
-        print(f'  {"system error:":<12} {ODriveError(self.error).name:^35}')
-        print(f'  {"error code:":<12} {"axis-0":^35} | {"axis-1":^35}')
+        print(f'  {"system error:":<15} {self.get_error():^35}')
+        print(f'  {"error code:":<15} {"axis-0":^35} | {"axis-1":^35}')
         print(
-            f'  {"axis":<12} '
-            f"{AxisError(self.axis0.error).name:^35} | "
-            f"{AxisError(self.axis1.error).name:^35}"
+            f'  {"axis":<15} '
+            f"{self.axis0.get_error():^35} | "
+            f"{self.axis1.get_error():^35}"
         )
         print(
-            f'  {"motor":<12} '
-            f"{MotorError(self.axis0.motor.error).name:^35} | "
-            f"{MotorError(self.axis1.motor.error).name:^35}"
+            f'  {"motor":<15} '
+            f"{self.axis0.motor.get_error():^35} | "
+            f"{self.axis1.motor.get_error():^35}"
         )
         print(
-            f'  {"controller":<12} '
+            f'  {"controller":<15} '
             f"{ControllerError(self.axis0.controller.error).name:^35} | "
             f"{ControllerError(self.axis1.controller.error).name:^35}"
         )
         print(
-            f'  {"encoder":<12} '
+            f'  {"encoder":<15} '
             f"{EncoderError(self.odrv.axis0.encoder.error).name:^35} | "
             f"{EncoderError(self.odrv.axis1.encoder.error).name:^35}"
         )
-
+        print(f'  {"is calibrated? :":<15} {"axis-0":^35} | {"axis-1":^35}')
+        print(
+            f'  {"motor":<15} '
+            f"{self.axis0.motor.is_calibrated:^35} | "
+            f"{self.axis1.motor.is_calibrated:^35}"
+        )
         print("--------------------------------------")
 
     def check_version(self) -> None:
