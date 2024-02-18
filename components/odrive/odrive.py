@@ -1,7 +1,7 @@
 import yaml
 import asyncio
 import odrive
-from enums import ControllerError, EncoderError, MotorError, ODriveError
+from enums import ODriveError
 from sensing import OdriveSensing
 from axis import Axis
 
@@ -56,33 +56,43 @@ class Odrive:
         if name is not None:
             print(f"{name} odrive checking...")
         self.print_voltage_current()
-        print(f'  {"system error:":<15} {self.get_error():^35}')
-        print(f'  {"error code:":<15} {"axis-0":^35} | {"axis-1":^35}')
+        print(f'  {"system error:":<20} {self.get_error():^35}')
+        print(f'  {"error code:":<20} {"axis-0":^35} | {"axis-1":^35}')
         print(
-            f'  {"axis":<15} '
+            f'  {"axis":<20} '
             f"{self.axis0.get_error():^35} | "
             f"{self.axis1.get_error():^35}"
         )
         print(
-            f'  {"motor":<15} '
+            f'  {"motor":<20} '
             f"{self.axis0.motor.get_error():^35} | "
             f"{self.axis1.motor.get_error():^35}"
         )
         print(
-            f'  {"controller":<15} '
-            f"{ControllerError(self.axis0.controller.error).name:^35} | "
-            f"{ControllerError(self.axis1.controller.error).name:^35}"
+            f'  {"controller":<20} '
+            f"{self.axis0.controller.get_error():^35} | "
+            f"{self.axis1.controller.get_error():^35}"
         )
         print(
-            f'  {"encoder":<15} '
-            f"{EncoderError(self.odrv.axis0.encoder.error).name:^35} | "
-            f"{EncoderError(self.odrv.axis1.encoder.error).name:^35}"
+            f'  {"encoder":<20} '
+            f"{self.axis0.encoder.get_error():^35} | "
+            f"{self.axis1.encoder.get_error():^35}"
         )
-        print(f'  {"is calibrated? :":<15} {"axis-0":^35} | {"axis-1":^35}')
+        print(f'  {"status :":<20} {"axis-0":^35} | {"axis-1":^35}')
         print(
-            f'  {"motor":<15} '
+            f'  {"motor calibrated":<20} '
             f"{self.axis0.motor.is_calibrated:^35} | "
             f"{self.axis1.motor.is_calibrated:^35}"
+        )
+        print(
+            f'  {"encoder ready":<20} '
+            f"{self.axis0.encoder.is_ready:^35} | "
+            f"{self.axis1.encoder.is_ready:^35}"
+        )
+        print(
+            f'  {"encoder index found":<20} '
+            f"{self.axis0.encoder.index_found:^35} | "
+            f"{self.axis1.encoder.index_found:^35}"
         )
         print("--------------------------------------")
 

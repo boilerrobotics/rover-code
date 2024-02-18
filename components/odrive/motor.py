@@ -6,7 +6,7 @@ class Motor:
     ODrive motor abstract class
 
     Full document:
-    https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motoris
+    https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor
 
     This class is not included all configurations from the document
     """
@@ -20,6 +20,6 @@ class Motor:
 
     def get_error(self) -> str:
         """
-        Return axis error
+        Return motor error
         """
         return MotorError(self.error).name

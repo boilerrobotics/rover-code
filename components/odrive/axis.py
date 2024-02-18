@@ -1,4 +1,6 @@
 from motor import Motor
+from controller import Controller
+from encoder import Encoder
 from enums import AxisError
 
 class Axis:
@@ -21,6 +23,10 @@ class Axis:
         self.requested_state: int = axis.requested_state
         # see motor.py
         self.motor: Motor = axis.motor
+        # see controller.py
+        self.controller: Controller = axis.controller
+        # see encoder.py
+        self.encoder: Encoder = axis.encoder
 
     def get_error(self) -> str:
         """
