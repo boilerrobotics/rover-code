@@ -1,8 +1,8 @@
 import asyncio
 import time
 import utils
+from enums import ControlMode, MotorType, EncoderMode, AxisState
 from test_run import test_run
-from odrive.enums import *
 
 
 def dump_config(odrv, filename) -> None:

@@ -6,7 +6,7 @@ import time
 import yaml
 import asyncio
 import odrive
-from odrive.enums import *
+from enums import AxisError, ControllerError, EncoderError, MotorError, ODriveError
 from sensing import OdriveSensing
 
 
@@ -90,7 +90,7 @@ def check_error(odrv, name: str | None = None) -> None:
     if name is not None:
         print(f"{name} odrive checking...")
     print_voltage_current(odrv)
-    print(f'  {"system error:":<12} {LegacyODriveError(odrv.error).name:^35}')
+    print(f'  {"system error:":<12} {ODriveError(odrv.error).name:^35}')
     print(f'  {"error code:":<12} {"axis-0":^35} | {"axis-1":^35}')
     print(
         f'  {"axis":<12} '
