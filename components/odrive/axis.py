@@ -22,11 +22,11 @@ class Axis:
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Axis.requested_state
         self.requested_state: int = axis.requested_state
         # see motor.py
-        self.motor: Motor = axis.motor
+        self.motor = Motor(axis.motor)
         # see controller.py
-        self.controller: Controller = axis.controller
+        self.controller = Controller(axis.controller)
         # see encoder.py
-        self.encoder: Encoder = axis.encoder
+        self.encoder = Encoder(axis.encoder)
 
     def get_error(self) -> str:
         """

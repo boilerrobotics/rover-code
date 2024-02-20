@@ -29,8 +29,9 @@ class Odrive:
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.fw_version_major
         self.fw_version = f"{odrv.fw_version_major}.{odrv.fw_version_minor}.{odrv.fw_version_revision}"
         # check axis.py
-        self.axis0: Axis = odrv.axis0
-        self.axis1: Axis = odrv.axis1
+        self.axis0 = Axis(odrv.axis0)
+        self.axis1 = Axis(odrv.axis1)
+        self.config = self.Config(odrv.config)
 
     def get_error(self) -> str:
         """
@@ -104,6 +105,27 @@ class Odrive:
             f"Firmware version is {self.fw_version}."
             f'{" " * 3} Hardware version is {self.hw_version}.'
         )
+
+    class Config:
+        """
+        Odrive config class
+        https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Config
+        """
+
+        def __init__(self, config) -> None:
+            self.config = config
+            # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Config.brake_resistance
+            self.brake_resistance = 0.5
+            # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Config.enable_brake_resistor
+            self.enable_brake_resistor = True
+
+        def set_break_resistor(self, brake_resistance: int | None = None) -> None:
+            if brake_resistance:
+                self.brake_resistance = brake_resistance
+            self.config.brake_resistance = self.brake_resistance
+            self.config.enable_brake_resistor = self.enable_brake_resistor
+                
+            
 
 
 async def find_odrvs_async(timeout=3) -> dict[str, Odrive]:
