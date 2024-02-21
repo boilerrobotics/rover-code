@@ -1,6 +1,6 @@
 import asyncio
 import time
-import utils
+from utils import Odrive, find_odrvs_async
 from enums import ControlMode, MotorType, EncoderMode, AxisState
 from test_run import test_run
 
@@ -98,22 +98,22 @@ def full_calibration(odrvs):
         print(f"Section {section} calibration completed")
 
 
-async def calibrate(section, odrv):
-    print(f"Calibrating {section}...")
-    utils.check_error(odrv, section)  # Checking errors before starting
-    odrv.config.brake_resistance = 0.5
-    for axis in [odrv.axis0, odrv.axis1]:
-        config_controller(axis.controller)
-        config_motor(axis.motor)
-        config_encoder(axis.encoder)
-    print(f"Section {section} calibration completed")
-    utils.check_error(odrv, section)  # Checking errors at the end
+async def calibrate(odrv: Odrive):
+    print(f"Calibrating {odrv.section}...")
+    odrv.check_errors()  # Checking errors before starting
+    # odrv.config.brake_resistance = 0.5
+    # for axis in [odrv.axis0, odrv.axis1]:
+    #     config_controller(axis.controller)
+    #     config_motor(axis.motor)
+    #     config_encoder(axis.encoder)
+    # print(f"Section {section} calibration completed")
+    # utils.check_error(odrv, section)  # Checking errors at the end
 
 
 async def main():
-    odrvs = await utils.find_odrvs_async()
+    odrvs = await find_odrvs_async()
     print("Running Calibration ...")
-    await asyncio.gather(*[calibrate(section, odrv) for section, odrv in odrvs.items()])
+    await asyncio.gather(*[calibrate(*odrvs)])
     # full_calibration(odrvs)
     # print("Test run ...")
     # test_run(odrvs, running_time=5, running_speed=3)
