@@ -11,7 +11,8 @@ This is a main repo for communication & intelligence team. There are three sub-f
 ## Setup
 
 The folder [src](./src/) is the main folder to work with.
-This ROS working space is tested on ROS Iron on Ubuntu 22.04 LTS and ROS Eloquent on Ubuntu 18.04 as it is a Jetson TX2 environment. 
+This ROS working space is tested on ROS Iron on Ubuntu 22.04 LTS.
+Some packages are tested with ROS Eloquent on Ubuntu 18.04 as it is a Jetson TX2 environment. 
 Installation guide can be found in [tutorial](./tutorial/)
 To run the code, you will need to compile and install.
 To compile
@@ -48,7 +49,7 @@ We use `rosdep` to manage them.
 sudo apt-get install python3-rosdep
 sudo rosdep init
 rosdep update
-rosdep install --from-paths src --ignore-src
+rosdep install --from-paths src --ignore-src --rosdistro iron --os=ubuntu:jammy
 ```
 
 All dependencies should be mentioned in each package's `package.xml` whenever possible.

@@ -4,7 +4,7 @@
 
 Our core software framework is Robot Operating System or [ROS](https://www.ros.org/).
 There are legacy ROS which is no longer actively developed.
-The latest version (Noetic Ninjemys) will reach End of Life in May 2025.
+The latest version (Noetic) will reach End of Life in May 2025.
 Therefore, we will use ROS 2 instead.
 We will use ROS or ROS 2 interchangeably and it will always refer to ROS 2.
 ROS can run on many operating systems but we highly recommend you to use it with Ubuntu.
@@ -18,10 +18,10 @@ The list below is software you need to install.
 2. [Ubuntu 22.04](https://ubuntu.com/download/desktop) (LTS - Long Term Support). This is a first tier support by ROS.
    You are welcome to choose any [flavors](https://ubuntu.com/desktop/flavours) that you want.
 
-3. [ROS 2 Iron Irwini](https://docs.ros.org/en/iron/Installation/Ubuntu-Install-Debians.html).
+3. [ROS 2 Iron](https://docs.ros.org/en/iron/Installation/Ubuntu-Install-Debians.html).
 
-Note: ROS Iron Irwini will reach EOL on November 2024.
-The new ROS Jazzy Jaliso will be release on May 2024.
+Note: ROS Iron will reach EOL on November 2024.
+The new ROS Jazzy will be release on May 2024.
 ROS Jazzy will likely to expect Ubuntu 24.04 (Noble Numbat) as first tier support which will be released on April 2024.
 The tutorial instruction will be updated to new version of ROS and Ubuntu once the code is tested.
 Until then, it is recommended to stay with Ubuntu 22.04 & ROS Iron.
