@@ -19,6 +19,7 @@ class Odrive:
     def __init__(self, odrv, section) -> None:
         self.odrv = odrv
         self.section = section
+        self.serial_number: str = f"{odrv.serial_number:x}".upper()
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.vbus_voltage
         self.vbus_voltage: float = odrv.vbus_voltage
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.ibus
@@ -107,6 +108,29 @@ class Odrive:
             f'{" " * 3} Hardware version is {self.hw_version}'
         )
 
+    async def reboot(self) -> None:
+        '''
+        Reboot Odrive then reconnect with 30 seconds timeout
+        '''
+        try:
+            self.odrv.reboot()
+        except Exception:
+            print(
+                f"rebooting {self.section} odrive..."
+            )  # odrive will disapper. expect error will happen
+        finally:
+            # find odrive again
+            try:
+                self.odrv = await asyncio.wait_for(
+                    odrive.find_any_async(serial_number=self.serial_number), timeout=30
+                )
+            except asyncio.TimeoutError:
+                print("Timeout: cannot reconnect with Odrive")
+            except Exception as e:
+                print(f"Unknown error: {e}")
+            else:
+                print(f"{self.section} odrive is online...")
+
     class Config:
         """
         Odrive config class
@@ -127,7 +151,7 @@ class Odrive:
             self.config.enable_brake_resistor = self.enable_brake_resistor
 
 
-async def find_odrvs_async(timeout=3) -> list[Odrive]:
+async def find_odrvs_async(timeout=3, section: str | None = None) -> list[Odrive]:
     """
     This function will find all ODrives asynchronously.
     This function is not available on Odrive library version 0.5.4
