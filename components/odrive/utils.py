@@ -20,12 +20,6 @@ class Odrive:
         self.odrv = odrv
         self.section = section
         self.serial_number: str = f"{odrv.serial_number:x}".upper()
-        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.vbus_voltage
-        self.vbus_voltage: float = odrv.vbus_voltage
-        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.ibus
-        self.ibus: float = odrv.ibus
-        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Error
-        self.error: int = odrv.error
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.hw_version_major
         self.hw_version = f"{odrv.hw_version_major}.{odrv.hw_version_minor} {odrv.hw_version_variant}V"
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.fw_version_major
@@ -39,18 +33,23 @@ class Odrive:
         """
         Return ODrive system error
         """
-        return ODriveError(self.error).name
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Error
+        return ODriveError(self.odrv.error).name
 
     def print_voltage_current(self, connection: OdriveSensing | None = None) -> None:
         """
         Print voltage and current for debugging.
         """
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.vbus_voltage
+        vbus_voltage: float = self.odrv.vbus_voltage
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.ibus
+        ibus: float = self.odrv.ibus
         print(
-            f"  voltage = {self.vbus_voltage:5.2f} V" f"  current = {self.ibus:6.4f} A"
+            f"  voltage = {vbus_voltage:5.2f} V" f"  current = {ibus:6.4f} A"
         )
         if connection:
-            connection.publish("brc/voltage", f"{self.vbus_voltage:5.2f}")
-            connection.publish("brc/current", f"{self.ibus:7.5f}")
+            connection.publish("brc/voltage", f"{vbus_voltage:5.2f}")
+            connection.publish("brc/current", f"{ibus:7.5f}")
 
     def check_errors(self) -> None:
         """
@@ -108,12 +107,16 @@ class Odrive:
             f'{" " * 3} Hardware version is {self.hw_version}'
         )
 
-    async def reboot(self) -> None:
+    async def reboot(self, save_config: bool = False) -> None:
         '''
-        Reboot Odrive then reconnect with 30 seconds timeout
+        Reboot Odrive then reconnect with 30 seconds timeout.
+        Option to save config
         '''
         try:
-            self.odrv.reboot()
+            if save_config:
+                self.odrv.save_configuration()
+            else:
+                self.odrv.reboot()
         except Exception:
             print(
                 f"rebooting {self.section} odrive..."

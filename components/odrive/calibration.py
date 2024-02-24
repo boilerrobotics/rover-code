@@ -102,9 +102,7 @@ async def calibrate(odrv: Odrive):
     print(f"Calibrating {odrv.section}...")
     odrv.check_errors()  # Checking errors before starting
     odrv.config.set_break_resistor(0.5)
-    await odrv.reboot()
-    print(odrv.odrv.vbus_voltage)
-
+    await odrv.reboot(save_config=True)
     # for axis in [odrv.axis0, odrv.axis1]:
     #     config_controller(axis.controller)
     #     config_motor(axis.motor)
