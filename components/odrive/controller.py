@@ -1,4 +1,4 @@
-from enums import ControllerError
+from enums import ControllerError, ControlMode
 
 
 class Controller:
@@ -28,3 +28,6 @@ class Controller:
         Return controller error
         """
         return ControllerError(self.error).name
+
+    def set_configs(self) -> None:
+        self.config.control_mode = ControlMode.VELOCITY_CONTROL

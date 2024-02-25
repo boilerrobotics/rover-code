@@ -56,7 +56,7 @@ class Odrive:
         This function will print the errors
         """
         print("-" * 100)
-        print(f"{self.section} odrive checking...")
+        print(f"{self.section} odrive status check...")
         self.print_voltage_current()
         print(f'  {"system error:":<10} {self.get_error():}')
         print(f'  {"error code:":<20} {"axis-0":^35} | {"axis-1":^35}')
@@ -124,15 +124,29 @@ class Odrive:
         finally:
             # find odrive again
             try:
-                self.odrv = await asyncio.wait_for(
+                odrv = await asyncio.wait_for(
                     odrive.find_any_async(serial_number=self.serial_number), timeout=30
                 )
+                self.odrv = odrv
+                self.axis0 = Axis(odrv.axis0)
+                self.axis1 = Axis(odrv.axis1)
             except asyncio.TimeoutError:
                 print("Timeout: cannot reconnect with Odrive")
             except Exception as e:
                 print(f"Unknown error: {e}")
             else:
                 print(f"{self.section} odrive is online...")
+
+    async def calibrate(self) -> None:
+        print(self.axis0.get_state())
+        self.print_voltage_current()
+        # self.axis0.request_full_calibration()
+        while(not self.axis0.is_idel()):
+            await asyncio.sleep(1)
+            print(self.axis0.get_state())
+            self.print_voltage_current()
+        
+
 
     class Config:
         """

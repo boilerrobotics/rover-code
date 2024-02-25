@@ -22,4 +22,5 @@ class Motor:
         """
         Return motor error
         """
-        return MotorError(self.error).name
+        # 4098 means 4096 + 2
+        return MotorError(self.error)

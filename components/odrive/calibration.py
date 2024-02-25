@@ -99,26 +99,24 @@ def full_calibration(odrvs):
 
 
 async def calibrate(odrv: Odrive):
-    print(f"Calibrating {odrv.section}...")
+    print(f"Calibrating {odrv.section} odrive...")
     odrv.check_errors()  # Checking errors before starting
     odrv.config.set_break_resistor(0.5)
     await odrv.reboot(save_config=True)
+    await odrv.calibrate()
     # for axis in [odrv.axis0, odrv.axis1]:
     #     config_controller(axis.controller)
     #     config_motor(axis.motor)
     #     config_encoder(axis.encoder)
-    # print(f"Section {section} calibration completed")
+    print(f"{odrv.section} odrive calibration completed")
     odrv.check_errors()  # Checking errors at the end
 
 
 async def main():
     odrvs = await find_odrvs_async()
     print("Running Calibration ...")
-    await calibrate(odrvs[0])
-    # tasks = [asyncio.create_task(calibrate(*odrvs))]
-    # done, pending = await asyncio.wait(tasks, return_when=asyncio.ALL_COMPLETED)
-    # res = await asyncio.gather(*[calibrate(*odrvs)], return_exceptions=True)
-    # print(res)
+    for odrv in odrvs:
+        await calibrate(odrv)
     # full_calibration(odrvs)
     # print("Test run ...")
     # test_run(odrvs, running_time=5, running_speed=3)

@@ -1,7 +1,7 @@
 from motor import Motor
 from controller import Controller
 from encoder import Encoder
-from enums import AxisError
+from enums import AxisError, AxisState
 
 class Axis:
     """
@@ -15,10 +15,6 @@ class Axis:
 
     def __init__(self, axis) -> None:
         self.axis = axis
-        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Axis.Error
-        self.error: int = axis.error
-        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Axis.AxisState
-        self.current_state: int = axis.current_state
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Axis.requested_state
         self.requested_state: int = axis.requested_state
         # see motor.py
@@ -32,4 +28,19 @@ class Axis:
         """
         Return axis error
         """
-        return AxisError(self.error).name
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Axis.Error
+        return AxisError(self.axis.error).name
+    
+    def is_idel(self) -> bool:
+        return self.axis.current_state == AxisState.IDLE
+
+    def get_state(self) -> str:
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Axis.AxisState
+        return AxisState(self.axis.current_state).name
+    
+    def request_full_calibration(self) -> str:
+        self.axis.requested_state = AxisState.FULL_CALIBRATION_SEQUENCE
+
+
+    # def set_configs(self) -> None:
+        
