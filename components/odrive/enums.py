@@ -135,30 +135,30 @@ class AxisError(enum.IntFlag):
 
 # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Error
 class MotorError(enum.IntFlag):
-    NONE                                            = 0x00000000
-    PHASE_RESISTANCE_OUT_OF_RANGE                   = 0x00000001
-    PHASE_INDUCTANCE_OUT_OF_RANGE                   = 0x00000002
-    DRV_FAULT                                       = 0x00000008
-    CONTROL_DEADLINE_MISSED                         = 0x00000010
-    MODULATION_MAGNITUDE                            = 0x00000080
-    CURRENT_SENSE_SATURATION                        = 0x00000400
-    CURRENT_LIMIT_VIOLATION                         = 0x00001000
-    MODULATION_IS_NAN                               = 0x00010000
-    MOTOR_THERMISTOR_OVER_TEMP                      = 0x00020000
-    FET_THERMISTOR_OVER_TEMP                        = 0x00040000
-    TIMER_UPDATE_MISSED                             = 0x00080000
-    CURRENT_MEASUREMENT_UNAVAILABLE                 = 0x00100000
-    CONTROLLER_FAILED                               = 0x00200000
-    I_BUS_OUT_OF_RANGE                              = 0x00400000
-    BRAKE_RESISTOR_DISARMED                         = 0x00800000
-    SYSTEM_LEVEL                                    = 0x01000000
-    BAD_TIMING                                      = 0x02000000
-    UNKNOWN_PHASE_ESTIMATE                          = 0x04000000
-    UNKNOWN_PHASE_VEL                               = 0x08000000
-    UNKNOWN_TORQUE                                  = 0x10000000
-    UNKNOWN_CURRENT_COMMAND                         = 0x20000000
-    UNKNOWN_CURRENT_MEASUREMENT                     = 0x40000000
-    UNKNOWN_VBUS_VOLTAGE                            = 0x80000000
+    NONE                                            = 0x000000000
+    PHASE_RESISTANCE_OUT_OF_RANGE                   = 0x000000001
+    PHASE_INDUCTANCE_OUT_OF_RANGE                   = 0x000000002
+    DRV_FAULT                                       = 0x000000008
+    CONTROL_DEADLINE_MISSED                         = 0x000000010
+    MODULATION_MAGNITUDE                            = 0x000000080
+    CURRENT_SENSE_SATURATION                        = 0x000000400
+    CURRENT_LIMIT_VIOLATION                         = 0x000001000
+    MODULATION_IS_NAN                               = 0x000010000
+    MOTOR_THERMISTOR_OVER_TEMP                      = 0x000020000
+    FET_THERMISTOR_OVER_TEMP                        = 0x000040000
+    TIMER_UPDATE_MISSED                             = 0x000080000
+    CURRENT_MEASUREMENT_UNAVAILABLE                 = 0x000100000
+    CONTROLLER_FAILED                               = 0x000200000
+    I_BUS_OUT_OF_RANGE                              = 0x000400000
+    BRAKE_RESISTOR_DISARMED                         = 0x000800000
+    SYSTEM_LEVEL                                    = 0x001000000
+    BAD_TIMING                                      = 0x002000000
+    UNKNOWN_PHASE_ESTIMATE                          = 0x004000000
+    UNKNOWN_PHASE_VEL                               = 0x008000000
+    UNKNOWN_TORQUE                                  = 0x010000000
+    UNKNOWN_CURRENT_COMMAND                         = 0x020000000
+    UNKNOWN_CURRENT_MEASUREMENT                     = 0x040000000
+    UNKNOWN_VBUS_VOLTAGE                            = 0x080000000
     UNKNOWN_VOLTAGE_COMMAND                         = 0x100000000
     UNKNOWN_GAINS                                   = 0x200000000
     CONTROLLER_INITIALIZING                         = 0x400000000
@@ -175,7 +175,7 @@ class ControllerError(enum.IntFlag):
     INVALID_LOAD_ENCODER                            = 0x00000010
     INVALID_ESTIMATE                                = 0x00000020
     INVALID_CIRCULAR_RANGE                          = 0x00000040
-    SPINOUT_DETECTED                                = 0x0000008
+    SPINOUT_DETECTED                                = 0x00000080
 
 
 # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Error
@@ -198,3 +198,26 @@ class SensorlessEstimatorError(enum.IntFlag):
     NONE                                            = 0x00000000
     UNSTABLE_GAIN                                   = 0x00000001
     UNKNOWN_CURRENT_MEASUREMENT                     = 0x00000002
+
+class Error:
+    """
+    Decode multiple errors.
+    """
+
+    def __init__(self) -> None:
+        pass
+
+    def decode_errors(self, error_code: int) -> list[int]:
+        errors = []
+        divider = 1
+        # find the upper value
+        while divider < error_code:
+            divider *= 2
+        # extract error codes
+        while error_code > 0:
+            if error_code // divider:
+                errors.append(divider)
+                error_code -= divider
+            divider /= 2
+        
+        return errors
