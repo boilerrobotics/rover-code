@@ -1,7 +1,7 @@
-from enums import EncoderError
+from enums import EncoderError, Error
 
 
-class Encoder:
+class Encoder(Error):
     """
     ODrive encoder abstract class
 
@@ -20,9 +20,10 @@ class Encoder:
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.index_found
         self.index_found: bool = encoder.index_found
 
-
-    def get_error(self) -> str:
+    def get_errors(self) -> str:
         """
-        Return encoder error
+        Return encoder errors
         """
-        return EncoderError(self.error).name
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Error
+        errors = self.decode_errors(self.encoder.error)
+        return " & ".join([EncoderError(error).name for error in errors])

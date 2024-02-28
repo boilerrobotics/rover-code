@@ -1,7 +1,7 @@
-from enums import MotorError
+from enums import MotorError, Error
 
 
-class Motor:
+class Motor(Error):
     """
     ODrive motor abstract class
 
@@ -18,9 +18,11 @@ class Motor:
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.is_calibrated
         self.is_calibrated: bool = motor.is_calibrated
 
-    def get_error(self) -> str:
+    def get_errors(self) -> str:
         """
-        Return motor error
+        Return motor errors
         """
-        # 4098 means 4096 + 2
-        return MotorError(self.error)
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Error
+        errors = self.decode_errors(self.motor.error)
+        return " & ".join([MotorError(error).name for error in errors])
+

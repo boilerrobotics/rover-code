@@ -1,7 +1,7 @@
-from enums import ControllerError, ControlMode
+from enums import ControllerError, ControlMode, Error
 
 
-class Controller:
+class Controller(Error):
     """
     ODrive controller abstract class
 
@@ -22,12 +22,13 @@ class Controller:
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.electrical_power
         self.electrical_power: float = controller.electrical_power
 
-
-    def get_error(self) -> str:
+    def get_errors(self) -> str:
         """
-        Return controller error
+        Return controller errors
         """
-        return ControllerError(self.error).name
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.Error
+        errors = self.decode_errors(self.controller.error)
+        return " & ".join([ControllerError(error).name for error in errors])
 
     def set_configs(self) -> None:
         self.config.control_mode = ControlMode.VELOCITY_CONTROL

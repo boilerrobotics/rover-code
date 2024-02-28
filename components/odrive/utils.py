@@ -1,12 +1,12 @@
 import yaml
 import asyncio
 import odrive
-from enums import ODriveError
+from enums import ODriveError, Error
 from sensing import OdriveSensing
 from axis import Axis
 
 
-class Odrive:
+class Odrive(Error):
     """
     ODrive abstract class
 
@@ -29,12 +29,13 @@ class Odrive:
         self.axis1 = Axis(odrv.axis1)
         self.config = self.Config(odrv.config)
 
-    def get_error(self) -> str:
+    def get_errors(self) -> str:
         """
-        Return ODrive system error
+        Return ODrive system errors
         """
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Error
-        return ODriveError(self.odrv.error).name
+        errors = self.decode_errors(self.odrv.error)
+        return " & ".join([ODriveError(error).name for error in errors])
 
     def print_voltage_current(self, connection: OdriveSensing | None = None) -> None:
         """
@@ -44,12 +45,17 @@ class Odrive:
         vbus_voltage: float = self.odrv.vbus_voltage
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.ibus
         ibus: float = self.odrv.ibus
-        print(
-            f"  voltage = {vbus_voltage:5.2f} V" f"  current = {ibus:6.4f} A"
-        )
+        print(f"  voltage = {vbus_voltage:5.2f} V" f"  current = {ibus:6.4f} A")
         if connection:
             connection.publish("brc/voltage", f"{vbus_voltage:5.2f}")
             connection.publish("brc/current", f"{ibus:7.5f}")
+
+    def print_errors(self, component, name: str) -> str: 
+        """
+        This function print part of the errors
+        """
+        if errors := component.get_errors():
+            print(f'  {name} has {errors}')
 
     def check_errors(self) -> None:
         """
@@ -58,28 +64,15 @@ class Odrive:
         print("-" * 100)
         print(f"{self.section} odrive status check...")
         self.print_voltage_current()
-        print(f'  {"system error:":<10} {self.get_error():}')
-        print(f'  {"error code:":<20} {"axis-0":^35} | {"axis-1":^35}')
-        print(
-            f'  {"axis":<20} '
-            f"{self.axis0.get_error():^35} | "
-            f"{self.axis1.get_error():^35}"
-        )
-        print(
-            f'  {"motor":<20} '
-            f"{self.axis0.motor.get_error():^35} | "
-            f"{self.axis1.motor.get_error():^35}"
-        )
-        print(
-            f'  {"controller":<20} '
-            f"{self.axis0.controller.get_error():^35} | "
-            f"{self.axis1.controller.get_error():^35}"
-        )
-        print(
-            f'  {"encoder":<20} '
-            f"{self.axis0.encoder.get_error():^35} | "
-            f"{self.axis1.encoder.get_error():^35}"
-        )
+        self.print_errors(self, "system errors")
+        self.print_errors(self.axis0, "axis 0")
+        self.print_errors(self.axis1, "axis 1")
+        self.print_errors(self.axis0.motor, "motor 0")
+        self.print_errors(self.axis1.motor, "motor 1")
+        self.print_errors(self.axis0.controller, "controller 0")
+        self.print_errors(self.axis1.controller, "controller 1")
+        self.print_errors(self.axis0.encoder, "encoder 0")
+        self.print_errors(self.axis1.encoder, "encoder 1")
         print(f'  {"status :":<20}')
         print(
             f'  {"motor calibrated":<20} '
@@ -108,10 +101,10 @@ class Odrive:
         )
 
     async def reboot(self, save_config: bool = False) -> None:
-        '''
+        """
         Reboot Odrive then reconnect with 30 seconds timeout.
         Option to save config
-        '''
+        """
         try:
             if save_config:
                 self.odrv.save_configuration()
@@ -139,14 +132,16 @@ class Odrive:
 
     async def calibrate(self) -> None:
         print(self.axis0.get_state())
+        print(self.axis1.get_state())
         self.print_voltage_current()
-        # self.axis0.request_full_calibration()
-        while(not self.axis0.is_idel()):
+        # Calibration can be done only one axis at a time
+        self.axis0.request_full_calibration()
+        # self.axis1.request_full_calibration()
+        while not (self.axis0.is_idel() & self.axis1.is_idel()):
             await asyncio.sleep(1)
             print(self.axis0.get_state())
+            print(self.axis1.get_state())
             self.print_voltage_current()
-        
-
 
     class Config:
         """
