@@ -5,23 +5,6 @@ from enums import ControlMode, MotorType, EncoderMode, AxisState
 from test_run import test_run
 
 
-def config_controller(controller) -> None:
-    controller.config.control_mode = ControlMode.VELOCITY_CONTROL
-    # controller.config.pos_gain = 1
-    controller.config.vel_limit = 10
-
-
-def config_motor(motor) -> None:
-    motor.config.pole_pairs = 7
-    motor.config.calibration_current = 20.0
-    motor.config.motor_type = MotorType.HIGH_CURRENT
-    motor.config.resistance_calib_max_voltage = 5.0
-    motor.config.requested_current_range = 20.0
-    motor.config.current_control_bandwidth = 100.0
-    motor.config.torque_constant = 8.27 / 270
-    motor.config.current_lim = 20
-
-
 def config_encoder(encoder) -> None:
     encoder.config.mode = EncoderMode.HALL
     encoder.config.cpr = 42

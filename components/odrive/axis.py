@@ -48,3 +48,4 @@ class Axis(Error):
         Set configurations
         """
         self.controller.set_configs()
+        self.motor.set_configs()

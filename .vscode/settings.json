@@ -9,6 +9,7 @@
         "src/install/shared_msgs/lib/python3.10/site-packages"
     ],
     "cSpell.words": [
+        "calib",
         "cantools",
         "colcon",
         "eabi",
