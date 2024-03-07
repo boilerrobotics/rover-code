@@ -221,3 +221,6 @@ class Error:
             divider /= 2
         
         return errors
+    
+    def decode_status(self, status: bool) -> str:
+        return "Y" if status else "N"

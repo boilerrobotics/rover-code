@@ -15,10 +15,6 @@ class Encoder(Error):
         self.encoder = encoder
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Error
         self.error: int = encoder.error
-        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.is_ready
-        self.is_ready: bool = encoder.is_ready
-        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.index_found
-        self.index_found: bool = encoder.index_found
 
     def get_errors(self) -> str:
         """
@@ -27,3 +23,11 @@ class Encoder(Error):
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Error
         errors = self.decode_errors(self.encoder.error)
         return " & ".join([EncoderError(error).name for error in errors])
+
+    def is_ready(self) -> str:
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.is_ready
+        return self.decode_status(self.encoder.is_ready)
+
+    def index_found(self) -> str:
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.index_found
+        return self.decode_status(self.encoder.index_found)

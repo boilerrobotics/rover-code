@@ -12,14 +12,18 @@
         "cantools",
         "colcon",
         "eabi",
+        "ibus",
         "Intelli",
         "Jetson",
         "lsusb",
         "odrive",
         "odrivetool",
+        "odrv",
+        "odrvs",
         "openocd",
         "rosdep",
         "rosdistro",
-        "sdist"
+        "sdist",
+        "vbus"
     ]
 }

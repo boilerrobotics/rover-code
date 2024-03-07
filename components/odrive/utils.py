@@ -50,12 +50,12 @@ class Odrive(Error):
             connection.publish("brc/voltage", f"{vbus_voltage:5.2f}")
             connection.publish("brc/current", f"{ibus:7.5f}")
 
-    def print_errors(self, component, name: str) -> str: 
+    def print_errors(self, component, name: str) -> str:
         """
         This function print part of the errors
         """
         if errors := component.get_errors():
-            print(f'  {name} has {errors}')
+            print(f"  {name} has {errors}")
 
     def check_errors(self) -> None:
         """
@@ -65,29 +65,31 @@ class Odrive(Error):
         print(f"{self.section} odrive status check...")
         self.print_voltage_current()
         self.print_errors(self, "system errors")
+        print(f"Axis 0 current state: {self.axis0.get_state()}")
         self.print_errors(self.axis0, "axis 0")
-        self.print_errors(self.axis1, "axis 1")
         self.print_errors(self.axis0.motor, "motor 0")
-        self.print_errors(self.axis1.motor, "motor 1")
         self.print_errors(self.axis0.controller, "controller 0")
-        self.print_errors(self.axis1.controller, "controller 1")
         self.print_errors(self.axis0.encoder, "encoder 0")
+        print(f"Axis 1 current state: {self.axis1.get_state()}")
+        self.print_errors(self.axis1, "axis 1")
+        self.print_errors(self.axis1.motor, "motor 1")
+        self.print_errors(self.axis1.controller, "controller 1")
         self.print_errors(self.axis1.encoder, "encoder 1")
-        print(f'  {"status :":<20}')
+        print(f' {"Status:":<20} {"axis-0":^15} | {"axis-1":^15}')
         print(
             f'  {"motor calibrated":<20} '
-            f"{self.axis0.motor.is_calibrated:^35} | "
-            f"{self.axis1.motor.is_calibrated:^35}"
+            f"{self.axis0.motor.is_calibrated():^15} | "
+            f"{self.axis1.motor.is_calibrated():^15}"
         )
         print(
             f'  {"encoder ready":<20} '
-            f"{self.axis0.encoder.is_ready:^35} | "
-            f"{self.axis1.encoder.is_ready:^35}"
+            f"{self.axis0.encoder.is_ready():^15} | "
+            f"{self.axis1.encoder.is_ready():^15}"
         )
         print(
             f'  {"encoder index found":<20} '
-            f"{self.axis0.encoder.index_found:^35} | "
-            f"{self.axis1.encoder.index_found:^35}"
+            f"{self.axis0.encoder.index_found():^15} | "
+            f"{self.axis1.encoder.index_found():^15}"
         )
         print("-" * 100)
 
@@ -113,7 +115,7 @@ class Odrive(Error):
         except Exception:
             print(
                 f"rebooting {self.section} odrive..."
-            )  # odrive will disapper. expect error will happen
+            )  # odrive will disappear. expect error will happen
         finally:
             # find odrive again
             try:
@@ -131,17 +133,17 @@ class Odrive(Error):
                 print(f"{self.section} odrive is online...")
 
     async def calibrate(self) -> None:
-        print(self.axis0.get_state())
-        print(self.axis1.get_state())
-        self.print_voltage_current()
-        # Calibration can be done only one axis at a time
-        self.axis0.request_full_calibration()
-        # self.axis1.request_full_calibration()
-        while not (self.axis0.is_idel() & self.axis1.is_idel()):
+        """
+        Run full calibration sequence
+        """
+        self.check_errors()
+        # calibration can be done only one axis at a time
+        for axis in [self.axis0, self.axis1]:
+            axis.request_full_calibration()
+        while not (self.axis0.is_idle() & self.axis1.is_idle()):
+            # check status every second
             await asyncio.sleep(1)
-            print(self.axis0.get_state())
-            print(self.axis1.get_state())
-            self.print_voltage_current()
+            self.check_errors()
 
     class Config:
         """
@@ -203,7 +205,7 @@ async def find_odrvs_async(timeout=3, section: str | None = None) -> list[Odrive
 def find_odrvs() -> dict[str, any]:
     """
     This function will find ODrive that serial numbers are list
-    in the config.yml. This fucntion needs to be changed to match
+    in the config.yml. This function needs to be changed to match
     expected output from `find_odrvs_async` function.
     """
 

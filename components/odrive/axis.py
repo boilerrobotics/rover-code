@@ -33,7 +33,7 @@ class Axis(Error):
         errors = self.decode_errors(self.axis.error)
         return " & ".join([AxisError(error).name for error in errors])
 
-    def is_idel(self) -> bool:
+    def is_idle(self) -> bool:
         return self.axis.current_state == AxisState.IDLE
 
     def get_state(self) -> str:
@@ -43,4 +43,8 @@ class Axis(Error):
     def request_full_calibration(self) -> str:
         self.axis.requested_state = AxisState.FULL_CALIBRATION_SEQUENCE
 
-    # def set_configs(self) -> None:
+    def set_configs(self) -> None:
+        """
+        Set configurations
+        """
+        self.controller.set_configs()

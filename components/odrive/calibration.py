@@ -5,27 +5,6 @@ from enums import ControlMode, MotorType, EncoderMode, AxisState
 from test_run import test_run
 
 
-def dump_config(odrv, filename) -> None:
-    """
-    Dump all config profile for comparison
-    """
-    with open(filename, "w+") as fp:
-        print(str(odrv), file=fp)
-        print(f'{"---" * 10}odrive config{"---" * 10}', file=fp)
-        print(str(odrv.config), file=fp)
-        for i, axis in enumerate([odrv.axis0, odrv.axis1]):
-            print(f'{"---" * 10}odrive axis{i}{"---" * 10}', file=fp)
-            print(str(axis), file=fp)
-            print(f'{"---" * 10}odrive axis{i} config{"---" * 10}', file=fp)
-            print(str(axis.config), file=fp)
-            print(f'{"---" * 10}odrive axis{i} controller{"---" * 10}', file=fp)
-            print(str(axis.controller.config), file=fp)
-            print(f'{"---" * 10}odrive axis{i} motor{"---" * 10}', file=fp)
-            print(str(axis.motor.config), file=fp)
-            print(f'{"---" * 10}odrive axis{i} encoder{"---" * 10}', file=fp)
-            print(str(axis.encoder.config), file=fp)
-
-
 def config_controller(controller) -> None:
     controller.config.control_mode = ControlMode.VELOCITY_CONTROL
     # controller.config.pos_gain = 1
@@ -102,6 +81,7 @@ async def calibrate(odrv: Odrive):
     print(f"Calibrating {odrv.section} odrive...")
     odrv.check_errors()  # Checking errors before starting
     odrv.config.set_break_resistor(0.5)
+    # need to reboot after set break resistor
     await odrv.reboot(save_config=True)
     await odrv.calibrate()
     # for axis in [odrv.axis0, odrv.axis1]:
