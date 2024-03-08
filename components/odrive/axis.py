@@ -49,3 +49,4 @@ class Axis(Error):
         """
         self.controller.set_configs()
         self.motor.set_configs()
+        self.encoder.set_configs()

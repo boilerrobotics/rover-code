@@ -1,4 +1,4 @@
-from enums import EncoderError, Error
+from enums import EncoderError, Error, EncoderMode
 
 
 class Encoder(Error):
@@ -31,3 +31,18 @@ class Encoder(Error):
     def index_found(self) -> str:
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.index_found
         return self.decode_status(self.encoder.index_found)
+
+    def set_configs(self) -> None:
+        """
+        Full document: https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config
+        """
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Mode
+        self.encoder.config.mode = EncoderMode.HALL
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.cpr
+        self.encoder.config.cpr = 42
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.bandwidth
+        self.encoder.config.bandwidth = 100
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.calib_scan_distance
+        self.encoder.config.calib_scan_distance = 100
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.calib_scan_omega
+        self.encoder.config.calib_scan_omega = 50
