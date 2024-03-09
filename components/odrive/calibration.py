@@ -36,10 +36,6 @@ async def calibrate(odrv: Odrive):
     # need to reboot after set break resistor
     await odrv.reboot(save_config=True)
     await odrv.calibrate()
-    # for axis in [odrv.axis0, odrv.axis1]:
-    #     config_controller(axis.controller)
-    #     config_motor(axis.motor)
-    #     config_encoder(axis.encoder)
     print(f"{odrv.section} odrive calibration completed")
     odrv.check_errors()  # Checking errors at the end
 

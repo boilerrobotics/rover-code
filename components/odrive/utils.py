@@ -75,7 +75,7 @@ class Odrive(Error):
         self.print_errors(self.axis1.motor, "motor 1")
         self.print_errors(self.axis1.controller, "controller 1")
         self.print_errors(self.axis1.encoder, "encoder 1")
-        print(f' {"Status:":<20} {"axis-0":^15} | {"axis-1":^15}')
+        print(f'  {"Status:":<20} {"axis-0":^15} | {"axis-1":^15}')
         print(
             f'  {"motor calibrated":<20} '
             f"{self.axis0.motor.is_calibrated():^15} | "
