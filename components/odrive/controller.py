@@ -40,6 +40,12 @@ class Controller(Error):
         """
         self.input_vel = speed
 
+    def stop(self) -> None:
+        """
+        Set speed to 0
+        """
+        self.set_speed(0)
+
     def set_configs(self) -> None:
         """
         Full document: https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.Config

@@ -52,8 +52,17 @@ class Axis(Error):
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Axis.AxisState
         return AxisState(self.axis.current_state).name
 
-    def request_full_calibration(self) -> str:
+    def request_full_calibration(self) -> None:
         self.axis.requested_state = AxisState.FULL_CALIBRATION_SEQUENCE
+
+    def request_close_loop_control(self) -> None:
+        self.axis.requested_state = AxisState.CLOSED_LOOP_CONTROL
+
+    def request_index_search(self) -> None:
+        self.axis.requested_state = AxisState.ENCODER_INDEX_SEARCH
+
+    def request_offset_calibration(self) -> None:
+        self.axis.requested_state = AxisState.ENCODER_OFFSET_CALIBRATION
 
     def set_configs(self) -> None:
         """

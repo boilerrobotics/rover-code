@@ -37,6 +37,12 @@ class Odrive(Error):
         errors = self.decode_errors(self.odrv.error)
         return " & ".join([ODriveError(error).name for error in errors])
 
+    def has_errors(self) -> bool:
+        """
+        Return true if there are any errors
+        """
+        return self.axis0.has_errors() or self.axis1.has_errors()
+
     def print_voltage_current(self, connection: OdriveSensing | None = None) -> None:
         """
         Print voltage and current for debugging.
@@ -133,6 +139,45 @@ class Odrive(Error):
                     # check status every second
                     await asyncio.sleep(1)
                     self.check_errors()
+
+    async def save_calibration_profile(self):
+        """
+        Save configuration to use pre-calibration profile.
+        No need to calibrate after power cycling.
+        Document: https://docs.odriverobotics.com/v/0.5.4/encoders.html#encoder-with-index-signal
+        """
+        self.check_errors()
+        # calibration can be done only one axis at a time
+        for axis in [self.axis0, self.axis1]:
+            axis.encoder.config.use_index = True
+            if axis.motor.is_calibrated() and axis.encoder.is_ready():
+                axis.request_index_search()
+                while not axis.is_idle():
+                    # check status every second
+                    await asyncio.sleep(1)
+                    self.check_errors()
+                axis.request_offset_calibration()
+                while not axis.is_idle():
+                    # check status every second
+                    await asyncio.sleep(1)
+                    self.check_errors()
+            axis.encoder.config.pre_calibrated = True
+            axis.motor.config.pre_calibrated = True
+
+    async def test_run(self, speed: float, duration: int) -> None:
+        """
+        Test run for "duration" second with "speed" turn/second.
+        Run both directions.
+        """
+        self.check_errors()
+        for axis in [self.axis0, self.axis1]:
+            axis.request_close_loop_control()
+            axis.controller.set_speed(speed)
+            await asyncio.sleep(duration)
+            axis.controller.set_speed(-speed)
+            await asyncio.sleep(duration)
+            axis.controller.stop()
+        self.check_errors()
 
     class Config:
         """

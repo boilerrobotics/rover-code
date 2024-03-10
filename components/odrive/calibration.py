@@ -1,31 +1,6 @@
 import asyncio
-import time
+
 from utils import Odrive, find_odrvs_async
-from enums import AxisState
-
-
-def pre_calibration_on(odrvs):
-    """
-    Set configuration to use pre-calibration profile.
-    """
-    for section, odrv in odrvs.items():
-        utils.check_error(odrv, section)
-        print(f"Calibrating {section}...")
-
-        for axis in [odrv.axis0, odrv.axis1]:
-            axis.encoder.config.use_index = True
-            axis.requested_state = AxisState.ENCODER_INDEX_SEARCH
-            while axis.current_state != AxisState.IDLE:
-                utils.print_voltage_current(odrv)
-                time.sleep(1)
-            axis.requested_state = AxisState.ENCODER_OFFSET_CALIBRATION
-            while axis.current_state != AxisState.IDLE:
-                utils.print_voltage_current(odrv)
-                time.sleep(1)
-            axis.encoder.config.pre_calibrated = True
-            axis.motor.config.pre_calibrated = True
-            utils.check_error(odrv, section)
-        odrv.save_configuration()
 
 
 async def calibrate(odrv: Odrive):
@@ -35,8 +10,26 @@ async def calibrate(odrv: Odrive):
         print(f"need to reset the system after enabling break resistor")
         await odrv.reboot(save_config=True)
     await odrv.calibrate()
-    print(f"{odrv.section} odrive calibration completed")
-    odrv.check_errors()  # Checking errors at the end
+    if odrv.has_errors():
+        print(f"{odrv.section} odrive calibration fail!")
+        odrv.check_errors()  # Checking errors at the end
+        return
+
+    print(f"{odrv.section} odrive calibration completed. Test run...")
+    for speed in [2, 5, 10]:
+        await odrv.test_run(speed, 2)
+    if odrv.has_errors():
+        print(f"{odrv.section} test run fail!")
+        return
+
+    print(f"{odrv.section} test run completed. Save configuration profile...")
+    odrv.save_calibration_profile()
+    await odrv.reboot(save_config=True)
+    # check if motor is calibrated
+    # and encoder is ready
+    # and index is found
+    # then test run
+    # or do we need to run offset calibration every time at the start up
 
 
 async def main():
@@ -44,7 +37,7 @@ async def main():
     print("Running Calibration ...")
     for odrv in odrvs:
         await calibrate(odrv)
-    # print("Test run ...")
+
     # test_run(odrvs, running_time=5, running_speed=3)
     # print("Setting pre-calibration ...")
     # pre_calibration_on(odrvs)
