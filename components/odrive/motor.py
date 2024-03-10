@@ -24,9 +24,15 @@ class Motor(Error):
         errors = self.decode_errors(self.motor.error)
         return " & ".join([MotorError(error).name for error in errors])
 
-    def is_calibrated(self) -> str:
+    def has_errors(self) -> bool:
+        """
+        Return true if there are any errors
+        """
+        return self.motor.error != 0
+
+    def is_calibrated(self) -> bool:
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.is_calibrated
-        return self.decode_status(self.motor.is_calibrated)
+        return self.motor.is_calibrated
 
     def set_configs(self) -> None:
         """

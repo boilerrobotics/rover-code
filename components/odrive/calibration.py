@@ -1,8 +1,7 @@
 import asyncio
 import time
 from utils import Odrive, find_odrvs_async
-from enums import ControlMode, MotorType, EncoderMode, AxisState
-from test_run import test_run
+from enums import AxisState
 
 
 def pre_calibration_on(odrvs):
@@ -32,9 +31,9 @@ def pre_calibration_on(odrvs):
 async def calibrate(odrv: Odrive):
     print(f"Calibrating {odrv.section} odrive...")
     odrv.check_errors()  # Checking errors before starting
-    odrv.config.set_break_resistor(0.5)
-    # need to reboot after set break resistor
-    await odrv.reboot(save_config=True)
+    if odrv.config.set_break_resistor(0.5):
+        print(f"need to reset the system after enabling break resistor")
+        await odrv.reboot(save_config=True)
     await odrv.calibrate()
     print(f"{odrv.section} odrive calibration completed")
     odrv.check_errors()  # Checking errors at the end

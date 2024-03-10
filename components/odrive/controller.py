@@ -28,6 +28,12 @@ class Controller(Error):
         errors = self.decode_errors(self.controller.error)
         return " & ".join([ControllerError(error).name for error in errors])
 
+    def has_errors(self) -> bool:
+        """
+        Return true if there are any errors
+        """
+        return self.controller.error != 0
+
     def set_speed(self, speed: float) -> None:
         """
         Set speed in turn per second

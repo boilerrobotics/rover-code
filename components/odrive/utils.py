@@ -25,8 +25,8 @@ class Odrive(Error):
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.fw_version_major
         self.fw_version = f"{odrv.fw_version_major}.{odrv.fw_version_minor}.{odrv.fw_version_revision}"
         # check axis.py
-        self.axis0 = Axis(odrv.axis0)
-        self.axis1 = Axis(odrv.axis1)
+        self.axis0 = Axis(odrv.axis0, 0)
+        self.axis1 = Axis(odrv.axis1, 1)
         self.config = self.Config(odrv.config)
 
     def get_errors(self) -> str:
@@ -75,23 +75,6 @@ class Odrive(Error):
         self.print_errors(self.axis1.motor, "motor 1")
         self.print_errors(self.axis1.controller, "controller 1")
         self.print_errors(self.axis1.encoder, "encoder 1")
-        print(f'  {"Status:":<20} {"axis-0":^15} | {"axis-1":^15}')
-        print(
-            f'  {"motor calibrated":<20} '
-            f"{self.axis0.motor.is_calibrated():^15} | "
-            f"{self.axis1.motor.is_calibrated():^15}"
-        )
-        print(
-            f'  {"encoder ready":<20} '
-            f"{self.axis0.encoder.is_ready():^15} | "
-            f"{self.axis1.encoder.is_ready():^15}"
-        )
-        print(
-            f'  {"encoder index found":<20} '
-            f"{self.axis0.encoder.index_found():^15} | "
-            f"{self.axis1.encoder.index_found():^15}"
-        )
-        print("-" * 100)
 
     def check_version(self) -> None:
         """
@@ -139,11 +122,17 @@ class Odrive(Error):
         self.check_errors()
         # calibration can be done only one axis at a time
         for axis in [self.axis0, self.axis1]:
-            axis.request_full_calibration()
-        while not (self.axis0.is_idle() & self.axis1.is_idle()):
-            # check status every second
-            await asyncio.sleep(1)
-            self.check_errors()
+            name = f"Odrive {self.section} axis {axis.id}"
+            if axis.motor.is_calibrated() and axis.encoder.is_ready():
+                print(f"{name} is calibrated and ready. Calibration is not needed")
+            elif axis.has_errors():
+                print(f"{name} has error(s). Abort calibration")
+            else:
+                axis.request_full_calibration()
+                while not axis.is_idle():
+                    # check status every second
+                    await asyncio.sleep(1)
+                    self.check_errors()
 
     class Config:
         """
@@ -158,11 +147,19 @@ class Odrive(Error):
             # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Config.enable_brake_resistor
             self.enable_brake_resistor = True
 
-        def set_break_resistor(self, brake_resistance: int | None = None) -> None:
+        def set_break_resistor(self, brake_resistance: int | None = None) -> bool:
+            """
+            If break resistor is already enable, return False.
+            The system won't reboot.
+            """
             if brake_resistance:
                 self.brake_resistance = brake_resistance
             self.config.brake_resistance = self.brake_resistance
-            self.config.enable_brake_resistor = self.enable_brake_resistor
+            if self.config.enable_brake_resistor:
+                return False
+            else:
+                self.config.enable_brake_resistor = self.enable_brake_resistor
+                return True
 
 
 async def find_odrvs_async(timeout=3, section: str | None = None) -> list[Odrive]:

@@ -14,8 +14,9 @@ class Axis(Error):
     This class is not included all configurations from the document
     """
 
-    def __init__(self, axis) -> None:
+    def __init__(self, axis, id: int) -> None:
         self.axis = axis
+        self.id = id
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Axis.requested_state
         self.requested_state: int = axis.requested_state
         # see motor.py
@@ -32,6 +33,17 @@ class Axis(Error):
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Axis.Error
         errors = self.decode_errors(self.axis.error)
         return " & ".join([AxisError(error).name for error in errors])
+
+    def has_errors(self) -> bool:
+        """
+        Return true if there are any errors
+        """
+        return (
+            self.axis.error != 0
+            or self.motor.has_errors()
+            or self.controller.has_errors()
+            or self.encoder.has_errors()
+        )
 
     def is_idle(self) -> bool:
         return self.axis.current_state == AxisState.IDLE
