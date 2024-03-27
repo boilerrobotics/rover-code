@@ -112,8 +112,8 @@ class Odrive(Error):
                     odrive.find_any_async(serial_number=self.serial_number), timeout=30
                 )
                 self.odrv = odrv
-                self.axis0 = Axis(odrv.axis0)
-                self.axis1 = Axis(odrv.axis1)
+                self.axis0 = Axis(odrv.axis0, 0)
+                self.axis1 = Axis(odrv.axis1, 1)
             except asyncio.TimeoutError:
                 print("Timeout: cannot reconnect with Odrive")
             except Exception as e:
@@ -134,7 +134,9 @@ class Odrive(Error):
             elif axis.has_errors():
                 print(f"{name} has error(s). Abort calibration")
             else:
+                axis.set_configs()
                 axis.request_full_calibration()
+                await asyncio.sleep(1)
                 while not axis.is_idle():
                     # check status every second
                     await asyncio.sleep(1)

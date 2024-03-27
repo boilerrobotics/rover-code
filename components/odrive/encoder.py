@@ -48,5 +48,3 @@ class Encoder(Error):
         self.encoder.config.bandwidth = 100
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.calib_scan_distance
         self.encoder.config.calib_scan_distance = 100
-        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.calib_scan_omega
-        self.encoder.config.calib_scan_omega = 50

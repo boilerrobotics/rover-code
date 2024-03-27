@@ -43,11 +43,11 @@ class Motor(Error):
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Config.calibration_current
         self.motor.config.calibration_current = 30.0
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Config.resistance_calib_max_voltage
-        self.motor.config.resistance_calib_max_voltage = 10.0
+        self.motor.config.resistance_calib_max_voltage = 5.0
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.MotorType
         self.motor.config.motor_type = MotorType.HIGH_CURRENT
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Config.requested_current_range
-        self.motor.config.requested_current_range = 30.0
+        self.motor.config.requested_current_range = 60.0
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Config.current_control_bandwidth
         self.motor.config.current_control_bandwidth = 100.0
         # https://docs.odriverobotics.com/v/0.5.4/getting-started.html#torque-constant

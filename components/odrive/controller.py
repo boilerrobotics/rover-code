@@ -63,7 +63,7 @@ class Controller(Error):
 
         """
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.ControlMode.VELOCITY_CONTROL
-        self.config.control_mode = ControlMode.VELOCITY_CONTROL
+        self.controller.config.control_mode = ControlMode.VELOCITY_CONTROL
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.Config.vel_limit
         self.controller.config.vel_limit = 10
 
