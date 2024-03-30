@@ -29,6 +29,12 @@ class Odrive(Error):
         self.axis1 = Axis(odrv.axis1, 1)
         self.config = self.Config(odrv.config)
 
+    def clear_errors(self) -> None:
+        """
+        Clear errors
+        """
+        self.odrv.clear_errors()
+
     def get_errors(self) -> str:
         """
         Return ODrive system errors
@@ -125,6 +131,7 @@ class Odrive(Error):
         """
         Run full calibration sequence
         """
+        self.clear_errors()
         self.check_errors()
         # calibration can be done only one axis at a time
         for axis in [self.axis0, self.axis1]:
@@ -139,7 +146,7 @@ class Odrive(Error):
                 await asyncio.sleep(1)
                 while not axis.is_idle():
                     # check status every second
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(0.5)
                     self.check_errors()
 
     async def save_calibration_profile(self):
@@ -193,6 +200,14 @@ class Odrive(Error):
             self.brake_resistance = 0.5
             # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Config.enable_brake_resistor
             self.enable_brake_resistor = True
+            # set GPIO mode for hall sensor pins
+            self.GPIO_MODE_DIGITAL = 0
+            self.config.gpio9_mode = self.GPIO_MODE_DIGITAL
+            self.config.gpio10_mode = self.GPIO_MODE_DIGITAL
+            self.config.gpio11_mode = self.GPIO_MODE_DIGITAL
+            self.config.gpio12_mode = self.GPIO_MODE_DIGITAL
+            self.config.gpio13_mode = self.GPIO_MODE_DIGITAL
+            self.config.gpio14_mode = self.GPIO_MODE_DIGITAL
 
         def set_break_resistor(self, brake_resistance: int | None = None) -> bool:
             """

@@ -66,8 +66,7 @@ class Controller(Error):
         self.controller.config.control_mode = ControlMode.VELOCITY_CONTROL
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.Config.vel_limit
         self.controller.config.vel_limit = 10
-
-        # # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.InputMode.VEL_RAMP
-        # self.config.input_mode = InputMode.VEL_RAMP
-        # # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.Config.vel_ramp_rate
-        # self.vel_ramp_rate = ???
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.InputMode.VEL_RAMP
+        self.controller.config.input_mode = InputMode.VEL_RAMP
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.Config.vel_ramp_rate
+        self.controller.config.vel_ramp_rate = 0.5

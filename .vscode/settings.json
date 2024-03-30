@@ -13,6 +13,7 @@
         "cantools",
         "colcon",
         "eabi",
+        "GPIO",
         "ibus",
         "Intelli",
         "Jetson",

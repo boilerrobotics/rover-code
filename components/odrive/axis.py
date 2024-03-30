@@ -64,6 +64,9 @@ class Axis(Error):
     def request_offset_calibration(self) -> None:
         self.axis.requested_state = AxisState.ENCODER_OFFSET_CALIBRATION
 
+    def request_motor_calibration(self) -> None:
+        self.axis.requested_state = AxisState.MOTOR_CALIBRATION
+
     def set_configs(self) -> None:
         """
         Set configurations

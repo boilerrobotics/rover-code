@@ -41,19 +41,19 @@ class Motor(Error):
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Config.pole_pairs
         self.motor.config.pole_pairs = 7
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Config.calibration_current
-        self.motor.config.calibration_current = 30.0
+        # self.motor.config.calibration_current = 20.0
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Config.resistance_calib_max_voltage
-        self.motor.config.resistance_calib_max_voltage = 5.0
+        # self.motor.config.resistance_calib_max_voltage = 5.0
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.MotorType
         self.motor.config.motor_type = MotorType.HIGH_CURRENT
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Config.requested_current_range
-        self.motor.config.requested_current_range = 60.0
+        # self.motor.config.requested_current_range = 30.0
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Config.current_control_bandwidth
         self.motor.config.current_control_bandwidth = 100.0
         # https://docs.odriverobotics.com/v/0.5.4/getting-started.html#torque-constant
         self.motor.config.torque_constant = 8.27 / 270
         # set current limit to high value during calibration
-        self.set_current_limit(40, 8)
+        self.set_current_limit(20, 8)
 
     def set_current_limit(
         self, current_limit: float, current_limit_margin: float

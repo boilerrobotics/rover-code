@@ -1,3 +1,4 @@
+import math
 from enums import EncoderError, Error, EncoderMode
 
 
@@ -44,7 +45,7 @@ class Encoder(Error):
         self.encoder.config.mode = EncoderMode.HALL
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.cpr
         self.encoder.config.cpr = 42
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.calib_scan_distance
+        self.encoder.config.calib_scan_distance = (math.pi * 2) * 50
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.bandwidth
         self.encoder.config.bandwidth = 100
-        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.calib_scan_distance
-        self.encoder.config.calib_scan_distance = 100
