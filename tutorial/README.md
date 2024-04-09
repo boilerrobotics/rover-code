@@ -18,13 +18,12 @@ The list below is software you need to install.
 2. [Ubuntu 22.04](https://ubuntu.com/download/desktop) (LTS - Long Term Support). This is a first tier support by ROS.
    You are welcome to choose any [flavors](https://ubuntu.com/desktop/flavours) that you want.
 
-3. [ROS 2 Iron](https://docs.ros.org/en/iron/Installation/Ubuntu-Install-Debians.html).
+3. [ROS 2 Humble](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html).
 
-Note: ROS Iron will reach EOL on November 2024.
-The new ROS Jazzy will be release on May 2024.
+Note: The new ROS Jazzy will be release on May 2024.
 ROS Jazzy will likely to expect Ubuntu 24.04 (Noble Numbat) as first tier support which will be released on April 2024.
 The tutorial instruction will be updated to new version of ROS and Ubuntu once the code is tested.
-Until then, it is recommended to stay with Ubuntu 22.04 & ROS Iron.
+Until then, it is recommended to stay with Ubuntu 22.04 & ROS Humble.
 
 Note 2: Jetson TX2 only cannot run JetPack SDK newer than version 4.
 The latest JetPack SDK 4 is 4.6.4 which derived from Ubuntu 18.04.
@@ -32,44 +31,42 @@ If you prefer to dig into Jetson and JetPack SDK, you will need to install Ubunt
 
 ### Installation Guide
 
-<ol>
-<li> Create a new virtual machine. We recommend to set the machine spec as following
+1. Create a new virtual machine. We recommend to set the machine spec as following
 
 - Type: Linux
 - Version: Ubuntu (64-bit)
-- Memory: 4096 MB or more (Ff you local machine has less than 8GB of RAM, you may need to use lightweight Ubuntu instead)
+- Memory: 4096 MB or more (If you local machine has less than 8GB of RAM, you may need to use lightweight Ubuntu instead)
 - Virtual Hard Drive: 25 GB or more (You will create a Dynamic VirtualBox Disk Image. It will take the actual space the VM use but not more than 25GB or at the capacity you allow it to use)
 
-<li> Mount the Ubuntu ISO that you download by clicking settings -> Storage. Click on CD drive icon then choose the disk file.
+2. Mount the Ubuntu ISO that you download by clicking settings -> Storage. Click on CD drive icon then choose the disk file.
 
 ![choose-iso](./img/select-iso.png)
 
-<li> Start the machine. You will follow the installation instruction. 
-Along the process, you will be a admin of this virtual machine. 
-The password that you choose for it is important. 
-If you forget the password, there is no way to recover it. 
-You will need this password to install software packages later.
+3. Start the machine. You will follow the installation instruction.
+   Along the process, you will be a admin of this virtual machine.
+   The password that you choose for it is important.
+   If you forget the password, there is no way to recover it.
+   You will need this password to install software packages later.
 
-<li> Follow this tutorial to install ROS: https://docs.ros.org/en/iron/Installation/Ubuntu-Install-Debians.html
+4. Follow this [tutorial](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html) to install ROS.
 
-<li> You can choose either (but not both) "desktop" or "base". 
-The base version has everything we are using right now. 
-The desktop version has tools that could be beneficial but we don't use it often. 
-If you choose to install the base version, keep in mind that you might not be able to run some commands.
+5. You can choose either (but not both) "desktop" or "base".
+   The base version has everything we are using right now.
+   The desktop version has tools that could be beneficial but we don't use it often.
+   If you choose to install the base version, keep in mind that you might not be able to run some commands.
+   For more detail about the difference, check this [document](https://www.ros.org/reps/rep-2001.html#humble-hawksbill-may-2022-may-2027).
 
-<li> At the end, run the following command, it will add a script to activate ROS every time you open the new terminal.
+6. At the end, run the following command, it will add a script to activate ROS every time you open the new terminal.
 
 ```bash
-echo "source /opt/ros/iron/setup.bash" >> ~/.bashrc
+echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 ```
 
-<li> Install "colcon". It is a package manager.
+7. Install `colcon`. It is a package manager.
 
 ```bash
 sudo apt install python3-colcon-common-extensions
 ```
-
-</ol>
 
 ### Visual Studio Code and GitHub
 
@@ -130,9 +127,9 @@ But once you push to GitHub, it is irreversible.
 
 ## ROS 2 Basics
 
-This section will cover most of what you will need to set up a publisher and subscriber through ROS2. If you ever want additional information on what other things can be done with ROS or want to check some information, their documentation can be found [here](https://docs.ros.org/en/iron/Tutorials.html).
+This section will cover most of what you will need to set up a publisher and subscriber through ROS2. If you ever want additional information on what other things can be done with ROS or want to check some information, their documentation can be found [here](https://docs.ros.org/en/humble/Tutorials.html).
 
-The goal of this tutorial is to familiarize you with the fundamentals of ROS communication. This is primarily done by several "nodes" (essentially single pieces of independent code) sending and receiving messages. For more details on ROS concepts, check this [tutorial](https://docs.ros.org/en/iron/Concepts/Basic.html).
+The goal of this tutorial is to familiarize you with the fundamentals of ROS communication. This is primarily done by several "nodes" (essentially single pieces of independent code) sending and receiving messages. For more details on ROS concepts, check this [tutorial](https://docs.ros.org/en/humble/Concepts/Basic.html).
 
 ### Creating a ROS 2 workspace
 
@@ -157,7 +154,7 @@ Feel free to name your workspace folder whatever you would like, but make sure t
 
 The simplest form of communication between nodes is a publisher and subscriber setup. One node will write a message to a specific topic (basically just a named place where the value will exist) and another node repeatedly checks that topic to see if anything has been sent. This kind of system is very useful for much of what we need for the rover. For example, one node can constantly publish the state of a joystick and another node can read this in and convert it to motor outputs.
 
-Please go through the [talker and listener tutorial](https://docs.ros.org/en/iron/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html) provided in the ROS 2 documentation. This tutorial is very thorough and we strongly recommend that you do the entire process and read it carefully, particularly the section describing how the talker and listener code actually works, as this will be critical to understanding rover communication.
+Please go through the [talker and listener tutorial](https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html) provided in the ROS 2 documentation. This tutorial is very thorough and we strongly recommend that you do the entire process and read it carefully, particularly the section describing how the talker and listener code actually works, as this will be critical to understanding rover communication.
 
 ## Communicating Across Machines
 
