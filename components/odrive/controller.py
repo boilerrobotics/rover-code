@@ -56,7 +56,7 @@ class Controller(Error):
         Use input_vel to command desired velocity, and input_torque.
         "
 
-        TODO: Test with VEL_RAMP for input_mode
+        Use VEL_RAMP for input_mode
         "
         Ramps a velocity command from the current value to the target value.
         "
