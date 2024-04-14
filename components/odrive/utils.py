@@ -127,6 +127,14 @@ class Odrive(Error):
             else:
                 print(f"{self.section} odrive is online...")
 
+    def set_configs(self) -> bool:
+        """
+        Set configurations (controller, motor, and encoder).
+        Return true, if reboot is needed.
+        """
+        print(f"Applying configurations...")
+        return True if (self.axis0.set_configs() | self.axis1.set_configs()) else False
+
     async def calibrate(self) -> None:
         """
         Run full calibration sequence
@@ -134,14 +142,14 @@ class Odrive(Error):
         self.clear_errors()
         self.check_errors()
         # calibration can be done only one axis at a time
-        for axis in [self.axis0, self.axis1]:
+        # for axis in [self.axis0, self.axis1]:
+        for axis in [self.axis0]:
             name = f"Odrive {self.section} axis {axis.id}"
             if axis.motor.is_calibrated() and axis.encoder.is_ready():
                 print(f"{name} is calibrated and ready. Calibration is not needed")
             elif axis.has_errors():
                 print(f"{name} has error(s). Abort calibration")
             else:
-                axis.set_configs()
                 axis.request_full_calibration()
                 await asyncio.sleep(1)
                 while not axis.is_idle():

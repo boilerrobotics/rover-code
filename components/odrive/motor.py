@@ -34,9 +34,10 @@ class Motor(Error):
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.is_calibrated
         return self.motor.is_calibrated
 
-    def set_configs(self) -> None:
+    def set_configs(self) -> bool:
         """
         Full document: https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Config
+        Return true, if reboot is needed.
         """
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Config.pole_pairs
         self.motor.config.pole_pairs = 7
@@ -55,11 +56,13 @@ class Motor(Error):
         # set current limit to high value during calibration
         self.set_current_limit(20, 8)
 
+        return False  # no need to reboot
+
     def set_current_limit(
         self, current_limit: float, current_limit_margin: float
-    ) -> None:
+    ) -> bool:
         """
-        Set current limit and current limit margin
+        Set current limit and current limit margin.
         """
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Config.current_lim
         self.motor.config.current_lim = current_limit

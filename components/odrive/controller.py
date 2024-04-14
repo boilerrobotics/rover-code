@@ -46,7 +46,7 @@ class Controller(Error):
         """
         self.set_speed(0)
 
-    def set_configs(self) -> None:
+    def set_configs(self) -> bool:
         """
         Full document: https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.Config
 
@@ -60,7 +60,7 @@ class Controller(Error):
         "
         Ramps a velocity command from the current value to the target value.
         "
-
+        Return true, if reboot is needed.
         """
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.ControlMode.VELOCITY_CONTROL
         self.controller.config.control_mode = ControlMode.VELOCITY_CONTROL
@@ -70,3 +70,5 @@ class Controller(Error):
         self.controller.config.input_mode = InputMode.VEL_RAMP
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.Config.vel_ramp_rate
         self.controller.config.vel_ramp_rate = 0.5
+
+        return False  # no need to reboot

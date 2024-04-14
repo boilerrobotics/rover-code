@@ -67,10 +67,16 @@ class Axis(Error):
     def request_motor_calibration(self) -> None:
         self.axis.requested_state = AxisState.MOTOR_CALIBRATION
 
-    def set_configs(self) -> None:
+    def set_configs(self) -> bool:
         """
-        Set configurations
+        Set configurations. Return true, if reboot is needed.
         """
-        self.controller.set_configs()
-        self.motor.set_configs()
-        self.encoder.set_configs()
+        return (
+            True
+            if (
+                self.controller.set_configs()
+                | self.motor.set_configs()
+                | self.encoder.set_configs()
+            )
+            else False
+        )

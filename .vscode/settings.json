@@ -1,11 +1,11 @@
 {
-    "ros.distro": "iron",
+    "ros.distro": "humble",
     "python.autoComplete.extraPaths": [
-        "/opt/ros/iron/lib/python3.10/site-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
         "src/install/shared_msgs/lib/python3.10/site-packages"
     ],
     "python.analysis.extraPaths": [
-        "/opt/ros/iron/lib/python3.10/site-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
         "src/install/shared_msgs/lib/python3.10/site-packages"
     ],
     "cSpell.words": [
