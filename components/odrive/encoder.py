@@ -37,6 +37,10 @@ class Encoder(Error):
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.index_found
         return self.encoder.index_found
 
+    def use_pre_calibrated(self) -> None:
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.pre_calibrated
+        self.encoder.config.pre_calibrated = True
+
     def set_configs(self) -> bool:
         """
         Full document: https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config
@@ -51,7 +55,7 @@ class Encoder(Error):
             need_reset = True
             self.encoder.config.cpr = 42
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.calib_scan_distance
-        self.encoder.config.calib_scan_distance = (math.pi * 2) * 50
+        self.encoder.config.calib_scan_distance = (math.pi * 2) * 10
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.bandwidth
         self.encoder.config.bandwidth = 100
 

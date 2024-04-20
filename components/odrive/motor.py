@@ -34,6 +34,10 @@ class Motor(Error):
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.is_calibrated
         return self.motor.is_calibrated
 
+    def use_pre_calibrated(self) -> None:
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Config.pre_calibrated
+        self.motor.config.pre_calibrated = True
+
     def set_configs(self) -> bool:
         """
         Full document: https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Config

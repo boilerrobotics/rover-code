@@ -18,13 +18,12 @@ async def calibrate(odrv: Odrive):
 
     print(f"{odrv.section} odrive calibration completed. Test run...")
     for speed in [2, 5, 10]:
-        await odrv.test_run(speed, 2)
+        await odrv.test_run(speed, speed * 0.5 + 1)
     if odrv.has_errors():
         print(f"{odrv.section} test run fail!")
         return
 
     print(f"{odrv.section} test run completed. Save configuration profile...")
-    # odrv.save_calibration_profile()
     await odrv.reboot(save_config=True)
 
 

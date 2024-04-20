@@ -78,15 +78,19 @@ class Odrive(Error):
         self.print_voltage_current()
         self.print_errors(self, "system errors")
         print(f"Axis 0 current state: {self.axis0.get_state()}")
-        print(f"Motor is {'' if self.axis0.motor.is_calibrated() else "not"} calibrated")
-        print(f"Encoder is {'' if self.axis0.encoder.is_ready() else "not"} ready")
+        print(
+            f"Motor is{'' if self.axis0.motor.is_calibrated() else ' not'} calibrated"
+        )
+        print(f"Encoder is{'' if self.axis0.encoder.is_ready() else ' not'} ready")
         self.print_errors(self.axis0, "axis 0")
         self.print_errors(self.axis0.motor, "motor 0")
         self.print_errors(self.axis0.controller, "controller 0")
         self.print_errors(self.axis0.encoder, "encoder 0")
         print(f"Axis 1 current state: {self.axis1.get_state()}")
-        print(f"Motor is {'' if self.axis1.motor.is_calibrated() else "not"} calibrated")
-        print(f"Encoder is {'' if self.axis1.encoder.is_ready() else "not"} ready")
+        print(
+            f"Motor is{'' if self.axis1.motor.is_calibrated() else ' not'} calibrated"
+        )
+        print(f"Encoder is{'' if self.axis1.encoder.is_ready() else ' not'} ready")
         self.print_errors(self.axis1, "axis 1")
         self.print_errors(self.axis1.motor, "motor 1")
         self.print_errors(self.axis1.controller, "controller 1")
@@ -158,43 +162,13 @@ class Odrive(Error):
                 await asyncio.sleep(1)
                 while not axis.is_idle():
                     # check status every second
-                    await asyncio.sleep(0.5)
+                    await asyncio.sleep(1)
                     self.check_errors()
 
                 if axis.motor.is_calibrated() and axis.encoder.is_ready():
                     print(f"{name} is calibrated and ready. Calibration is completed")
-                    axis.encoder.config.pre_calibrated = True
-                    axis.motor.config.pre_calibrated = True
-
-    async def save_calibration_profile(self):
-        """
-        Save configuration to use pre-calibration profile.
-        No need to calibrate after power cycling.
-        Document: https://docs.odriverobotics.com/v/0.5.4/encoders.html#encoder-with-index-signal
-        """
-        self.check_errors()
-        # calibration can be done only one axis at a time
-        # for axis in [self.axis0, self.axis1]:
-        for axis in [self.axis0]:
-            name = f"Odrive {self.section} axis {axis.id}"
-            if axis.encoder.index_found:
-                print(f"Index has found. {name} is ready to use")
-            else:
-                axis.encoder.config.use_index = True
-                # TODO: we might not need index for hall encoder
-                if axis.motor.is_calibrated() and axis.encoder.is_ready():
-                    axis.request_index_search()
-                    while not axis.is_idle():
-                        # check status every second
-                        await asyncio.sleep(1)
-                        self.check_errors()
-                    axis.request_offset_calibration()
-                    while not axis.is_idle():
-                        # check status every second
-                        await asyncio.sleep(1)
-                        self.check_errors()
-                axis.encoder.config.pre_calibrated = True
-                axis.motor.config.pre_calibrated = True
+                    axis.encoder.use_pre_calibrated()
+                    axis.motor.use_pre_calibrated()
 
     async def test_run(self, speed: float, duration: int) -> None:
         """
@@ -210,6 +184,9 @@ class Odrive(Error):
             axis.controller.set_speed(-speed)
             await asyncio.sleep(duration)
             axis.controller.stop()
+            await asyncio.sleep(duration)
+            axis.request_idle()
+
         self.check_errors()
 
     class Config:

@@ -38,7 +38,7 @@ class Controller(Error):
         """
         Set speed in turn per second
         """
-        self.input_vel = speed
+        self.controller.input_vel = speed
 
     def stop(self) -> None:
         """
@@ -69,6 +69,6 @@ class Controller(Error):
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.InputMode.VEL_RAMP
         self.controller.config.input_mode = InputMode.VEL_RAMP
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.Config.vel_ramp_rate
-        self.controller.config.vel_ramp_rate = 0.5
+        self.controller.config.vel_ramp_rate = 3
 
         return False  # no need to reboot
