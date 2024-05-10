@@ -4,9 +4,9 @@
 
 Our core software framework is Robot Operating System or [ROS](https://www.ros.org/).
 There are legacy ROS which is no longer actively developed.
-The latest version (Noetic) will reach End of Life in May 2025.
+The latest version (Noetic) will reach [End of Life](https://endoflife.date/ros) in May 2025.
 Therefore, we will use ROS 2 instead.
-We will use ROS or ROS 2 interchangeably and it will always refer to ROS 2.
+We will use ROS or ROS 2 interchangeably and it will always refer to **ROS 2**.
 ROS can run on many operating systems but we highly recommend you to use it with Ubuntu.
 We also highly recommend to create a virtual machine and install ROS on it.
 Therefore, you will not mess up with your host machine.
@@ -14,20 +14,33 @@ The list below is software you need to install.
 
 1. Virtual Machine. We will need to install Ubuntu in the machine.
    The recommendation is [Virtual Box](https://www.virtualbox.org/).
+   Use version 7 or newer.
 
-2. [Ubuntu 22.04](https://ubuntu.com/download/desktop) (LTS - Long Term Support). This is a first tier support by ROS.
+2. [Ubuntu 22.04](https://ubuntu.com/download/desktop) (LTS - Long Term Support). This is a first tier support by ROS Humble.
    You are welcome to choose any [flavors](https://ubuntu.com/desktop/flavours) that you want.
 
 3. [ROS 2 Humble](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html).
 
-Note: The new ROS Jazzy will be release on May 2024.
-ROS Jazzy will likely to expect Ubuntu 24.04 (Noble Numbat) as first tier support which will be released on April 2024.
-The tutorial instruction will be updated to new version of ROS and Ubuntu once the code is tested.
-Until then, it is recommended to stay with Ubuntu 22.04 & ROS Humble.
+### Hardware - Software Compatibility
 
-Note 2: Jetson TX2 only cannot run JetPack SDK newer than version 4.
+Our core computer is Nvidia Jetson that runs on a specific software suite from Nvidia called [JetPack](https://developer.nvidia.com/embedded/jetpack).
+Each JetPack version can run on certain numbers of Jetson boards.
+For example, JetPack 6 (released in 2024) only supports Jetson Orin series (released in 2023).
+See full compatible lists [here](https://developer.nvidia.com/embedded/jetpack-archive).
+
+[JetPack 6](https://developer.nvidia.com/embedded/jetpack-sdk-60) is a derived of Ubuntu 22.04 LTS.
+To prevent compatibility issues, we will stay with Ubuntu 22.04 LTS (Jammy), and ROS Humble which is the [first tier support](https://www.ros.org/reps/rep-2000.html#humble-hawksbill-may-2022-may-2027) for Ubuntu 22.04.
+
+Ubuntu 22.04 and ROS Humble are both LTS versions and will be supported until [April 2027](https://endoflife.date/ubuntu) and [May 2027](https://endoflife.date/ros-2) respectively.
+We will upgrade our software stack to match with [JetPack software stack](https://developer.nvidia.com/embedded/develop/roadmap).
+In the past, new JetPack version will be released about 2 years after its Ubuntu version.
+JetPack 5.0.2 (first production released of version 5) was released in August 2022 which was based on Ubuntu 20.04 which released in April 2020.
+JetPack 6 was released in March 2024 which was based on Ubuntu 22.04 which was released in April 2022.
+JetPack 7 which will be on Ubuntu 24.04 (released in April 2024) could be released in 2026.
+
+Note: We also have Jetson TX2 that cannot run JetPack SDK newer than version 4.
 The latest JetPack SDK 4 is 4.6.4 which derived from Ubuntu 18.04.
-If you prefer to dig into Jetson and JetPack SDK, you will need to install Ubuntu 18.04 (and ROS Eloquent) instead of Ubuntu 22.04.
+If you prefer to dig into Jetson TX2 and JetPack 4 SDK, you will need to install Ubuntu 18.04 (and ROS Eloquent) instead of Ubuntu 22.04.
 
 ### Installation Guide
 
