@@ -1,31 +1,38 @@
 {
-    "ros.distro": "iron",
-    "python.autoComplete.extraPaths": [
-        "/opt/ros/iron/lib/python3.10/site-packages",
-        "src/install/shared_msgs/lib/python3.10/site-packages"
-    ],
-    "python.analysis.extraPaths": [
-        "/opt/ros/iron/lib/python3.10/site-packages",
-        "src/install/shared_msgs/lib/python3.10/site-packages"
-    ],
-    "cSpell.words": [
-        "calib",
-        "cantools",
-        "colcon",
-        "eabi",
-        "GPIO",
-        "ibus",
-        "Intelli",
-        "Jetson",
-        "lsusb",
-        "odrive",
-        "odrivetool",
-        "odrv",
-        "odrvs",
-        "openocd",
-        "rosdep",
-        "rosdistro",
-        "sdist",
-        "vbus"
-    ]
+  "ros.distro": "iron",
+  "python.autoComplete.extraPaths": [
+    "/opt/ros/iron/lib/python3.10/site-packages",
+    "src/install/shared_msgs/lib/python3.10/site-packages"
+  ],
+  "python.analysis.extraPaths": [
+    "/opt/ros/iron/lib/python3.10/site-packages",
+    "src/install/shared_msgs/lib/python3.10/site-packages"
+  ],
+  "cSpell.words": [
+    "calib",
+    "cantools",
+    "colcon",
+    "eabi",
+    "GPIO",
+    "ibus",
+    "Intelli",
+    "Jetson",
+    "lsusb",
+    "odrive",
+    "odrivetool",
+    "odrv",
+    "odrvs",
+    "openocd",
+    "rosdep",
+    "rosdistro",
+    "sdist",
+    "vbus"
+  ],
+  "[xml]": {
+    "editor.defaultFormatter": "redhat.vscode-xml",
+    "editor.tabSize": 2
+  },
+  "xml.format.enforceQuoteStyle": "preferred",
+  "xml.preferences.quoteStyle": "double",
+  "xml.format.joinCommentLines": true
 }
