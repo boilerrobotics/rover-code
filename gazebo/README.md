@@ -32,12 +32,12 @@ ros2 launch joystick diff_drive_launch.yml
 ```
 
 Joy node will read inputs from the joystick then map those inputs into Twist message.  
-Then run following command to bridge Twist message from ROS to Gazebo.
+Then navigate to Gazebo folder and run following command to bridge Twist message from ROS to Gazebo.
 See [ref1](https://gazebosim.org/docs/fortress/ros2_integration) and [ref2](https://index.ros.org/p/ros_gz_bridge/) for more detail about parameters.
 
-````bash
-ros2 run ros_gz_bridge parameter_bridge /cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist```
-````
+```bash
+ros2 run ros_gz_bridge parameter_bridge --ros-args -p config_file:=config.yaml
+```
 
 Then start Gazebo.
 After you start simulation and click on `play` button (or press space on your keyboard), you will be able to control the robot with the joystick
