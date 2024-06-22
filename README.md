@@ -40,6 +40,13 @@ You can install packages by
 source install/setup.bash
 ```
 
+Note: You could use `symlink-install` along with `colcon build` to avoid building and installing every time you make changes on the code.
+However, this only works with Python packages.
+
+```bash
+colcon build --symlink-install
+```
+
 ## Dependencies
 
 Some packages have dependencies.

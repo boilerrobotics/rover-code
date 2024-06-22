@@ -75,7 +75,8 @@ If you prefer to dig into Jetson TX2 and JetPack 4 SDK, you will need to install
 echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 ```
 
-7. Install `colcon`. It is a package manager.
+7. Install `colcon`.
+   It is a package manager.
 
 ```bash
 sudo apt install python3-colcon-common-extensions
