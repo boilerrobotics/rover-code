@@ -4,6 +4,13 @@ As Current JetPack 6 is a derived of Ubuntu 22.04, we will stick with Ubuntu 22.
 In addition, we will use ROS2 Humble as it is a LTS version that supports Ubuntu 22.04.
 With this bundle of environments, it is recommended to use Gazebo Fortress.
 See this [document](https://gazebosim.org/docs/fortress/ros_installation) for ROS2 and Gazebo version pairing.
+Make sure you are looking for the documents with the right version.
+For example,
+
+| Differences  | Fortress           | Harmonic |
+| ------------ | ------------------ | -------- |
+| sdf version  | 1.8                | 1.10     |
+| plug-in name | libignition-gazebo | gz-sim   |
 
 ## Installation
 
