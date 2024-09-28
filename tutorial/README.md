@@ -3,22 +3,44 @@
 ## Install Software
 
 Our core software framework is Robot Operating System or [ROS](https://www.ros.org/).
-There are legacy versions of ROS which are no longer actively developed.
-The latest version (Noetic Ninjemys) will reach End of Life in May 2025.
-
-For this tutorial, we will use ROS 2 instead.
-The latest ROS 2 release is Iron Irwini (May 2023), and this tutorial will use ROS or ROS2 interchangeably to refer to it.
-
-ROS can run on many operating systems, but we highly recommend using it with Ubuntu.
-We also highly recommend creating a virtual machine and installing ROS on it to not mess up your host machine.
-The list below is software you need to install:
+There are legacy ROS which is no longer actively developed.
+The latest version (Noetic) will reach [End of Life](https://endoflife.date/ros) in May 2025.
+Therefore, we will use ROS 2 instead.
+We will use ROS or ROS 2 interchangeably and it will always refer to **ROS 2**.
+ROS can run on many operating systems but we highly recommend you to use it with Ubuntu.
+We also highly recommend to create a virtual machine and install ROS on it.
+Therefore, you will not mess up with your host machine.
+The list below is software you need to install.
 
 1. Virtual Machine. We will need to install Ubuntu in the machine.
    The recommendation is [Virtual Box](https://www.virtualbox.org/).
+   Use version 7 or newer.
 
-2. [Ubuntu 22.04](https://ubuntu.com/download/desktop) (LTS - Long Term Support). This is a first tier support by ROS.
+2. [Ubuntu 22.04](https://ubuntu.com/download/desktop) (LTS - Long Term Support). This is a first tier support by ROS Humble.
+   You are welcome to choose any [flavors](https://ubuntu.com/desktop/flavours) that you want.
 
-3. ROS Iron.
+3. [ROS 2 Humble](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html).
+
+### Hardware - Software Compatibility
+
+Our core computer is Nvidia Jetson that runs on a specific software suite from Nvidia called [JetPack](https://developer.nvidia.com/embedded/jetpack).
+Each JetPack version can run on certain numbers of Jetson boards.
+For example, JetPack 6 (released in 2024) only supports Jetson Orin series (released in 2023).
+See full compatible lists [here](https://developer.nvidia.com/embedded/jetpack-archive).
+
+[JetPack 6](https://developer.nvidia.com/embedded/jetpack-sdk-60) is a derived of Ubuntu 22.04 LTS.
+To prevent compatibility issues, we will stay with Ubuntu 22.04 LTS (Jammy), and ROS Humble which is the [first tier support](https://www.ros.org/reps/rep-2000.html#humble-hawksbill-may-2022-may-2027) for Ubuntu 22.04.
+
+Ubuntu 22.04 and ROS Humble are both LTS versions and will be supported until [April 2027](https://endoflife.date/ubuntu) and [May 2027](https://endoflife.date/ros-2) respectively.
+We will upgrade our software stack to match with [JetPack software stack](https://developer.nvidia.com/embedded/develop/roadmap).
+In the past, new JetPack version will be released about 2 years after its Ubuntu version.
+JetPack 5.0.2 (first production released of version 5) was released in August 2022 which was based on Ubuntu 20.04 which released in April 2020.
+JetPack 6 was released in March 2024 which was based on Ubuntu 22.04 which was released in April 2022.
+JetPack 7 which will be on Ubuntu 24.04 (released in April 2024) could be released in 2026.
+
+Note: We also have Jetson TX2 that cannot run JetPack SDK newer than version 4.
+The latest JetPack SDK 4 is 4.6.4 which derived from Ubuntu 18.04.
+If you prefer to dig into Jetson TX2 and JetPack 4 SDK, you will need to install Ubuntu 18.04 (and ROS Eloquent) instead of Ubuntu 22.04.
 
 ### Installation Guide
 
@@ -32,6 +54,7 @@ The list below is software you need to install:
 2. Mount the Ubuntu ISO that you download by clicking `Settings -> Storage`. Click on the CD drive icon, then choose the disk file.
 
    ![choose-iso](./img/select-iso.png)
+
 
 3. Start the machine and follow the installation instructions. 
 The install process will make you an admin of this virtual machine, and the password that you choose for it is important:
@@ -56,7 +79,6 @@ If you choose to install the base version, keep in mind that you might not be ab
    ```bash
    sudo apt install python3-colcon-common-extensions
    ```
-
 ### Visual Studio Code and GitHub
 
 We recommend using [Visual Studio Code](https://code.visualstudio.com/) (VS Code) for writing code.
@@ -74,6 +96,7 @@ This tutorial will only cover the VS Code option.
 First, copy the source code URL from GitHub.
 ![github-url](./img/github-url.png)
 
+
 In VS Code, click `View -> Command Palette` (Ctrl + Shift + P) and type `git: clone`.
 ![gitclone](./img/gitclone.png)
 
@@ -82,6 +105,15 @@ VS Code will ask for the URL.
 
 Select the location that you want to keep the source code. You've successfully cloned the source code to your local machine!
 
+### VS Code Extensions
+
+This is a list of recommended extensions
+
+- [ROS](https://marketplace.visualstudio.com/items?itemName=ms-iot.vscode-ros)
+- [Intelli Code](https://marketplace.visualstudio.com/items?itemName=VisualStudioExptTeam.vscodeintellicode)
+- [Black Formatter](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter)
+- [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+
 ## Git 101
 
 Check out the Git Cheat Sheet [here](https://education.github.com/git-cheat-sheet-education.pdf).
@@ -89,6 +121,7 @@ Fortunately, we can do most of the tasks in VS Code.
 In the "Source Control" tab, you will find all Git commands.
 
 ![vscode-git](./img/vscode-git.png)
+
 
 Each time you make any commits, make sure that you are working in the correct branch.
 By default, you will be in the main (or master) branch.
@@ -106,9 +139,9 @@ Note that you can undo your local commits, but once you push to GitHub it is irr
 
 ## ROS 2 Basics
 
-This section will cover most of what you will need to set up a publisher and subscriber through ROS2. If you ever want additional information on what other things can be done with ROS or want to check some information, their documentation can be found [here](https://docs.ros.org/en/iron/Tutorials.html).
+This section will cover most of what you will need to set up a publisher and subscriber through ROS2. If you ever want additional information on what other things can be done with ROS or want to check some information, their documentation can be found [here](https://docs.ros.org/en/humble/Tutorials.html).
 
-The goal of this tutorial is to familiarize you with the fundamentals of ROS communication. This is primarily done by several "nodes" (essentially single pieces of independent code) sending and receiving messages. For more details on ROS concepts, check this [tutorial](https://docs.ros.org/en/iron/Concepts/Basic.html).
+The goal of this tutorial is to familiarize you with the fundamentals of ROS communication. This is primarily done by several "nodes" (essentially single pieces of independent code) sending and receiving messages. For more details on ROS concepts, check this [tutorial](https://docs.ros.org/en/humble/Concepts/Basic.html).
 
 ### Creating a ROS 2 workspace
 
@@ -133,7 +166,7 @@ Feel free to name your workspace folder whatever you would like, but make sure t
 
 The simplest form of communication between nodes is a publisher and subscriber setup. One node will write a message to a specific topic (basically just a named place where the value will exist) and another node repeatedly checks that topic to see if anything has been sent. This kind of system is very useful for much of what we need for the rover. For example, one node can constantly publish the state of a joystick and another node can read this in and convert it to motor outputs.
 
-Please go through the [talker and listener tutorial](https://docs.ros.org/en/iron/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html) provided in the ROS 2 documentation. This tutorial is very thorough and we strongly recommend that you do the entire process and read it carefully, particularly the section describing how the talker and listener code actually works, as this will be critical to understanding rover communication.
+Please go through the [talker and listener tutorial](https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html) provided in the ROS 2 documentation. This tutorial is very thorough and we strongly recommend that you do the entire process and read it carefully, particularly the section describing how the talker and listener code actually works, as this will be critical to understanding rover communication.
 
 ## Communicating Across Machines
 
@@ -143,10 +176,10 @@ In order to do this, you will first want to make a few changes to your publisher
 
 You will also need to change your network settings in VirtualBox. Under Network, you will just need to change from NAT to Bridged Adapter so that you can send and receive messages. Once you have done this and are connected to the same network as the subscriber node, make sure your domain id matches that of the receiving computer.
 
-## Minirover
+## Mini-rover
 
-Now that you can communicate between different machines, it's time to apply that to something more like the rover. This is in the form of the "minirover" which is a small 6 wheel robot with a RaspberryPi. The Pi will be running a node that subscribes to the topic "cmd_vel" and then sets motor speeds based on the information it receives from there. The minirover code can be found [here](https://github.com/boilerrobotics/rover-code/blob/master/rover/src/minirover/minirover/driver.py).
+Now that you can communicate between different machines, it's time to apply that to something more like the rover. This is in the form of the "mini-rover" which is a small 6 wheel robot with a RaspberryPi. The Pi will be running a node that subscribes to the topic "cmd_vel" and then sets motor speeds based on the information it receives from there. The mini-rover code can be found [here](https://github.com/boilerrobotics/rover-code/blob/master/rover/src/minirover/minirover/driver.py).
 
-The Minirover takes in a different kind of message than the publisher and subscriber you have worked with so far. Instead of a string, this topic uses something called a Twist. A twist is essentially a special data type with 2 categories: linear and angular. Each of these contain the variables x, y, and z. For the minirover, we only care about the x value from linear and the z value from angular, which control the speeds of the left and right sides of the rover, respectively.
+The mini-rover takes in a different kind of message than the publisher and subscriber you have worked with so far. Instead of a string, this topic uses something called a Twist. A twist is essentially a special data type with 2 categories: linear and angular. Each of these contain the variables x, y, and z. For the mini-rover, we only care about the x value from linear and the z value from angular, which control the speeds of the left and right sides of the rover, respectively.
 
-Your task is to write a node that sends a command to control the minirover. You must use Twist message type and send the command to "cmd_vel" topic. Other than that, you have freedom on designing your node.
+Your task is to write a node that sends a command to control the mini-rover. You must use Twist message type and send the command to "cmd_vel" topic. Other than that, you have freedom on designing your node.

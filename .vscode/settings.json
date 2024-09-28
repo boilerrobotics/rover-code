@@ -1,0 +1,35 @@
+{
+  "ros.distro": "humble",
+  "python.autoComplete.extraPaths": [
+    "/opt/ros/humble/lib/python3.10/site-packages",
+    "/opt/ros/humble/local/lib/python3.10/dist-packages",
+    "src/install/shared_msgs/lib/python3.10/site-packages"
+  ],
+  "python.analysis.extraPaths": [
+    "/opt/ros/humble/lib/python3.10/site-packages",
+    "/opt/ros/humble/local/lib/python3.10/dist-packages",
+    "src/install/shared_msgs/lib/python3.10/site-packages"
+  ],
+  "cSpell.words": [
+    "calib",
+    "cantools",
+    "colcon",
+    "eabi",
+    "GPIO",
+    "ibus",
+    "Intelli",
+    "Jetson",
+    "lsusb",
+    "odrive",
+    "odrives",
+    "odrivetool",
+    "odrv",
+    "odrvs",
+    "openocd",
+    "rclpy",
+    "rosdep",
+    "rosdistro",
+    "sdist",
+    "vbus"
+  ]
+}
