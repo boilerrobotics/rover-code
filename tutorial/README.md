@@ -44,68 +44,66 @@ If you prefer to dig into Jetson TX2 and JetPack 4 SDK, you will need to install
 
 ### Installation Guide
 
-1. Create a new virtual machine. We recommend to set the machine spec as following
+1. Create a new virtual machine. We recommend to set the machine spec as following:
 
-- Type: Linux
-- Version: Ubuntu (64-bit)
-- Memory: 4096 MB or more (If you local machine has less than 8GB of RAM, you may need to use lightweight Ubuntu instead)
-- Virtual Hard Drive: 25 GB or more (You will create a Dynamic VirtualBox Disk Image. It will take the actual space the VM use but not more than 25GB or at the capacity you allow it to use)
+   - **Type:** Linux
+   - **Version:** Ubuntu (64-bit)
+   - **Memory:** 4096 MB or more (If your local machine has less than 8GB of RAM, you may need to use lightweight Ubuntu instead)
+   - **Virtual Hard Drive:** 25 GB or more (You will create a Dynamic VirtualBox Disk Image. It will take the actual space the VM uses, but not more than 25GB or the capacity you allow it to use)
 
-2. Mount the Ubuntu ISO that you download by clicking settings -> Storage. Click on CD drive icon then choose the disk file.
+2. Mount the Ubuntu ISO that you download by clicking `Settings -> Storage`. Click on the CD drive icon, then choose the disk file.
 
-![choose-iso](./img/select-iso.png)
+   ![choose-iso](./img/select-iso.png)
 
-3. Start the machine. You will follow the installation instruction.
-   Along the process, you will be a admin of this virtual machine.
-   The password that you choose for it is important.
-   If you forget the password, there is no way to recover it.
-   You will need this password to install software packages later.
 
-4. Follow this [tutorial](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html) to install ROS.
+3. Start the machine and follow the installation instructions. 
+The install process will make you an admin of this virtual machine, and the password that you choose for it is important:
+if you forget the password, there is no way to recover it. 
+You will need this password to install software packages later.
 
-5. You can choose either (but not both) "desktop" or "base".
-   The base version has everything we are using right now.
-   The desktop version has tools that could be beneficial but we don't use it often.
-   If you choose to install the base version, keep in mind that you might not be able to run some commands.
-   For more detail about the difference, check this [document](https://www.ros.org/reps/rep-2001.html#humble-hawksbill-may-2022-may-2027).
+4. Follow this tutorial to install ROS: https://docs.ros.org/en/iron/Installation/Ubuntu-Install-Debians.html
 
-6. At the end, run the following command, it will add a script to activate ROS every time you open the new terminal.
+5. You can choose either (but not both) "desktop" or "base". 
+The base version has everything we are using right now. 
+The desktop version has tools that could be beneficial, but that we don't use often. 
+If you choose to install the base version, keep in mind that you might not be able to run some commands.
 
-```bash
-echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
-```
+6. At the end, run the following command to add a script to activate ROS everytime you open a new terminal:
 
-7. Install `colcon`.
-   It is a package manager.
+   ```bash
+   echo "source /opt/ros/iron/setup.bash" >> ~/.bashrc
+   ```
 
-```bash
-sudo apt install python3-colcon-common-extensions
-```
+7. Finally, install the `colcon` package manager.
 
+   ```bash
+   sudo apt install python3-colcon-common-extensions
+   ```
 ### Visual Studio Code and GitHub
 
-We recommend using [Visual Studio Code ](https://code.visualstudio.com/)(VS Code) for writing code.
+We recommend using [Visual Studio Code](https://code.visualstudio.com/) (VS Code) for writing code.
 It comes with extensions that will make coding much easier.
-You will need to install [Git](https://git-scm.com/).
-For Ubuntu, run the following command to on the terminal
+You will also need to install [Git](https://git-scm.com/). For Ubuntu, run the following command in the terminal:
 
 ```bash
 sudo apt install git
 ```
 
 Now, you have everything ready to clone the source code and start editing.
-You have two options to clone the source code: command or VS Code.
+You have two options when cloning: using the command line or VS Code.
 This tutorial will only cover the VS Code option.
+
 First, copy the source code URL from GitHub.
 ![github-url](./img/github-url.png)
 
-On the VS Code, click View -> Command Palette (Ctrl + Shift + P) then type `git: clone`.
-![git clone](./img/gitclone.png)
+
+In VS Code, click `View -> Command Palette` (Ctrl + Shift + P) and type `git: clone`.
+![gitclone](./img/gitclone.png)
 
 VS Code will ask for the URL.
-![place url](./img/place-url.png)
+![place-url](./img/place-url.png)
 
-Select the location that you want to keep the source code. Then you have a source code in your local machine.
+Select the location that you want to keep the source code. You've successfully cloned the source code to your local machine!
 
 ### VS Code Extensions
 
@@ -118,26 +116,26 @@ This is a list of recommended extensions
 
 ## Git 101
 
-Check out Git Cheat Sheet [here](https://education.github.com/git-cheat-sheet-education.pdf).
+Check out the Git Cheat Sheet [here](https://education.github.com/git-cheat-sheet-education.pdf).
 Fortunately, we can do most of the tasks in VS Code.
 In the "Source Control" tab, you will find all Git commands.
 
 ![vscode-git](./img/vscode-git.png)
 
-every time before making any commits, make sure that you are working in the correct branch.
-By default, you will be in the main (or master) branch.
-This branch is protected.
-You cannot make any chances to on this branch directly.
-You will need to create another branches then submitting a pull request after you finish the task.
 
-Making commit is a two-steps process.
-First, you will need to stage "changes".
-It means you will need to tell Git which files you want to include in this commit.
-Next, you will write a commit message then commit.
-At this point, the commit is made in your local machine.
-You can either push the commit(s) to GitHub.
-Note that you can undo your local commits.
-But once you push to GitHub, it is irreversible.
+Each time you make any commits, make sure that you are working in the correct branch.
+By default, you will be in the main (or master) branch.
+This branch is protected, so you cannot make any chances to it directly.
+You will need to create another branch and submit a pull request after you finish your task.
+
+Making a commit is a two-step process.
+First, you'll need to stage your changes — you'll need to tell Git which files you want to include in the commit.
+Next, you will write a commit message and commit, after which the commit will be made on your local machine.
+
+Finally, you can push your local commit(s) to GitHub.
+Note that you can undo your local commits, but once you push to GitHub it is irreversible[^1].
+
+[^1]: Without force pushing or other history-altering commands.
 
 ## ROS 2 Basics
 
@@ -147,7 +145,7 @@ The goal of this tutorial is to familiarize you with the fundamentals of ROS com
 
 ### Creating a ROS 2 workspace
 
-In order to start working with nodes through ROS, you will first need to create the workspace that they will run in. Whenever working with multiple nodes, you will want to start by setting a value called your ROS Domain ID. This essentially sets your ROS up so that nodes will be able to communicate with each other but it will ignore unrelated nodes on the same network. Each time you open a terminal, you can set this by running the command
+In order to start working with nodes through ROS, you will first need to create the workspace that they will run in. Whenever working with multiple nodes, you will want to start by setting a value called your ROS Domain ID. This essentially sets your ROS up so that nodes will be able to communicate with each other, but it will ignore unrelated nodes on the same network. Each time you open a terminal, you can set this by running the command
 
 ```
 export ROS_DOMAIN_ID=<your_domain_id>
