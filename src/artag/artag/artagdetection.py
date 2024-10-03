@@ -1,7 +1,7 @@
 import numpy as np
 import cv2 as cv
 
-# margin of error for centering robot with ar tag
+# margin of error for centering robot with ar tag (adjust as needed)
 margin_of_error = 10
 
 # Function to draw hierarchy lines
@@ -9,11 +9,11 @@ def draw_hierarchy_lines(contours, hierarchy, parent_idx, color, image):
     for i, contour in enumerate(contours):
         if hierarchy[0][i-1][3] == parent_idx:
             cv.drawContours(image, contours, i, color, 2, cv.LINE_AA)
-            
+
+# Function to try to minimize jagged edges/straighten lines
 def straighten_contours(contours, epsilon):
     straightened_contours = []
     for contour in contours:
-        # Approximate contour using the Ramer-Douglas-Peucker algorithm
         approx = cv.approxPolyDP(contour, epsilon, True)
         straightened_contours.append(approx)
     return straightened_contours

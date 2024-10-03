@@ -10,7 +10,6 @@ def draw_hierarchy_lines(contours, hierarchy, parent_idx, color, image):
 def straighten_contours(contours, epsilon):
     straightened_contours = []
     for contour in contours:
-        # Approximate contour using the Ramer-Douglas-Peucker algorithm
         approx = cv.approxPolyDP(contour, epsilon, True)
         straightened_contours.append(approx)
     return straightened_contours
