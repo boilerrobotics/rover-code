@@ -25,7 +25,7 @@ def filter_contours(contour):
             filtered_contours.append(contour)
     return filtered_contours
 
-# read the image
+# read input image in input folder
 image = cv.imread('src\\artag\\artag\\input\\image_1.jpg')
 
 # convert the image to grayscale format
@@ -67,7 +67,6 @@ for i, contour in enumerate(contours):
 
 # Calculate the center coordinates of the largest contour
 if len(contours) > 0:
-    #largest_contour = max(contours, key=cv.contourArea)
     largest_contour = max(contours, key=cv.contourArea)
     M = cv.moments(largest_contour)
     cx = int(M['m10'] / M['m00'])

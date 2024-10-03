@@ -1,6 +1,9 @@
 import numpy as np
 import cv2 as cv
 
+# margin of error for centering robot with ar tag
+margin_of_error = 10
+
 # Function to draw hierarchy lines
 def draw_hierarchy_lines(contours, hierarchy, parent_idx, color, image):
     for i, contour in enumerate(contours):
@@ -18,6 +21,7 @@ def straighten_contours(contours, epsilon):
 # Function that filters contours based on area
 def filter_contour(contour):
     filtered_contours = []
+    # filters out potential ar tags that are too big or small (typically false positives) however might not be robust enough
     min_area_threshold = 1000  # Adjust this value as needed
     max_area_threshold = 100000
     for contour in contours:
@@ -36,15 +40,17 @@ while True:
     if not ret:
         print("Can't receive frame")
         break
+    # apply filters to frame
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
     gray = cv.blur(gray, (5, 5))
     gray = cv.GaussianBlur(gray, (5, 5), 0)
     gray = cv.medianBlur(gray, 5)
     gray = cv.bilateralFilter(gray,9,75,75)
     ret, thresh = cv.threshold(gray, 150, 255, cv.THRESH_BINARY)
+
+    # finds contours and gets all square contours
     contours, hierarchy = cv.findContours(image=thresh, mode=cv.RETR_TREE, method=cv.CHAIN_APPROX_NONE)
     contours = filter_contour(contours)
-    #contours = straighten_contours(contours, .1)
     square_contours = [c for c in contours if len(cv.approxPolyDP(c, 0.02*cv.arcLength(c, True), True)) == 4]
     inner_contours = []
     for square_contour in square_contours:
@@ -68,26 +74,10 @@ while True:
     else:
         contours = square_contours
 
-    #Broken code to try to differentiate hierarchy by color
-    # Draw straightened contours
-    # for i, contour in enumerate(contours):       
-    #     parent_idx = hierarchy[0][i][3]  # Get the index of the parent contour
-    #     if parent_idx == -1:
-    #         cv.drawContours(image=frame, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=2, lineType=cv.LINE_AA)
-    #     else:
-    #         if parent_idx == 1:
-    #             draw_hierarchy_lines(contours, hierarchy, parent_idx, (255, 0, 0), frame)
-    #             continue
-    #         else:
-    #             draw_hierarchy_lines(contours, hierarchy, parent_idx, (0, 0, 255), frame)
-    #             continue
-
     cv.drawContours(image=frame, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=2, lineType=cv.LINE_AA)
     # Calculate the center coordinates of the largest contour
     if len(contours) > 0:
         largest_contour = max(contours, key=lambda c: cv.contourArea(c) / (frame_width * frame_height))
-        #largest_contour = max(contours, key=lambda c: cv.contourArea(c) / cv.arcLength(c, True)**2)
-        #largest_contour = max(contours, key=cv.contourArea)
         M = cv.moments(largest_contour)
         if M['m00'] != 0:
             cx = int(M['m10'] / M['m00'])
@@ -98,16 +88,16 @@ while True:
         # Draw a circle at the center of the contour
         cv.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
         # Print the coordinates of the center
-        if cx < frame_width // 2:
+        # Goal is to have robot turn based on if ar tag is left or right of it
+        # Adjust margin of error (hasn't been fully tuned)
+        if cx + margin_of_error < frame_width // 2:
             print("Left")
-        else:
+        elif cx - margin_of_error > frame_width // 2:
             print("Right")
+        else:
+            print("Center")
 
-        #print("Center coordinates (x, y):", cx, cy)
     
-
-    #cv.imshow('frame', gray)
-    #cv.imshow('Binary image', thresh)
     cv.imshow('None approximation', frame)
     if cv.waitKey(1) == ord('q'):
         break
