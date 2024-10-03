@@ -18,10 +18,11 @@ def straighten_contours(contours, epsilon):
 # Function that filters contours based on area
 def filter_contour(contour):
     filtered_contours = []
-    min_area_threshold = 150  # Adjust this value as needed
+    min_area_threshold = 1000  # Adjust this value as needed
+    max_area_threshold = 100000
     for contour in contours:
         area = cv.contourArea(contour)
-        if min_area_threshold < area:
+        if min_area_threshold < area < max_area_threshold:
             filtered_contours.append(contour)
     return filtered_contours
 
@@ -43,7 +44,7 @@ while True:
     ret, thresh = cv.threshold(gray, 150, 255, cv.THRESH_BINARY)
     contours, hierarchy = cv.findContours(image=thresh, mode=cv.RETR_TREE, method=cv.CHAIN_APPROX_NONE)
     contours = filter_contour(contours)
-    contours = straighten_contours(contours, .75)
+    #contours = straighten_contours(contours, .1)
     square_contours = [c for c in contours if len(cv.approxPolyDP(c, 0.02*cv.arcLength(c, True), True)) == 4]
     inner_contours = []
     for square_contour in square_contours:
@@ -51,14 +52,21 @@ while True:
         for contour in contours:
             if contour is not square_contour:
                 M = cv.moments(contour)
-                cx = int(M['m10'] / M['m00'])
-                cy = int(M['m01'] / M['m00'])
+                if M['m00'] != 0:
+                    cx = int(M['m10'] / M['m00'])
+                    cy = int(M['m01'] / M['m00'])
+                else:
+                    cx = 0
+                    cy = 0
                 # Check if the centroid lies inside the square contour
                 if cv.pointPolygonTest(square_contour, (cx, cy), False) > 0:
                     inner.append(contour)
         inner_contours.extend(inner)
-    contours = square_contours
-    contours.extend(inner_contours)
+    if square_contours:
+        contours = square_contours
+        contours.extend(inner_contours)
+    else:
+        contours = square_contours
 
     #Broken code to try to differentiate hierarchy by color
     # Draw straightened contours
@@ -81,8 +89,12 @@ while True:
         #largest_contour = max(contours, key=lambda c: cv.contourArea(c) / cv.arcLength(c, True)**2)
         #largest_contour = max(contours, key=cv.contourArea)
         M = cv.moments(largest_contour)
-        cx = int(M['m10'] / M['m00'])
-        cy = int(M['m01'] / M['m00'])
+        if M['m00'] != 0:
+            cx = int(M['m10'] / M['m00'])
+            cy = int(M['m01'] / M['m00'])
+        else:
+            cx = 0
+            cy = 0
         # Draw a circle at the center of the contour
         cv.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
         # Print the coordinates of the center
