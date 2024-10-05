@@ -18,6 +18,9 @@
 			filename="ignition-gazebo-scene-broadcaster-system"
 			name="ignition::gazebo::systems::SceneBroadcaster">
 		</plugin>
+		<plugin filename="libignition-gazebo-imu-system"
+			name="ignition::gazebo::systems::Imu">
+</plugin>
 
 		<light type="directional" name="sun">
 			<cast_shadows>true</cast_shadows>
@@ -95,6 +98,13 @@
 						</box>
 					</geometry>
 				</collision>
+
+				<sensor name="imu_sensor" type="imu">
+					<always_on>1</always_on>
+					<update_rate>1</update_rate>
+					<visualize>true</visualize>
+					<topic>imu</topic>
+				</sensor>
 			</link>
 
 			<link name="left_wheel">
@@ -292,5 +302,6 @@
 				linear: {x: 0.0}, angular: {z: 0.5}
 			</output>
 		</plugin>
+
 	</world>
 </sdf>

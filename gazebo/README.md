@@ -52,3 +52,9 @@ After you start simulation and click on `play` button (or press space on your ke
 ```bash
 ign gazebo tutorial.sdf
 ```
+
+### Run IMU
+
+```bash
+ign topic -e -t /imu
+```
