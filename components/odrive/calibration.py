@@ -28,7 +28,7 @@ async def calibrate(odrv: Odrive):
 
 
 async def main():
-    odrvs = await find_odrvs_async()
+    odrvs: list[Odrive] = await find_odrvs_async()
     print("Running Calibration ...")
     for odrv in odrvs:
         await calibrate(odrv)

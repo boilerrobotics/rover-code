@@ -60,3 +60,15 @@ class Encoder(Error):
         self.encoder.config.bandwidth = 100
 
         return need_reset
+
+    def get_speed(self) -> float:
+        """
+        Return encoder speed in rad/s
+        """
+        return self.encoder.vel_estimate
+    
+    def get_position(self) -> float:
+        """
+        Return encoder position in rad
+        """
+        return self.encoder.pos_estimate
