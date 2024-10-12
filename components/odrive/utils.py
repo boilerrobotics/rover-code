@@ -176,15 +176,25 @@ class Odrive(Error):
         Run both directions.
         """
         self.check_errors()
+        INTERVAL = 0.1
+        
         # for axis in [self.axis0, self.axis1]:
         for axis in [self.axis0]:
             axis.request_close_loop_control()
-            axis.controller.set_speed(speed)
-            await asyncio.sleep(duration)
-            axis.controller.set_speed(-speed)
-            await asyncio.sleep(duration)
-            axis.controller.stop()
-            await asyncio.sleep(duration)
+            for spd in [speed, -speed, 0]:
+                axis.controller.set_speed(spd)
+                
+                # print initial speed
+                print(f"Testing {self.section} axis {axis.id} at {spd} turn/second")
+                total_time = 0
+                while total_time < duration:
+                    # read and print current speed
+                    current_speed = axis.encoder.get_speed()
+                    print(f"  current speed = {current_speed:5.2f} turn/second")
+
+                    # wait for a small interval before checking again
+                    await asyncio.sleep(INTERVAL)
+                    total_time += INTERVAL  # increment the total time
             axis.request_idle()
 
         self.check_errors()
