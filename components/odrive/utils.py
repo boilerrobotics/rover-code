@@ -49,7 +49,7 @@ class Odrive(Error):
         """
         return self.axis0.has_errors() or self.axis1.has_errors()
 
-    def print_voltage_current(self, connection: OdriveSensing | None = None) -> None:
+    def print_voltage_current(self, connection: (OdriveSensing | None) = None) -> None:
         """
         Print voltage and current for debugging.
         """
@@ -181,7 +181,7 @@ class Odrive(Error):
         # for axis in [self.axis0, self.axis1]:
         for axis in [self.axis0]:
             axis.request_close_loop_control()
-            for spd in [speed, -speed, 0]:
+            for spd in [0, speed, -speed, 0]:
                 axis.controller.set_speed(spd)
                 
                 # print initial speed
@@ -191,10 +191,12 @@ class Odrive(Error):
                     # read and print current speed
                     current_speed = axis.encoder.get_speed()
                     print(f"  current speed = {current_speed:5.2f} turn/second")
+                    
+                    # current_amperage = axis.motor.get_current()
+                    # print(f"  current amperage = {current_amperage:6.4f} A")
 
-                    # wait for a small interval before checking again
                     await asyncio.sleep(INTERVAL)
-                    total_time += INTERVAL  # increment the total time
+                    total_time += INTERVAL
             axis.request_idle()
 
         self.check_errors()

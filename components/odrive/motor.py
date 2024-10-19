@@ -23,6 +23,13 @@ class Motor(Error):
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.Error
         errors = self.decode_errors(self.motor.error)
         return " & ".join([MotorError(error).name for error in errors])
+    
+    def get_current(self) -> float:
+        """
+        Return current in Ampere
+        """
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.I_bus
+        return self.motor.I_bus
 
     def has_errors(self) -> bool:
         """
