@@ -16,9 +16,12 @@ async def calibrate(odrv: Odrive):
         odrv.check_errors()  # Checking errors at the end
         return
 
+    final_data: list = []
+    
     print(f"{odrv.section} odrive calibration completed. Test run...")
     for speed in [2, 5, 10]:
-        await odrv.test_run(speed, speed * 0.5 + 1)
+        data = await odrv.test_run(speed, speed * 0.5 + 1)
+        final_data.append(data)
     if odrv.has_errors():
         print(f"{odrv.section} test run fail!")
         return

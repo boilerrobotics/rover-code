@@ -150,8 +150,8 @@ class Odrive(Error):
         self.clear_errors()
         self.check_errors()
         # calibration can be done only one axis at a time
-        # for axis in [self.axis0, self.axis1]:
-        for axis in [self.axis0]:
+        for axis in [self.axis0, self.axis1]:
+        # for axis in [self.axis0]:
             name = f"Odrive {self.section} axis {axis.id}"
             if axis.motor.is_calibrated() and axis.encoder.is_ready():
                 print(f"{name} is calibrated and ready. Calibration is not needed")
@@ -170,7 +170,7 @@ class Odrive(Error):
                     axis.encoder.use_pre_calibrated()
                     axis.motor.use_pre_calibrated()
 
-    async def test_run(self, speed: float, duration: int) -> None:
+    async def test_run(self, speed: float, duration: int) -> dict:
         """
         Test run for "duration" second with "speed" turn/second.
         Run both directions.
@@ -178,10 +178,22 @@ class Odrive(Error):
         self.check_errors()
         INTERVAL = 0.1
         
-        # for axis in [self.axis0, self.axis1]:
-        for axis in [self.axis0]:
+        AXES = [self.axis0, self.axis1]
+        AXES_NAMES = [f"axis{axis.id}" for axis in AXES]
+        SPEEDS = [speed, -speed, 0]
+        
+        axis_data: dict = {
+            axis: {
+                "speed": {spd: [] for spd in SPEEDS},
+                "amperage": {spd: [] for spd in SPEEDS},
+            }
+            for axis in AXES_NAMES
+        }
+        
+        id = 0
+        for axis in AXES:
             axis.request_close_loop_control()
-            for spd in [0, speed, -speed, 0]:
+            for spd in SPEEDS:
                 axis.controller.set_speed(spd)
                 
                 # print initial speed
@@ -190,16 +202,22 @@ class Odrive(Error):
                 while total_time < duration:
                     # read and print current speed
                     current_speed = axis.encoder.get_speed()
-                    print(f"  current speed = {current_speed:5.2f} turn/second")
+                    # print(f"  current speed = {current_speed:5.2f} turn/second")
                     
-                    # current_amperage = axis.motor.get_current()
+                    current_amperage = axis.motor.get_current()
                     # print(f"  current amperage = {current_amperage:6.4f} A")
+                    
+                    axis_data[AXES_NAMES[id]]["speed"][spd].append(current_speed)
+                    axis_data[AXES_NAMES[id]]["amperage"][spd].append(current_amperage)
 
                     await asyncio.sleep(INTERVAL)
                     total_time += INTERVAL
             axis.request_idle()
+            id += 1
 
         self.check_errors()
+        
+        return axis_data
 
     class Config:
         """
