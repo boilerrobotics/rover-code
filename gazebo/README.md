@@ -58,3 +58,9 @@ ign gazebo tutorial.sdf
 ```bash
 ign topic -e -t /imu
 ```
+
+# View camera
+
+```bash
+rqt
+```
