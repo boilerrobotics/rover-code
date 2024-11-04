@@ -150,8 +150,7 @@ class Odrive(Error):
         self.clear_errors()
         self.check_errors()
         # calibration can be done only one axis at a time
-        # for axis in [self.axis0, self.axis1]:
-        for axis in [self.axis0]:
+        for axis in [self.axis0, self.axis1]:
             name = f"Odrive {self.section} axis {axis.id}"
             if axis.motor.is_calibrated() and axis.encoder.is_ready():
                 print(f"{name} is calibrated and ready. Calibration is not needed")
@@ -176,18 +175,26 @@ class Odrive(Error):
         Run both directions.
         """
         self.check_errors()
-        # for axis in [self.axis0, self.axis1]:
-        for axis in [self.axis0]:
-            axis.request_close_loop_control()
-            axis.controller.set_speed(speed)
-            await asyncio.sleep(duration)
-            axis.controller.set_speed(-speed)
-            await asyncio.sleep(duration)
-            axis.controller.stop()
-            await asyncio.sleep(duration)
-            axis.request_idle()
-
+        await asyncio.gather(
+            *[
+                self.test_run_cycle(axis, speed, duration)
+                for axis in [self.axis0, self.axis1]
+            ]
+        )
         self.check_errors()
+
+    async def test_run_cycle(self, axis: Axis, speed: float, duration: int) -> None:
+        """
+        Test run for "duration" second with "speed" turn/second.
+        """
+        axis.request_close_loop_control()
+        axis.controller.set_speed(speed)
+        await asyncio.sleep(duration)
+        axis.controller.set_speed(-speed)
+        await asyncio.sleep(duration)
+        axis.controller.stop()
+        await asyncio.sleep(duration)
+        axis.request_idle()
 
     class Config:
         """

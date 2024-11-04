@@ -17,7 +17,7 @@ async def calibrate(odrv: Odrive):
         return
 
     print(f"{odrv.section} odrive calibration completed. Test run...")
-    for speed in [2, 5, 10]:
+    for speed in [2, 10]:
         await odrv.test_run(speed, speed * 0.5 + 1)
     if odrv.has_errors():
         print(f"{odrv.section} test run fail!")
@@ -30,8 +30,7 @@ async def calibrate(odrv: Odrive):
 async def main():
     odrvs = await find_odrvs_async()
     print("Running Calibration ...")
-    for odrv in odrvs:
-        await calibrate(odrv)
+    await asyncio.gather(*[calibrate(odrv) for odrv in odrvs])
 
 
 if __name__ == "__main__":
