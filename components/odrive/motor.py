@@ -29,6 +29,12 @@ class Motor(Error):
         Return true if there are any errors
         """
         return self.motor.error != 0
+    
+    def get_current(self) -> float:
+        return self.motor.I_bus
+    
+    def get_power(self) -> float:
+        return self.motor.current_control.power
 
     def is_calibrated(self) -> bool:
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Motor.is_calibrated

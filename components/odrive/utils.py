@@ -150,8 +150,8 @@ class Odrive(Error):
         self.clear_errors()
         self.check_errors()
         # calibration can be done only one axis at a time
-        # for axis in [self.axis0, self.axis1]:
-        for axis in [self.axis0]:
+        for axis in [self.axis0, self.axis1]:
+        #for axis in [self.axis0]:
             name = f"Odrive {self.section} axis {axis.id}"
             if axis.motor.is_calibrated() and axis.encoder.is_ready():
                 print(f"{name} is calibrated and ready. Calibration is not needed")
@@ -177,15 +177,20 @@ class Odrive(Error):
         """
         self.check_errors()
         # for axis in [self.axis0, self.axis1]:
-        for axis in [self.axis0]:
-            axis.request_close_loop_control()
-            axis.controller.set_speed(speed)
+        for axis0, axis1 in [(self.axis0, self.axis1)]:
+            axis0.request_close_loop_control()
+            axis1.request_close_loop_control()
+            axis0.controller.set_speed(speed)
+            axis1.controller.set_speed(speed)
             await asyncio.sleep(duration)
-            axis.controller.set_speed(-speed)
+            axis0.controller.set_speed(-speed)
+            axis1.controller.set_speed(-speed)
             await asyncio.sleep(duration)
-            axis.controller.stop()
+            axis0.controller.stop()
+            axis1.controller.stop()
             await asyncio.sleep(duration)
-            axis.request_idle()
+            axis0.request_idle()
+            axis1.request_idle()
 
         self.check_errors()
 
@@ -231,7 +236,7 @@ async def find_odrvs_async(timeout=3, section: str | None = None) -> list[Odrive
     This function is not available on Odrive library version 0.5.4
     as `odrive.find_any_async()` function was introduced in version 0.6
     """
-    with open("config.yml") as fp:
+    with open("components\odrive\config.yml") as fp:
         config = yaml.safe_load(fp)
 
     tasks = [

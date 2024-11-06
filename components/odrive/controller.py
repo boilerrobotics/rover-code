@@ -46,6 +46,9 @@ class Controller(Error):
         """
         self.set_speed(0)
 
+    def return_commanded_vel(self) -> float:
+        return self.controller.vel_setpoint
+
     def set_configs(self) -> bool:
         """
         Full document: https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Controller.Config

@@ -14,6 +14,7 @@ class Encoder(Error):
 
     def __init__(self, encoder) -> None:
         self.encoder = encoder
+        self.vel = encoder.vel_estimate
 
     def get_errors(self) -> str:
         """
@@ -28,6 +29,10 @@ class Encoder(Error):
         Return true if there are any errors
         """
         return self.encoder.error != 0
+    
+    def get_vel(self) -> float:
+        return self.encoder.vel_estimate
+    
 
     def is_ready(self) -> bool:
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.is_ready
