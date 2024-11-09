@@ -1,12 +1,12 @@
+import asyncio
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
 
-import asyncio
+from odrivelib.utils import find_odrvs_async
+from odrivelib.axis import Axis
 
-from odrivelib.utils import Odrive, find_odrvs_async
-from odrivelib.controller import Controller
 
 class DiffDriveNode(Node):
 
@@ -18,30 +18,44 @@ class DiffDriveNode(Node):
             self.drive_callback,
             qos_profile_sensor_data,
         )
+        #  Find all ODrives
+        self.odrvs = asyncio.run(find_odrvs_async())
+        assert len(self.odrvs) == 3, "All 3 ODrives must be connected"
+        self.assign_odrive(self.odrvs)
+        # configure ODrives
+        self.speed_limit = 10  # use turn for seconds
+        for axis in self.left_wheels + self.right_wheels:
+            axis.request_close_loop_control()
+            axis.controller.set_speed_limit(self.speed_limit)
 
-        odrvs = asyncio.run(find_odrvs_async())
-        self.odrvFront = odrvs[0]
-        self.odrvLeft = odrvs[1]
-        self.odrvRight = odrvs[2]
-        for odrv in odrvs:
-            odrv.axis0.request_close_loop_control()
-            odrv.axis1.request_close_loop_control()
-            if odrv.serial_number == "2071316B4E53":
-                self.odrvFront = odrv
-            if odrv.serial_number == "208E31834E53":
-                self.odrvLeft = odrv
-            if odrv.serial_number == "206737A14152":
-                self.odrvRight = odrv
-        
-        
-
-    # Set speed by multiplying twist linear velocity by max_speed
-    def move_straight(self, vel: float):
-        
+    def assign_odrive(self):
+        """
+        Group Odrives into a left side and right side.
+        Each side has 3 axis.
+        """
+        self.left_wheels: list[Axis] = []
+        self.right_wheels: list[Axis] = []
+        for odrv in self.odrvs:
+            match odrv.section:
+                case "left":
+                    self.left_wheels.extend([odrv.axis0, odrv.axis1])
+                case "right":
+                    self.right_wheels.append([odrv.axis0, odrv.axis1])
+                case "front":
+                    self.left_wheels.append(odrv.axis0)
+                    self.right_wheels.append(odrv.axis1)
 
     def drive_callback(self, msg: Twist):
-        # Send the command to the ODrive
-        pass
+        """
+        Callback function that receives Twist messages.
+        Convert Twist message to wheel speed.
+        """
+        left_speed = msg.linear.x - msg.angular.z
+        right_speed = msg.linear.x + msg.angular.z
+        for axis in self.left_wheels:
+            axis.controller.set_speed(left_speed)
+        for axis in self.right_wheels:
+            axis.controller.set_speed(right_speed)
 
 
 def main(args=None):
