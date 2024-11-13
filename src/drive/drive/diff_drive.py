@@ -4,8 +4,8 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
 
-from odrivelib.utils import find_odrvs_async
-from odrivelib.axis import Axis
+from drive.odrivelib.utils import find_odrvs_async
+from drive.odrivelib.axis import Axis
 
 
 class DiffDriveNode(Node):
