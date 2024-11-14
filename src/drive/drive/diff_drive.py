@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
+from pathlib import Path
 
 from drive.odrivelib.utils import find_odrvs_async
 from drive.odrivelib.axis import Axis
@@ -19,7 +20,15 @@ class DiffDriveNode(Node):
             qos_profile_sensor_data,
         )
         #  Find all ODrives
-        self.odrvs = asyncio.run(find_odrvs_async())
+        self.odrvs = asyncio.run(
+            find_odrvs_async(
+                config=Path(__file__).parents[4]
+                / "share"
+                / "drive"
+                / "odrivelib"
+                / "config.yml"
+            )
+        )
         assert len(self.odrvs) == 3, "All 3 ODrives must be connected"
         self.assign_odrive(self.odrvs)
         # configure ODrives
