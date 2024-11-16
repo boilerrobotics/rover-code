@@ -4,6 +4,8 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
 from pathlib import Path
+import numpy
+import odrive
 
 from drive.odrivelib.utils import find_odrvs_async
 from drive.odrivelib.axis import Axis
@@ -30,12 +32,14 @@ class DiffDriveNode(Node):
             )
         )
         assert len(self.odrvs) == 3, "All 3 ODrives must be connected"
-        self.assign_odrive(self.odrvs)
+        self.assign_odrive()
+        self.get_logger().info("Odrives initialized")
         # configure ODrives
         self.speed_limit = 10  # use turn for seconds
         for axis in self.left_wheels + self.right_wheels:
             axis.request_close_loop_control()
             axis.controller.set_speed_limit(self.speed_limit)
+        self.get_logger().info("Odrives configured")
 
     def assign_odrive(self):
         """

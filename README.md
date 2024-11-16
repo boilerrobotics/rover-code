@@ -55,6 +55,12 @@ However, this only works with Python packages.
 colcon build --symlink-install
 ```
 
+Note2: If you use virtual environment, you should use the following command to compile the code.
+
+```bash
+python -m colcon build
+```
+
 ## Dependencies
 
 Some packages have dependencies.
