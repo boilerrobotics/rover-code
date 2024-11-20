@@ -4,8 +4,6 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
 from pathlib import Path
-import numpy
-import odrive
 
 from drive.odrivelib.utils import find_odrvs_async
 from drive.odrivelib.axis import Axis
@@ -24,7 +22,7 @@ class DiffDriveNode(Node):
         #  Find all ODrives
         self.odrvs = asyncio.run(
             find_odrvs_async(
-                config=Path(__file__).parents[4]
+                config_file=Path(__file__).parents[4]
                 / "share"
                 / "drive"
                 / "odrivelib"

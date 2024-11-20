@@ -233,14 +233,14 @@ class Odrive(Error):
 
 
 async def find_odrvs_async(
-    config="config.yml", timeout=3, section: str | None = None
+    config_file="config.yml", timeout=3, section: str | None = None
 ) -> list[Odrive]:
     """
     This function will find all ODrives asynchronously.
     This function is not available on Odrive library version 0.5.4
     as `odrive.find_any_async()` function was introduced in version 0.6
     """
-    with open(config) as fp:
+    with open(config_file) as fp:
         config = yaml.safe_load(fp)
 
     tasks = [
