@@ -3,7 +3,9 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
+import math
 from pathlib import Path
+import numpy
 
 from drive.odrivelib.utils import find_odrvs_async
 from drive.odrivelib.axis import Axis
@@ -19,6 +21,14 @@ class DiffDriveNode(Node):
             self.drive_callback,
             qos_profile_sensor_data,
         )
+        self._publisher = self.create_publisher(Twist, "pos", qos_profile_sensor_data)
+        time_period = .1
+        self.timer = self.create_timer(time_period, self.timer_callback)
+        self.x = 0
+        self.y = 0
+        self.z = 0
+        self.r = .7
+
         #  Find all ODrives
         self.odrvs = asyncio.run(
             find_odrvs_async(
@@ -40,7 +50,25 @@ class DiffDriveNode(Node):
             axis.request_close_loop_control()
             axis.controller.set_speed_limit(self.linear_speed_limit)
         self.get_logger().info("Odrives configured")
+        
+    def timer_callback(self):
+        time_period = .1
+        wheel_vel_left = sum([x.get_vel() for x in self.right_wheels]) / 3
+        wheel_vel_right = sum([x.get_vel() for x in self.left_wheels]) / 3
+        vx = ((wheel_vel_left + wheel_vel_right) / 2) * math.cos(self.z)
+        vy = ((wheel_vel_left + wheel_vel_right) / 2) * math.sin(self.z)
+        wc = (wheel_vel_right - wheel_vel_left) / (2 * self.r)
 
+        matrix1 = [[math.cos(self.z), -math.sin(self.z), 0], [math.sin(self.z), math.cos(self.zheta), 0], [0, 0, 1]]
+        matrix2 = [[1 - (wc * time_period)**2, -(wc * time_period)/2, 0], [(wc * time_period)/2, 1 - (wc * time_period)**2, 0], [0, 0, 1]]
+        vextor = [vx * time_period, vy * time_period, wc * time_period]
+        [dx, dy, dtheta] = numpy.dot(numpy.dot(matrix1, matrix2), vextor)
+        self.x += dx
+        self.y+= dy
+        self.z += dtheta
+
+        msg = Twist(self.x, self.y, self.z)
+        self._publisher.publish(msg)
     def assign_odrive(self):
         """
         Group Odrives into a left side and right side.
@@ -77,6 +105,7 @@ def main(args=None):
 
     drive_subscriber = DiffDriveNode()
     rclpy.spin(drive_subscriber)
+
 
     drive_subscriber.destroy_node()
     rclpy.shutdown()
