@@ -27,7 +27,7 @@ class DiffDriveNode(Node):
         self.x = 0
         self.y = 0
         self.z = 0
-        self.r = .7
+        self.r = .9398
 
         #  Find all ODrives
         self.odrvs = asyncio.run(
@@ -53,21 +53,24 @@ class DiffDriveNode(Node):
         
     def timer_callback(self):
         time_period = .1
-        wheel_vel_left = sum([x.get_vel() for x in self.right_wheels]) / 3
-        wheel_vel_right = sum([x.get_vel() for x in self.left_wheels]) / 3
+        wheel_vel_left = -1 * sum([x.encoder.get_vel() for x in self.right_wheels]) / 3 / 16 * math.pi * 2 * 0.0762
+        wheel_vel_right = sum([x.encoder.get_vel() for x in self.left_wheels]) / 3 / 16
         vx = ((wheel_vel_left + wheel_vel_right) / 2) * math.cos(self.z)
         vy = ((wheel_vel_left + wheel_vel_right) / 2) * math.sin(self.z)
         wc = (wheel_vel_right - wheel_vel_left) / (2 * self.r)
 
-        matrix1 = [[math.cos(self.z), -math.sin(self.z), 0], [math.sin(self.z), math.cos(self.zheta), 0], [0, 0, 1]]
+        matrix1 = [[math.cos(self.z), -math.sin(self.z), 0], [math.sin(self.z), math.cos(self.z), 0], [0, 0, 1]]
         matrix2 = [[1 - (wc * time_period)**2, -(wc * time_period)/2, 0], [(wc * time_period)/2, 1 - (wc * time_period)**2, 0], [0, 0, 1]]
-        vextor = [vx * time_period, vy * time_period, wc * time_period]
-        [dx, dy, dtheta] = numpy.dot(numpy.dot(matrix1, matrix2), vextor)
+        vector = [vx * time_period, vy * time_period, wc * time_period]
+        [dx, dy, d_theta] = numpy.dot(numpy.dot(matrix1, matrix2), vector)
         self.x += dx
-        self.y+= dy
-        self.z += dtheta
+        self.y += dy
+        self.z += d_theta
 
-        msg = Twist(self.x, self.y, self.z)
+        msg = Twist()
+        msg.linear.x = self.x
+        msg.linear.y = self.y
+        msg.angular.z = self.z
         self._publisher.publish(msg)
     def assign_odrive(self):
         """
