@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy, LivelinessPolicy
 import math
 from pathlib import Path
 import numpy
@@ -14,12 +15,20 @@ from drive.odrivelib.axis import Axis
 class DiffDriveNode(Node):
 
     def __init__(self):
-        super().__init__("drive_subscriber")
+        super().__init__("ve_subscriber")
+        qos_profile = QoSProfile(
+            history = HistoryPolicy.KEEP_LAST,
+            reliability = ReliabilityPolicy.BEST_EFFORT,
+            depth = 1,
+            durability = DurabilityPolicy.VOLATILE,
+            liveliness = LivelinessPolicy.AUTOMATIC,
+            lifespan = .1
+        )
         self._subscription = self.create_subscription(
             Twist,
             "cmd_vel",
             self.drive_callback,
-            qos_profile_sensor_data,
+            qos_profile,
         )
         self._publisher = self.create_publisher(Twist, "pos", qos_profile_sensor_data)
         time_period = .1
@@ -54,7 +63,7 @@ class DiffDriveNode(Node):
     def timer_callback(self):
         time_period = .1
         wheel_vel_left = -1 * sum([x.encoder.get_vel() for x in self.right_wheels]) / 3 / 16 * math.pi * 2 * 0.0762
-        wheel_vel_right = sum([x.encoder.get_vel() for x in self.left_wheels]) / 3 / 16
+        wheel_vel_right = sum([x.encoder.get_vel() for x in self.left_wheels]) / 3 / 16 * math.pi * 2 * 0.0762
         vx = ((wheel_vel_left + wheel_vel_right) / 2) * math.cos(self.z)
         vy = ((wheel_vel_left + wheel_vel_right) / 2) * math.sin(self.z)
         wc = (wheel_vel_right - wheel_vel_left) / (2 * self.r)
