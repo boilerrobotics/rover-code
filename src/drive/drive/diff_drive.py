@@ -62,8 +62,9 @@ class DiffDriveNode(Node):
         
     def timer_callback(self):
         time_period = .1
-        wheel_vel_left = -1 * sum([x.encoder.get_vel() for x in self.right_wheels]) / 3 / 16 * math.pi * 2 * 0.0762
-        wheel_vel_right = sum([x.encoder.get_vel() for x in self.left_wheels]) / 3 / 16 * math.pi * 2 * 0.0762
+        radius = 0.1143
+        wheel_vel_left = -1 * sum([x.encoder.get_vel() for x in self.right_wheels]) / 3 / 16 * math.pi * 2 * radius
+        wheel_vel_right = sum([x.encoder.get_vel() for x in self.left_wheels]) / 3 / 16 * math.pi * 2 * radius
         vx = ((wheel_vel_left + wheel_vel_right) / 2) * math.cos(self.z)
         vy = ((wheel_vel_left + wheel_vel_right) / 2) * math.sin(self.z)
         wc = (wheel_vel_right - wheel_vel_left) / (2 * self.r)
