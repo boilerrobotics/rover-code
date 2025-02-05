@@ -17,14 +17,15 @@ from sensor_msgs.msg import Image
 from rclpy.qos import qos_profile_system_default
 import cv2 as cv
 import cv2.aruco as aruco
+import numpy as np
 
 class ARTagDetector(Node):
-    def __init__(self, interval) -> None:
+    def __init__(self) -> None:
         super().__init__('ardectector')
-        self.subscriber_ = self.create_subscription(Image, "image_raw", self.detect, qos_profile_system_default)
-        self.timer = self.create_timer(interval, self.detect)
-        self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
-        self.camera = cv.VideoCapture(0)
+        self.subscriber_ = self.create_subscription(Image, 'image_raw', self.detect, qos_profile_system_default)
+        #self.timer = self.create_timer(interval, self.detect)
+        self.publisher_ = self.create_publisher(Twist, 'cmd_vel', qos_profile_system_default)
+        #self.camera = cv.VideoCapture(0)
 
     def parse_coords(self, corners):
         coords = []
@@ -36,9 +37,9 @@ class ARTagDetector(Node):
 
     def detect(self, msg: Image):
         # print('callback start!')
-        frame = Image
-        gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50)
+        frame = np.asarray(msg)
+        #gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_50)
         parameters = aruco.DetectorParameters_create()
         corners, ids, _ = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
         if ids is not None:
@@ -94,7 +95,7 @@ class ARTagDetector(Node):
 def main(args=None):
     rclpy.init(args=args)
   
-    detector = ARTagDetector(0.1)
+    detector = ARTagDetector()
     rclpy.spin(detector)
     detector.destroy_node()
     rclpy.shutdown()
