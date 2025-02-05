@@ -13,12 +13,15 @@ Version:        0.1.0
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
+from sensor_msgs.msg import Image
+from rclpy.qos import qos_profile_system_default
 import cv2 as cv
 import cv2.aruco as aruco
 
 class ARTagDetector(Node):
     def __init__(self, interval) -> None:
         super().__init__('ardectector')
+        self.subscriber_ = self.create_subscription(Image, "image_raw", self.detect, qos_profile_system_default)
         self.timer = self.create_timer(interval, self.detect)
         self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
         self.camera = cv.VideoCapture(0)
@@ -31,9 +34,9 @@ class ARTagDetector(Node):
             coords.append([x, y])
         return coords
 
-    def detect(self):
+    def detect(self, msg: Image):
         # print('callback start!')
-        _, frame = self.camera.read()
+        frame = Image
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50)
         parameters = aruco.DetectorParameters_create()

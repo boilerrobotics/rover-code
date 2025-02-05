@@ -3,7 +3,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
-from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy, LivelinessPolicy
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy, LivelinessPolicy, Duration
 import math
 from pathlib import Path
 import numpy
@@ -22,7 +22,7 @@ class DiffDriveNode(Node):
             depth = 1,
             durability = DurabilityPolicy.VOLATILE,
             liveliness = LivelinessPolicy.AUTOMATIC,
-            lifespan = .1
+            lifespan = Duration(seconds=.1,nanoseconds=0)
         )
         self._subscription = self.create_subscription(
             Twist,
