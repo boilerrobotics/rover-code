@@ -61,6 +61,12 @@ class Odrive(Error):
         if connection:
             connection.publish("brc/voltage", f"{vbus_voltage:5.2f}")
             connection.publish("brc/current", f"{ibus:7.5f}")
+    
+    def get_voltage(self) -> float:
+        return self.odrv.vbus_voltage
+    
+    def get_current(self) -> float:
+        return self.odrv.ibus
 
     def print_errors(self, component, name: str) -> str:
         """
