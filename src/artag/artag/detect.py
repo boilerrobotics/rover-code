@@ -17,15 +17,17 @@ from sensor_msgs.msg import Image
 from rclpy.qos import qos_profile_system_default
 import cv2 as cv
 import cv2.aruco as aruco
+from cv_bridge import CvBridge
 import numpy as np
 
 class ARTagDetector(Node):
     def __init__(self) -> None:
         super().__init__('ardectector')
-        self.subscriber_ = self.create_subscription(Image, 'image_raw', self.detect, qos_profile_system_default)
+        self.subscriber_ = self.create_subscription(Image, '/image_raw', self.detect, qos_profile_system_default)
         #self.timer = self.create_timer(interval, self.detect)
         self.publisher_ = self.create_publisher(Twist, 'cmd_vel', qos_profile_system_default)
         #self.camera = cv.VideoCapture(0)
+        self.bridge = CvBridge()
 
     def parse_coords(self, corners):
         coords = []
@@ -37,14 +39,19 @@ class ARTagDetector(Node):
 
     def detect(self, msg: Image):
         # print('callback start!')
-        frame = np.asarray(msg)
+        cv_image = self.bridge.imgmsg_to_cv2(msg,"mono8")
+        gray = cv.UMat(cv_image)
+        print(type(gray))
         #gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_50)
-        parameters = aruco.DetectorParameters_create()
-        corners, ids, _ = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
-        if ids is not None:
+        parameters = aruco.DetectorParameters()
+        detector = aruco.ArucoDetector(aruco_dict, parameters)
+        corners, ids, _ = detector.detectMarkers(gray)
+        if not(ids == None):
             print('------------')
-            ids = tuple(ids.tolist())
+            print(type(ids))
+            ids = tuple(np.array(ids.get()).tolist())
+            corners = [x.get() for x in corners]
             coords = self.parse_coords(list(tuple(corners)[0][0]))
             tagmid = (coords[0][0] + coords[1][0] + coords[2][0] + coords[3][0]) / 4
             if tagmid < 220:
@@ -83,7 +90,7 @@ class ARTagDetector(Node):
                 print(f"ID: {ids[0][0]}\nCoords: {coords}\nSegment: {seg}")
 
             command = Twist()
-            command.linear.x = 0.8
+            command.linear.x = 0.0
             if seg == -1:
                 command.angular.z = -0.5
             else:
