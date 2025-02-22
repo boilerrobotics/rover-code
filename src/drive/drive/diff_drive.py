@@ -35,6 +35,7 @@ class DiffDriveNode(Node):
         self._pos_publisher = self.create_publisher(Twist, "pos", qos_profile_sensor_data)
         self._bat_publisher = self.create_publisher(String, "bat", qos_profile_sensor_data)
         self._volt_cur_publisher = self.create_publisher(String, "volt_cur", qos_profile_sensor_data)
+        self._vel_publisher = self.create_publisher(String, "vel", qos_profile_sensor_data)
         time_period = .1
         self.timer = self.create_timer(time_period, self.timer_callback)
         self.x = 0
@@ -92,16 +93,23 @@ class DiffDriveNode(Node):
         # Getting voltage and current using average measurements
 
         volt = sum(odrv.get_voltage() for odrv in self.odrvs) / 3
-        cur = sum(odrv.get_current() for odrv in self.odrvs) / 3d
+        cur = sum(odrv.get_current() for odrv in self.odrvs) / 3
 
         # Publish battery percentage to bat topic
         
-        bat_msg = f"Battery: {self.get_battery(volt)}"
+        bat_msg = String()
+        bat_msg.data = f"Battery: {self.get_battery(volt)}"
         self._bat_publisher.publish(bat_msg)
 
         # Publish voltage and current to volt_cur topic
-        volt_cur_msg = f"Voltage: {volt}   Current: {cur}"
+        volt_cur_msg = String()
+        volt_cur_msg.data = f"Voltage: {volt}\nCurrent: {cur}"
         self._volt_cur_publisher.publish(volt_cur_msg)
+
+        # Publish velocity to vel topic
+        vel_msg = String()
+        vel_msg.data = f"Velocity-x: {vx}\nVelocity-y: {vy}\nAngular: {wc}"
+        self._vel_publisher.publish(vel_msg)
 
     def assign_odrive(self):
         """
@@ -135,7 +143,7 @@ class DiffDriveNode(Node):
     
     # Function mapping voltage to battery percentage
 
-    def get_battery(volt: float) -> int:
+    def get_battery(self, volt: float) -> int:
         if volt >= 25.2:
             return 100
         elif volt >= 24.9:
