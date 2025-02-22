@@ -45,13 +45,23 @@ class ARTagDetector(Node):
         #gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_50)
         parameters = aruco.DetectorParameters()
+        
         detector = aruco.ArucoDetector(aruco_dict, parameters)
         corners, ids, _ = detector.detectMarkers(gray)
-        if not(ids == None):
+
+        print(type(ids))
+        #try:
+        if ids.get() is not None:
             print('------------')
-            print(type(ids))
-            ids = tuple(np.array(ids.get()).tolist())
+            aruco.drawDetectedMarkers(gray, corners, ids)
+            cv.imshow("Image", gray)
+            cv.waitKey(1)
+
             corners = [x.get() for x in corners]
+            print(type(ids))
+            print(ids.get())
+            ids = tuple(np.array(ids.get()).tolist())
+        
             coords = self.parse_coords(list(tuple(corners)[0][0]))
             tagmid = (coords[0][0] + coords[1][0] + coords[2][0] + coords[3][0]) / 4
             if tagmid < 220:
@@ -88,7 +98,6 @@ class ARTagDetector(Node):
             else:
                 seg = 1
                 print(f"ID: {ids[0][0]}\nCoords: {coords}\nSegment: {seg}")
-
             command = Twist()
             command.linear.x = 0.0
             if seg == -1:
@@ -97,6 +106,10 @@ class ARTagDetector(Node):
                 command.angular.z = 0.5
 
             self.publisher_.publish(command)
+        #except TypeError:
+            #print("No tag")
+
+            
 
 
 def main(args=None):
@@ -104,6 +117,7 @@ def main(args=None):
   
     detector = ARTagDetector()
     rclpy.spin(detector)
+
     detector.destroy_node()
     rclpy.shutdown()
 
