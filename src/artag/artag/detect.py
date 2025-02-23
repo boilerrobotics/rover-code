@@ -37,6 +37,7 @@ class ARTagDetector(Node):
             Image, "aruco_box", qos_profile=qos_profile_system_default
         )
         self.bridge = CvBridge()
+        self.width = None
 
     def parse_coords(self, corners):
         coords = []
@@ -49,6 +50,8 @@ class ARTagDetector(Node):
     def detect(self, msg: Image):
         try:
             image_raw = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+            if self.width is None:
+                self.width = image_raw.shape[1]
             aruco_dictionary = aruco.getPredefinedDictionary(aruco.DICT_4X4_50)
             aruco_parameters = aruco.DetectorParameters_create()
             corners, ids, _ = aruco.detectMarkers(
@@ -62,113 +65,18 @@ class ARTagDetector(Node):
                 # find center of aruco tag (only look for one tag)
                 M = cv.moments(corners[0])
                 cX = int(M["m10"] / M["m00"])
-                cY = int(M["m01"] / M["m00"])
-                print(cX, cY)
-            return
+                # send turning signal
+                command = Twist()
+                command.linear.x = 0.5
+                if np.sign(self.width / 2 - cX) > 0:
+                    command.angular.z = -0.5
+                else:
+                    command.angular.z = 0.5
+                self.publisher_cmd_vel.publish(command)
 
         except CvBridgeError as e:
             self.get_logger().error("Failed to convert image: %s" % str(e))
             return
-
-        # try:
-        if ids.get() is not None:
-            print("------------")
-            aruco.drawDetectedMarkers(gray, corners, ids)
-            cv.imshow("Image", gray)
-            cv.waitKey(1)
-
-            corners = [x.get() for x in corners]
-            print(type(ids))
-            print(ids.get())
-            ids = tuple(np.array(ids.get()).tolist())
-
-            coords = self.parse_coords(list(tuple(corners)[0][0]))
-            tagmid = (coords[0][0] + coords[1][0] + coords[2][0] + coords[3][0]) / 4
-            if tagmid < 220:
-                seg = -1
-                print(f"ID: {ids[0][0]}\nCoords: {coords}\nSegment: {seg}")
-            elif tagmid >= 220 and tagmid < 440:
-                widthperc1 = (
-                    abs(coords[0][1] - coords[1][1]) / coords[0][1]
-                    + abs(coords[0][1] - coords[1][1]) / coords[1][1]
-                ) / 2
-                widthperc2 = (
-                    abs(coords[2][1] - coords[3][1]) / coords[2][1]
-                    + abs(coords[2][1] - coords[3][1]) / coords[3][1]
-                ) / 2
-                heightperc1 = (
-                    abs(coords[0][0] - coords[3][0]) / coords[0][0]
-                    + abs(coords[0][0] - coords[3][0]) / coords[3][0]
-                ) / 2
-                heightperc2 = (
-                    abs(coords[1][0] - coords[2][0]) / coords[1][0]
-                    + abs(coords[1][0] - coords[2][0]) / coords[2][0]
-                ) / 2
-                try:
-                    genperc1 = (
-                        abs(
-                            abs(coords[0][0] - coords[1][0])
-                            - abs(coords[0][1] - coords[3][1])
-                        )
-                        / abs(coords[0][0] - coords[1][0])
-                        + abs(
-                            abs(coords[0][0] - coords[1][0])
-                            - abs(coords[0][1] - coords[3][1])
-                        )
-                        / abs(coords[0][1] - coords[3][1])
-                    ) / 2
-                except ZeroDivisionError:
-                    genperc1 = 0
-                try:
-                    genperc2 = (
-                        abs(
-                            abs(coords[2][0] - coords[3][0])
-                            - abs(coords[1][1] - coords[2][1])
-                        )
-                        / abs(coords[2][0] - coords[3][0])
-                        + abs(
-                            abs(coords[2][0] - coords[3][0])
-                            - abs(coords[1][1] - coords[2][1])
-                        )
-                        / abs(coords[1][1] - coords[2][1])
-                    ) / 2
-                except ZeroDivisionError:
-                    genperc2 = 0
-                seg = 0
-                if all(
-                    x < 0.05
-                    for x in [
-                        widthperc1,
-                        widthperc2,
-                        heightperc1,
-                        heightperc2,
-                        genperc1,
-                        genperc2,
-                    ]
-                ):
-                    tagside = 5  # cm
-                    tagarea = tagside**2
-                    captureside = abs(coords[0][0] - coords[1][0]) * 0.0264583333
-                    coeff = tagside * 18.1 - 6
-                    distance = coeff / captureside
-                    print(
-                        f"ID: {ids[0][0]}\nCoords: {coords}\nSegment: {seg}\nDistance: {distance} cm"
-                    )
-                else:
-                    print(f"ID: {ids[0][0]}\nCoords: {coords}\nSegment: {seg}")
-            else:
-                seg = 1
-                print(f"ID: {ids[0][0]}\nCoords: {coords}\nSegment: {seg}")
-            command = Twist()
-            command.linear.x = 0.0
-            if seg == -1:
-                command.angular.z = -0.5
-            else:
-                command.angular.z = 0.5
-
-            self.publisher_cmd_vel.publish(command)
-        # except TypeError:
-        # print("No tag")
 
 
 def main(args=None):
