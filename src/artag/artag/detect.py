@@ -59,16 +59,17 @@ class ARTagDetector(Node):
             if len(corners) > 0:
                 aruco_image = self.bridge.cv2_to_imgmsg(aruco_image, "bgr8")
                 self.publisher_aruco_box.publish(aruco_image)
+                # find center of aruco tag (only look for one tag)
+                M = cv.moments(corners[0])
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+                print(cX, cY)
             return
 
         except CvBridgeError as e:
             self.get_logger().error("Failed to convert image: %s" % str(e))
             return
 
-        gray = cv.UMat(cv_image)
-        print(type(gray))
-
-        print(type(ids))
         # try:
         if ids.get() is not None:
             print("------------")
