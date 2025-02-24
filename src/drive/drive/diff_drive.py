@@ -3,10 +3,12 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
+from std_msgs.msg import String
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy, LivelinessPolicy, Duration
 import math
 from pathlib import Path
 import numpy
+
 
 from drive.odrivelib.utils import find_odrvs_async
 from drive.odrivelib.axis import Axis
@@ -30,7 +32,10 @@ class DiffDriveNode(Node):
             self.drive_callback,
             qos_profile,
         )
-        self._publisher = self.create_publisher(Twist, "pos", qos_profile_sensor_data)
+        self._pos_publisher = self.create_publisher(Twist, "pos", qos_profile_sensor_data)
+        self._bat_publisher = self.create_publisher(String, "bat", qos_profile_sensor_data)
+        self._volt_cur_publisher = self.create_publisher(String, "volt_cur", qos_profile_sensor_data)
+        self._vel_publisher = self.create_publisher(String, "vel", qos_profile_sensor_data)
         time_period = .1
         self.timer = self.create_timer(time_period, self.timer_callback)
         self.x = 0
@@ -77,11 +82,35 @@ class DiffDriveNode(Node):
         self.y += dy
         self.z += d_theta
 
+        # Publish linear and angular position to pos
+
         msg = Twist()
         msg.linear.x = self.x
         msg.linear.y = self.y
         msg.angular.z = self.z
-        self._publisher.publish(msg)
+        self._pos_publisher.publish(msg)
+
+        # Getting voltage and current using average measurements
+
+        volt = sum(odrv.get_voltage() for odrv in self.odrvs) / 3
+        cur = sum(odrv.get_current() for odrv in self.odrvs) / 3
+
+        # Publish battery percentage to bat topic
+        
+        bat_msg = String()
+        bat_msg.data = f"Battery: {self.get_battery(volt)}"
+        self._bat_publisher.publish(bat_msg)
+
+        # Publish voltage and current to volt_cur topic
+        volt_cur_msg = String()
+        volt_cur_msg.data = f"Voltage: {volt}\nCurrent: {cur}"
+        self._volt_cur_publisher.publish(volt_cur_msg)
+
+        # Publish velocity to vel topic
+        vel_msg = String()
+        vel_msg.data = f"Velocity-x: {vx}\nVelocity-y: {vy}\nAngular: {wc}"
+        self._vel_publisher.publish(vel_msg)
+
     def assign_odrive(self):
         """
         Group Odrives into a left side and right side.
@@ -111,7 +140,52 @@ class DiffDriveNode(Node):
             axis.controller.set_speed(left_speed)
         for axis in self.right_wheels:
             axis.controller.set_speed(right_speed)
+    
+    # Function mapping voltage to battery percentage
 
+    def get_battery(self, volt: float) -> int:
+        if volt >= 25.2:
+            return 100
+        elif volt >= 24.9:
+            return 95
+        elif volt >= 24.67:
+            return 90
+        elif volt >= 24.49:
+            return 85
+        elif volt >= 24.14:
+            return 80
+        elif volt >= 23.9:
+            return 75
+        elif volt >= 23.72:
+            return 70
+        elif volt >= 23.48:
+            return 65
+        elif volt >= 23.25:
+            return 60
+        elif volt >= 23.13:
+            return 55
+        elif volt >= 23.01:
+            return 50
+        elif volt >= 22.89:
+            return 45
+        elif volt >= 22.77:
+            return 40
+        elif volt >= 22.72:
+            return 35
+        elif volt >= 22.6:
+            return 30
+        elif volt >= 22.48:
+            return 25
+        elif volt >= 22.36:
+            return 20
+        elif volt >= 22.24:
+            return 15
+        elif volt >= 22.12:
+            return 10
+        elif volt >= 21.65:
+            return 5
+        else:
+            return 0
 
 def main(args=None):
     rclpy.init(args=args)
