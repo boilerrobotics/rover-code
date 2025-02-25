@@ -57,8 +57,8 @@ class DiffDriveNode(Node):
         self.assign_odrive()
         self.get_logger().info("Odrives initialized")
         # configure ODrives
-        self.linear_speed_limit = 3  # use turn for seconds
-        self.angular_speed_limit = 1  # radians per second
+        self.linear_speed_limit = 10  # use turn for seconds
+        self.angular_speed_limit = 3  # radians per second
         self.track_width = 1  # meters **TODO: change to actual value
         for axis in self.left_wheels + self.right_wheels:
             axis.request_close_loop_control()
@@ -133,9 +133,9 @@ class DiffDriveNode(Node):
         Callback function that receives Twist messages.
         Convert Twist message to wheel speed.
         """
-        left_speed = msg.linear.x - msg.angular.z * self.track_width / 2
+        left_speed = -msg.linear.x 
         # negative sign because of the orientation of the wheels
-        right_speed = (msg.linear.x + msg.angular.z * self.track_width / 2) * -1
+        right_speed = msg.angular.z
         for axis in self.left_wheels:
             axis.controller.set_speed(left_speed)
         for axis in self.right_wheels:
