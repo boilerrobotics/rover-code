@@ -133,9 +133,9 @@ class DiffDriveNode(Node):
         Callback function that receives Twist messages.
         Convert Twist message to wheel speed.
         """
-        left_speed = msg.linear.x - msg.angular.z * self.track_width / 2
+        left_speed = -msg.linear.x 
         # negative sign because of the orientation of the wheels
-        right_speed = (msg.linear.x + msg.angular.z * self.track_width / 2) * -1
+        right_speed = msg.angular.z
         for axis in self.left_wheels:
             axis.controller.set_speed(left_speed)
         for axis in self.right_wheels:
