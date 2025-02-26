@@ -4,7 +4,14 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
 from std_msgs.msg import String
-from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy, LivelinessPolicy, Duration
+from rclpy.qos import (
+    QoSProfile,
+    ReliabilityPolicy,
+    HistoryPolicy,
+    DurabilityPolicy,
+    LivelinessPolicy,
+    Duration,
+)
 import math
 from pathlib import Path
 import numpy
@@ -19,12 +26,12 @@ class DiffDriveNode(Node):
     def __init__(self):
         super().__init__("ve_subscriber")
         qos_profile = QoSProfile(
-            history = HistoryPolicy.KEEP_LAST,
-            reliability = ReliabilityPolicy.BEST_EFFORT,
-            depth = 1,
-            durability = DurabilityPolicy.VOLATILE,
-            liveliness = LivelinessPolicy.AUTOMATIC,
-            lifespan = Duration(seconds=.1,nanoseconds=0)
+            history=HistoryPolicy.KEEP_LAST,
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            depth=1,
+            durability=DurabilityPolicy.VOLATILE,
+            liveliness=LivelinessPolicy.AUTOMATIC,
+            lifespan=Duration(seconds=0.1, nanoseconds=0),
         )
         self._subscription = self.create_subscription(
             Twist,
@@ -32,16 +39,24 @@ class DiffDriveNode(Node):
             self.drive_callback,
             qos_profile,
         )
-        self._pos_publisher = self.create_publisher(Twist, "pos", qos_profile_sensor_data)
-        self._bat_publisher = self.create_publisher(String, "bat", qos_profile_sensor_data)
-        self._volt_cur_publisher = self.create_publisher(String, "volt_cur", qos_profile_sensor_data)
-        self._vel_publisher = self.create_publisher(String, "vel", qos_profile_sensor_data)
-        time_period = .1
+        self._pos_publisher = self.create_publisher(
+            Twist, "pos", qos_profile_sensor_data
+        )
+        self._bat_publisher = self.create_publisher(
+            String, "bat", qos_profile_sensor_data
+        )
+        self._volt_cur_publisher = self.create_publisher(
+            String, "volt_cur", qos_profile_sensor_data
+        )
+        self._vel_publisher = self.create_publisher(
+            String, "vel", qos_profile_sensor_data
+        )
+        time_period = 0.1
         self.timer = self.create_timer(time_period, self.timer_callback)
         self.x = 0
         self.y = 0
         self.z = 0
-        self.r = .9398
+        self.r = 0.9398
 
         #  Find all ODrives
         self.odrvs = asyncio.run(
@@ -64,18 +79,41 @@ class DiffDriveNode(Node):
             axis.request_close_loop_control()
             axis.controller.set_speed_limit(self.linear_speed_limit)
         self.get_logger().info("Odrives configured")
-        
+
     def timer_callback(self):
-        time_period = .1
+        time_period = 0.1
         radius = 0.1143
-        wheel_vel_left = -1 * sum([x.encoder.get_vel() for x in self.right_wheels]) / 3 / 16 * math.pi * 2 * radius
-        wheel_vel_right = sum([x.encoder.get_vel() for x in self.left_wheels]) / 3 / 16 * math.pi * 2 * radius
+        wheel_vel_left = (
+            -1
+            * sum([x.encoder.get_vel() for x in self.right_wheels])
+            / 3
+            / 16
+            * math.pi
+            * 2
+            * radius
+        )
+        wheel_vel_right = (
+            sum([x.encoder.get_vel() for x in self.left_wheels])
+            / 3
+            / 16
+            * math.pi
+            * 2
+            * radius
+        )
         vx = ((wheel_vel_left + wheel_vel_right) / 2) * math.cos(self.z)
         vy = ((wheel_vel_left + wheel_vel_right) / 2) * math.sin(self.z)
         wc = (wheel_vel_right - wheel_vel_left) / (2 * self.r)
 
-        matrix1 = [[math.cos(self.z), -math.sin(self.z), 0], [math.sin(self.z), math.cos(self.z), 0], [0, 0, 1]]
-        matrix2 = [[1 - (wc * time_period)**2, -(wc * time_period)/2, 0], [(wc * time_period)/2, 1 - (wc * time_period)**2, 0], [0, 0, 1]]
+        matrix1 = [
+            [math.cos(self.z), -math.sin(self.z), 0],
+            [math.sin(self.z), math.cos(self.z), 0],
+            [0, 0, 1],
+        ]
+        matrix2 = [
+            [1 - (wc * time_period) ** 2, -(wc * time_period) / 2, 0],
+            [(wc * time_period) / 2, 1 - (wc * time_period) ** 2, 0],
+            [0, 0, 1],
+        ]
         vector = [vx * time_period, vy * time_period, wc * time_period]
         [dx, dy, d_theta] = numpy.dot(numpy.dot(matrix1, matrix2), vector)
         self.x += dx
@@ -96,7 +134,7 @@ class DiffDriveNode(Node):
         cur = sum(odrv.get_current() for odrv in self.odrvs) / 3
 
         # Publish battery percentage to bat topic
-        
+
         bat_msg = String()
         bat_msg.data = f"Battery: {self.get_battery(volt)}"
         self._bat_publisher.publish(bat_msg)
@@ -133,14 +171,18 @@ class DiffDriveNode(Node):
         Callback function that receives Twist messages.
         Convert Twist message to wheel speed.
         """
-        left_speed = -msg.linear.x * self.linear_speed_limit
+        left_speed = (
+            msg.linear.x - msg.angular.z * self.track_width / 2
+        ) * self.linear_speed_limit
         # negative sign because of the orientation of the wheels
-        right_speed = msg.angular.z * self.linear_speed_limit
+        right_speed = (
+            (msg.linear.x + msg.angular.z * self.track_width / 2) * -1
+        ) * self.linear_speed_limit
         for axis in self.left_wheels:
             axis.controller.set_speed(left_speed)
         for axis in self.right_wheels:
             axis.controller.set_speed(right_speed)
-    
+
     # Function mapping voltage to battery percentage
 
     def get_battery(self, volt: float) -> int:
@@ -187,12 +229,12 @@ class DiffDriveNode(Node):
         else:
             return 0
 
+
 def main(args=None):
     rclpy.init(args=args)
 
     drive_subscriber = DiffDriveNode()
     rclpy.spin(drive_subscriber)
-
 
     drive_subscriber.destroy_node()
     rclpy.shutdown()
