@@ -60,19 +60,42 @@ class ARTagDetector(Node):
             aruco_image = aruco.drawDetectedMarkers(image_raw.copy(), corners, ids)
 
             if len(corners) > 0:
-                aruco_image = self.bridge.cv2_to_imgmsg(aruco_image, "bgr8")
-                self.publisher_aruco_box.publish(aruco_image)
                 # find center of aruco tag (only look for one tag)
-                M = cv.moments(corners[0])
-                cX = int(M["m10"] / M["m00"])
+                moment = cv.moments(corners[0])
+                # center x,y
+                center = (
+                    int(moment["m10"] / moment["m00"]),
+                    int(moment["m01"] / moment["m00"]),
+                )
                 # send turning signal
                 command = Twist()
                 command.linear.x = 0.5
-                if np.sign(self.width / 2 - cX) > 0:
+                if np.sign(self.width / 2 - center[0]) > 0:
                     command.angular.z = -0.5
+                    cv.putText(
+                        aruco_image,
+                        "turn_left",
+                        (center[0] - 20, center[1] - 20),
+                        cv.FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        (255, 0, 0),
+                        2,
+                    )
                 else:
                     command.angular.z = 0.5
+                    cv.putText(
+                        aruco_image,
+                        "turn_right",
+                        (center[0] - 20, center[1] - 20),
+                        cv.FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        (255, 0, 0),
+                        2,
+                    )
                 self.publisher_cmd_vel.publish(command)
+                # publish aruco box
+                aruco_image = self.bridge.cv2_to_imgmsg(aruco_image, "bgr8")
+                self.publisher_aruco_box.publish(aruco_image)
 
         except CvBridgeError as e:
             self.get_logger().error("Failed to convert image: %s" % str(e))
