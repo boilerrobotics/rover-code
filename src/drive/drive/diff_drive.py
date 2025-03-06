@@ -162,9 +162,9 @@ class DiffDriveNode(Node):
                     self.left_wheels.extend([odrv.axis0, odrv.axis1])
                 case "right":
                     self.right_wheels.extend([odrv.axis0, odrv.axis1])
-                case "front":
-                    self.left_wheels.append(odrv.axis0)
-                    self.right_wheels.append(odrv.axis1)
+                case "rear":
+                    self.left_wheels.append(odrv.axis1)
+                    self.right_wheels.append(odrv.axis0)
 
     def drive_callback(self, msg: Twist):
         """
