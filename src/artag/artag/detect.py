@@ -31,7 +31,7 @@ class ARTagDetector(Node):
             qos_profile_sensor_data,
         )
         self.publisher_cmd_vel = self.create_publisher(
-            Twist, "cmd_vel", qos_profile_sensor_data
+            Twist, "cmd_vel", qos_profile_system_default
         )
         self.publisher_aruco_box = self.create_publisher(
             Image, "aruco_box", qos_profile=qos_profile_system_default
@@ -78,29 +78,34 @@ class ARTagDetector(Node):
                 )
                 # send turning signal
                 command = Twist()
-                command.linear.x = 0.5
-                if np.sign(self.width / 2 - self.center[0]) > 0:
-                    command.angular.z = -0.5
-                    cv.putText(
-                        aruco_image,
-                        "turn_left",
-                        (self.center[0] - 20, self.center[1] - 20),
-                        cv.FONT_HERSHEY_SIMPLEX,
-                        0.5,
-                        (255, 0, 0),
-                        2,
-                    )
+                if self.distance:
+                    if self.distance > 0.8:
+                        command.linear.x = -0.5
+                        if np.sign(self.width / 2 - self.center[0]) > 0:
+                            command.angular.z = 0.3
+                            cv.putText(
+                                aruco_image,
+                                "turn_left",
+                                (self.center[0] - 20, self.center[1] - 20),
+                                cv.FONT_HERSHEY_SIMPLEX,
+                                0.5,
+                                (255, 0, 0),
+                                2,
+                            )
+                        else:
+                            command.angular.z = -0.3
+                            cv.putText(
+                                aruco_image,
+                                "turn_right",
+                                (self.center[0] - 20, self.center[1] - 20),
+                                cv.FONT_HERSHEY_SIMPLEX,
+                                0.5,
+                                (255, 0, 0),
+                                2,
+                            )
                 else:
-                    command.angular.z = 0.5
-                    cv.putText(
-                        aruco_image,
-                        "turn_right",
-                        (self.center[0] - 20, self.center[1] - 20),
-                        cv.FONT_HERSHEY_SIMPLEX,
-                        0.5,
-                        (255, 0, 0),
-                        2,
-                    )
+                    command.linear.x = 0.0
+                    command.angular.z = 0.0
                 self.publisher_cmd_vel.publish(command)
                 # publish aruco box
                 if self.distance:

@@ -58,6 +58,8 @@ class DiffDriveNode(Node):
         self.z = 0
         self.r = 0.9398
 
+        self.dianostic = self.create_timer(10, self.dianostic)
+
         #  Find all ODrives
         self.odrvs = asyncio.run(
             find_odrvs_async(
@@ -72,13 +74,17 @@ class DiffDriveNode(Node):
         self.assign_odrive()
         self.get_logger().info("Odrives initialized")
         # configure ODrives
-        self.linear_speed_limit = 3  # use turn for seconds
-        self.angular_speed_limit = 1  # radians per second
+        self.linear_speed_limit = 10  # use turn for seconds
+        self.angular_speed_limit = 3  # radians per second
         self.track_width = 1  # meters **TODO: change to actual value
         for axis in self.left_wheels + self.right_wheels:
             axis.request_close_loop_control()
             axis.controller.set_speed_limit(self.linear_speed_limit)
         self.get_logger().info("Odrives configured")
+
+    def dianostic(self):
+        for odrv in self.odrvs:
+            odrv.check_errors()
 
     def timer_callback(self):
         time_period = 0.1
@@ -172,12 +178,17 @@ class DiffDriveNode(Node):
         Convert Twist message to wheel speed.
         """
         left_speed = (
-            msg.linear.x * self.linear_speed_limit / .1143 -  msg.angular.z * math.pi / .1143 * self.track_width / 2
-        ) 
+            (msg.linear.x - msg.angular.z * self.track_width / 2)
+            * self.linear_speed_limit
+            / 2
+        )
         # negative sign because of the orientation of the wheels
         right_speed = (
-            (msg.linear.x * self.linear_speed_limit / .1143 + msg.angular.z * math.pi / .1143 * self.track_width / 2) * -1
+            ((msg.linear.x + msg.angular.z * self.track_width / 2) * -1)
+            * self.linear_speed_limit
+            / 2
         )
+        # print(left_speed, right_speed)
         for axis in self.left_wheels:
             axis.controller.set_speed(left_speed)
         for axis in self.right_wheels:
