@@ -1,7 +1,7 @@
 """
 ===============================================================================
-Program Description 
-	AR tag detection.
+Program Description
+        AR tag detection.
 
 Author:         Thirawat Bureetes(Thirawat.tam@gmail.com)
 Maintainer:     Thirawat Bureetes(Thirawat.tam@gmail.com)
@@ -22,15 +22,12 @@ import numpy as np
 import time
 import math
 
-class ARTagDetector(Node):
+
+class PosController(Node):
     def __init__(self) -> None:
-        super().__init__("aruco_detector")
-        self.create_subscription(
-            Twist,
-            "/pos",
-            self.setPos,
-            qos_profile_sensor_data)
-        
+        super().__init__("pos_controller")
+        self.create_subscription(Twist, "/pos", self.setPos, qos_profile_sensor_data)
+
         self.publisher_cmd_vel = self.create_publisher(
             Twist, "cmd_vel", qos_profile_sensor_data
         )
@@ -41,22 +38,22 @@ class ARTagDetector(Node):
             self.cal_distance,
             qos_profile_sensor_data,
         )
-        self.pos = None
+        self.pos = [0, 0, 0]
         self.bridge = CvBridge()
         self.width = None
         self.center = None
         self.distance = None
-        self.isCalibrated = False
+        self.isCalibrated = True
 
-        self.target_pos = (0, 0, 0)
+        self.target_pos = [0, 0, 0]
+        time_period = 0.1
 
         self.timer = self.create_timer(time_period, self.pub_cmd_vel)
-        time_period = .1
-    
+
     def calibrate_heading(self):
         startPos = self.pos
         startTime = time.time()
-        while(time.time() - startTime < 3):
+        while time.time() - startTime < 3:
             msg = Twist()
             msg.linear.x = 1
             self.publisher_cmd_vel.publish(msg)
@@ -70,31 +67,44 @@ class ARTagDetector(Node):
         self.pos[2] = math.atan2(y_error, x_error)
 
     def pub_cmd_vel(self):
-        if(not self.isCalibrated):
-           self.calibrate_heading()
-           self.isCalibrated = True
-        
-        x_error = self.target_pos[0] - self.pos[0]
-        y_error = self.target_pos[1] - self.pos[1]
+        if not self.isCalibrated:
+            self.calibrate_heading()
+            self.isCalibrated = True
 
-        self.target_pos[2] = math.atan2(y_error, x_error)
+        dist = math.sqrt(
+            (self.target_pos[1] - self.pos[1]) ** 2
+            + (self.target_pos[0] - self.pos[0]) ** 2
+        )
+        # self.target_pos[2] = math.atan2(self.target_pos[1], self.target_pos[0])
 
         h_error = self.target_pos[2] - self.pos[2]
 
         msg = Twist()
-        if(h_error < .1):
-            msg.linear.x = 1
+        if abs(h_error) > 0.1:
+            try:
+                msg.angular.z = -h_error / abs(h_error)
+            except ZeroDivisionError:
+                msg.angular.z = 0.0
+        elif dist > 0.1:
+            msg.linear.x = 1.0
         else:
-            msg.angular.z = h_error / math.abs(h_error)
-        
+            msg.linear.x = 0.0
+            msg.angular.z = 0.0
+
+        print("------------------")
+        print("Pos: ")
+        print(f"x: {self.pos[0]:.2f}")
+        print(f"y: {self.pos[1]:.2f}")
+        print(f"heading: {self.pos[2]:.2f}")
+        print()
+        print(f"dist: {dist:.2f}")
+        print(f"heading_error: {h_error:.2f}")
+
         self.publisher_cmd_vel.publish(msg)
-
-
 
     def setPos(self, msg: Twist):
         self.pos = (msg.linear.x, msg.linear.y, msg.angular.z)
 
-    
     def cal_distance(self, msg: Image):
         try:
             depth = self.bridge.imgmsg_to_cv2(msg, "32FC1")
@@ -109,12 +119,11 @@ class ARTagDetector(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    detector = ARTagDetector()
+    mover = PosController()
 
-    
-    rclpy.spin(detector)
+    rclpy.spin(mover)
 
-    detector.destroy_node()
+    mover.destroy_node()
     rclpy.shutdown()
 
 

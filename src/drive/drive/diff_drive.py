@@ -55,7 +55,7 @@ class DiffDriveNode(Node):
         self.timer = self.create_timer(time_period, self.timer_callback)
         self.x = 0
         self.y = 0
-        self.z = 0
+        self.z = math.pi / 2
         self.r = 0.9398
 
         self.dianostic = self.create_timer(10, self.dianostic)
