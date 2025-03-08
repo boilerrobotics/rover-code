@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
+from src.custom_interfaces.srv import Reboot
 from std_msgs.msg import String
 from rclpy.qos import (
     QoSProfile,
@@ -51,6 +52,8 @@ class DiffDriveNode(Node):
         self._vel_publisher = self.create_publisher(
             String, "vel", qos_profile_sensor_data
         )
+        self.reboot_caller = self.create_client(Reboot, 'reboot')
+
         time_period = 0.1
         self.timer = self.create_timer(time_period, self.timer_callback)
         self.x = 0
@@ -70,7 +73,17 @@ class DiffDriveNode(Node):
                 / "config.yml"
             )
         )
-        assert len(self.odrvs) == 3, "All 3 ODrives must be connected"
+
+        try:
+            assert len(self.odrvs) == 3, "All 3 ODrives must be connected"
+        except(AssertionError):
+            req = Reboot.Request()
+            req.odrive = "front"
+            future = self.reboot_caller.call_async(req)
+            response = future.result()
+            print(response.success)
+
+
         self.assign_odrive()
         self.get_logger().info("Odrives initialized")
         # configure ODrives
