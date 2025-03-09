@@ -10,7 +10,7 @@
   <exec_depend>rclpy</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>python3-odrive-pip</exec_depend>
-  <exec_depend>tutorial_interfaces</exec_depend>
+  <exec_depend>custom_interfaces</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
