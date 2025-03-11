@@ -61,6 +61,12 @@ class Odrive(Error):
         if connection:
             connection.publish("brc/voltage", f"{vbus_voltage:5.2f}")
             connection.publish("brc/current", f"{ibus:7.5f}")
+    
+    def get_voltage(self) -> float:
+        return self.odrv.vbus_voltage
+    
+    def get_current(self) -> float:
+        return self.odrv.ibus
 
     def print_errors(self, component, name: str) -> str:
         """
@@ -78,11 +84,19 @@ class Odrive(Error):
         self.print_voltage_current()
         self.print_errors(self, "system errors")
         print(f"Axis 0 current state: {self.axis0.get_state()}")
+        print(
+            f"Motor is{'' if self.axis0.motor.is_calibrated() else ' not'} calibrated"
+        )
+        print(f"Encoder is{'' if self.axis0.encoder.is_ready() else ' not'} ready")
         self.print_errors(self.axis0, "axis 0")
         self.print_errors(self.axis0.motor, "motor 0")
         self.print_errors(self.axis0.controller, "controller 0")
         self.print_errors(self.axis0.encoder, "encoder 0")
         print(f"Axis 1 current state: {self.axis1.get_state()}")
+        print(
+            f"Motor is{'' if self.axis1.motor.is_calibrated() else ' not'} calibrated"
+        )
+        print(f"Encoder is{'' if self.axis1.encoder.is_ready() else ' not'} ready")
         self.print_errors(self.axis1, "axis 1")
         self.print_errors(self.axis1.motor, "motor 1")
         self.print_errors(self.axis1.controller, "controller 1")
@@ -127,6 +141,14 @@ class Odrive(Error):
             else:
                 print(f"{self.section} odrive is online...")
 
+    def set_configs(self) -> bool:
+        """
+        Set configurations (controller, motor, and encoder).
+        Return true, if reboot is needed.
+        """
+        print(f"Applying configurations...")
+        return True if (self.axis0.set_configs() | self.axis1.set_configs()) else False
+
     async def calibrate(self) -> None:
         """
         Run full calibration sequence
@@ -141,37 +163,17 @@ class Odrive(Error):
             elif axis.has_errors():
                 print(f"{name} has error(s). Abort calibration")
             else:
-                axis.set_configs()
                 axis.request_full_calibration()
                 await asyncio.sleep(1)
                 while not axis.is_idle():
                     # check status every second
-                    await asyncio.sleep(0.5)
+                    await asyncio.sleep(1)
                     self.check_errors()
 
-    async def save_calibration_profile(self):
-        """
-        Save configuration to use pre-calibration profile.
-        No need to calibrate after power cycling.
-        Document: https://docs.odriverobotics.com/v/0.5.4/encoders.html#encoder-with-index-signal
-        """
-        self.check_errors()
-        # calibration can be done only one axis at a time
-        for axis in [self.axis0, self.axis1]:
-            axis.encoder.config.use_index = True
-            if axis.motor.is_calibrated() and axis.encoder.is_ready():
-                axis.request_index_search()
-                while not axis.is_idle():
-                    # check status every second
-                    await asyncio.sleep(1)
-                    self.check_errors()
-                axis.request_offset_calibration()
-                while not axis.is_idle():
-                    # check status every second
-                    await asyncio.sleep(1)
-                    self.check_errors()
-            axis.encoder.config.pre_calibrated = True
-            axis.motor.config.pre_calibrated = True
+                if axis.motor.is_calibrated() and axis.encoder.is_ready():
+                    print(f"{name} is calibrated and ready. Calibration is completed")
+                    axis.encoder.use_pre_calibrated()
+                    axis.motor.use_pre_calibrated()
 
     async def test_run(self, speed: float, duration: int) -> None:
         """
@@ -179,14 +181,26 @@ class Odrive(Error):
         Run both directions.
         """
         self.check_errors()
-        for axis in [self.axis0, self.axis1]:
-            axis.request_close_loop_control()
-            axis.controller.set_speed(speed)
-            await asyncio.sleep(duration)
-            axis.controller.set_speed(-speed)
-            await asyncio.sleep(duration)
-            axis.controller.stop()
+        await asyncio.gather(
+            *[
+                self.test_run_cycle(axis, speed, duration)
+                for axis in [self.axis0, self.axis1]
+            ]
+        )
         self.check_errors()
+
+    async def test_run_cycle(self, axis: Axis, speed: float, duration: int) -> None:
+        """
+        Test run for "duration" second with "speed" turn/second.
+        """
+        axis.request_close_loop_control()
+        axis.controller.set_speed(speed)
+        await asyncio.sleep(duration)
+        axis.controller.set_speed(-speed)
+        await asyncio.sleep(duration)
+        axis.controller.stop()
+        await asyncio.sleep(duration)
+        axis.request_idle()
 
     class Config:
         """
@@ -224,13 +238,15 @@ class Odrive(Error):
                 return True
 
 
-async def find_odrvs_async(timeout=3, section: str | None = None) -> list[Odrive]:
+async def find_odrvs_async(
+    config_file="config.yml", timeout=3, section: str | None = None
+) -> list[Odrive]:
     """
     This function will find all ODrives asynchronously.
     This function is not available on Odrive library version 0.5.4
     as `odrive.find_any_async()` function was introduced in version 0.6
     """
-    with open("config.yml") as fp:
+    with open(config_file) as fp:
         config = yaml.safe_load(fp)
 
     tasks = [

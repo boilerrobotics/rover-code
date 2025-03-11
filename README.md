@@ -11,11 +11,19 @@ This is a main repo for communication & intelligence team. There are three sub-f
 ## Setup
 
 The folder [src](./src/) is the main folder to work with.
-This ROS working space is tested on ROS Iron on Ubuntu 22.04 LTS.
-Some packages are tested with ROS Eloquent on Ubuntu 18.04 as it is a Jetson TX2 environment. 
+This ROS working space is tested on ROS Humble on Ubuntu 22.04 LTS.
 Installation guide can be found in [tutorial](./tutorial/)
 To run the code, you will need to compile and install.
-To compile
+
+### Python Virtual Environment
+
+If you use Python virtual environment, you will need to create the virtual environment using extra option as below
+
+```bash
+python3 -m venv .venv --system-site-packages
+```
+
+### To compile
 
 ```bash
 colcon build
@@ -40,28 +48,43 @@ You can install packages by
 source install/setup.bash
 ```
 
+Note: You could use `symlink-install` along with `colcon build` to avoid building and installing every time you make changes on the code.
+However, this only works with Python packages.
+
+```bash
+colcon build --symlink-install
+```
+
+Note2: If you use virtual environment, you should use the following command to compile the code.
+
+```bash
+python -m colcon build
+```
+
 ## Dependencies
 
 Some packages have dependencies.
 We use `rosdep` to manage them.
 
 ```bash
+# run the following code only once
 sudo apt-get install python3-rosdep
 sudo rosdep init
 rosdep update
-rosdep install --from-paths src --ignore-src --rosdistro iron --os=ubuntu:jammy
+rosdep install --from-paths src --ignore-src --rosdistro humble --os=ubuntu:jammy
 ```
 
-All dependencies should be mentioned in each package's `package.xml` whenever possible.
+All dependencies should be mentioned in each package's `package.xml` whenever possible. Use the following command for install dependencies.
 
-Use the following list and this [tutorial](https://docs.ros.org/en/iron/Tutorials/Intermediate/Rosdep.html).
+```bash
+# run this command from ROS workspace
+rosdep install --from-paths src -y --ignore-src
+```
+
+Use the following list and this [tutorial](https://docs.ros.org/en/humble/Tutorials/Intermediate/Rosdep.html).
 
 - [ROS base](https://github.com/ros/rosdistro/blob/master/rosdep/base.yaml)
 - [Python](https://github.com/ros/rosdistro/blob/master/rosdep/python.yaml)
-
-We also use custom-made interfaces from [brc_msgs](https://github.com/boilerrobotics/brc_msgs).
-Clone or download [brc_msgs](https://github.com/boilerrobotics/brc_msgs) into the same location as this repo is required.
-Since this repo depends on `brc_msgs`, you will need to build and install packages from `brc_msgs` as well.
 
 ### Automated Setup
 

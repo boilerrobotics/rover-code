@@ -1,8 +1,10 @@
 # ODrive
+
 Current code is developed and tested on following environments
+
 - ODrive hw version 3.6 56V variant
 - ODrive fw version 0.5.4 ([docs](https://docs.odriverobotics.com/v/0.5.4/getting-started.html))
-- Python 3.10 
+- Python 3.10
 - Odrive Python library version 0.6.8 ([package requirements](./requirements.txt))
 
 ## Upgrade Firmware
@@ -78,3 +80,8 @@ sudo dfu-util -a 0 -s 0x08000000 -D build/ODriveFirmware.bin
 ```
 
 Don't forget to switch the dip switch back and reboot Odrive.
+
+## Notes
+
+- Changing Encoder type and CPR rate requires system reboot.
+- To save configuration, the axis must be in idle state.

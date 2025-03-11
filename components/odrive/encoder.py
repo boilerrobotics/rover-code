@@ -28,6 +28,9 @@ class Encoder(Error):
         Return true if there are any errors
         """
         return self.encoder.error != 0
+    
+    def get_vel(self) -> float:
+        return self.encoder.vel_estimate
 
     def is_ready(self) -> bool:
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.is_ready
@@ -37,15 +40,26 @@ class Encoder(Error):
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.index_found
         return self.encoder.index_found
 
-    def set_configs(self) -> None:
+    def use_pre_calibrated(self) -> None:
+        # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.pre_calibrated
+        self.encoder.config.pre_calibrated = True
+
+    def set_configs(self) -> bool:
         """
         Full document: https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config
+        Return true, if reboot is needed.
         """
+        need_reset = False
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Mode
         self.encoder.config.mode = EncoderMode.HALL
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.cpr
-        self.encoder.config.cpr = 42
+        cpr = 42
+        if self.encoder.config.cpr != cpr:
+            need_reset = True
+            self.encoder.config.cpr = 42
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.calib_scan_distance
-        self.encoder.config.calib_scan_distance = (math.pi * 2) * 50
+        self.encoder.config.calib_scan_distance = (math.pi * 2) * 10
         # https://docs.odriverobotics.com/v/0.5.4/fibre_types/com_odriverobotics_ODrive.html#ODrive.Encoder.Config.bandwidth
         self.encoder.config.bandwidth = 100
+
+        return need_reset

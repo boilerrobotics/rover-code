@@ -9,6 +9,7 @@
     "/opt/ros/humble/local/lib/python3.10/dist-packages"
   ],
   "cSpell.words": [
+    "Bureetes",
     "calib",
     "cantools",
     "colcon",
@@ -20,20 +21,17 @@
     "libignition",
     "lsusb",
     "odrive",
+    "odrivelib",
+    "odrives",
     "odrivetool",
     "odrv",
     "odrvs",
     "openocd",
+    "rclpy",
     "rosdep",
     "rosdistro",
     "sdist",
-    "vbus"
-  ],
-  "[xml]": {
-    "editor.defaultFormatter": "redhat.vscode-xml",
-    "editor.tabSize": 2
-  },
-  "xml.format.enforceQuoteStyle": "preferred",
-  "xml.preferences.quoteStyle": "double",
-  "xml.format.joinCommentLines": true
+    "vbus",
+    "venv"
+  ]
 }
