@@ -68,12 +68,35 @@ class Odrive(Error):
     def get_current(self) -> float:
         return self.odrv.ibus
 
-    def print_errors(self, component, name: str) -> str:
+    def print_errors(self, component, name: str) -> bool:
         """
-        This function print part of the errors
+        This function print part of the errors, and returns true if there are errors and false if there are not
         """
         if errors := component.get_errors():
             print(f"  {name} has {errors}")
+            return True
+        return False
+
+    
+    def check_and_print_errors(self) -> bool:
+        '''
+        This function is just to regularly check if odrive has errors. Runs through each component and checks for errors, and prints errors if there are any, and returns true if any component had errors and 
+        returns false otherwise. 
+        '''
+
+        has_errors = []
+        has_errors.append(self.print_errors(self.axis0, "axis 0"))
+        has_errors.append(self.print_errors(self.axis0.motor, "motor 0"))
+        has_errors.append(self.print_errors(self.axis0.controller, "controller 0"))
+        has_errors.append(self.print_errors(self.axis0.encoder, "encoder 0"))
+        has_errors.append(self.print_errors(self.axis1, "axis 1"))
+        has_errors.append(self.print_errors(self.axis1.motor, "motor 1"))
+        has_errors.append(self.print_errors(self.axis1.controller, "controller 1"))
+        has_errors.append(self.print_errors(self.axis1.encoder, "encoder 1"))
+
+        if True in has_errors:
+            return True
+        return False
 
     def check_errors(self) -> None:
         """
@@ -277,29 +300,31 @@ async def find_odrvs_async(
     return odrvs
 
 
-def find_odrvs() -> dict[str, any]:
+def find_odrvs(config_file="config.yml") -> list[Odrive]:
     """
     This function will find ODrive that serial numbers are list
     in the config.yml. This function needs to be changed to match
     expected output from `find_odrvs_async` function.
     """
 
-    with open("config.yml") as fp:
+    with open(config_file) as fp:
         config = yaml.safe_load(fp)
 
     print("finding ODrives...")
-    odrvs = {}  # Looking for available ODrive
+    odrvs = []  # Looking for available ODrive
     for section, serial in config["serial"].items():
         print(f"searching for serial number {serial}...")
         try:
             odrv = odrive.find_any(serial_number=serial, timeout=2)
-            odrv = Odrive(odrv)
-            odrvs[section] = odrv
+            odrv = Odrive(odrv, section)
+            odrvs.append(odrv)
             print(f"-> assign odrive {serial} to {section} section")
             print(f"-> ", end="")
             odrv.check_version()
         except TimeoutError as e:
             print(f"error: Cannot find serial {serial} !!")
     print("--------------------------------------")
+
+    
 
     return odrvs

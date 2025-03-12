@@ -18,7 +18,7 @@ from pathlib import Path
 import numpy
 
 
-from drive.odrivelib.utils import find_odrvs_async
+from drive.odrivelib.utils import find_odrvs_async, find_odrvs
 from drive.odrivelib.axis import Axis
 
 
@@ -54,15 +54,22 @@ class DiffDriveNode(Node):
         )
         self.reboot_caller = self.create_client(Reboot, "reboot")
 
+        self.declare_parameter("speed_limit", 10)
+
         time_period = 0.1
         self.timer = self.create_timer(time_period, self.timer_callback)
+        self.check_err = self.create_timer(.1, self.diagnose)
         self.x = 0
         self.y = 0
         self.z = math.pi / 2
         self.r = 0.9398
+        self.has_errors = False
 
         self.dianostic = self.create_timer(10, self.dianostic)
 
+        self.update_speed = self.create_timer(1, self.update_linear_speed_limit)
+
+       
         #  Find all ODrives
 
         self.odrvs = []
@@ -83,6 +90,11 @@ class DiffDriveNode(Node):
             axis.request_close_loop_control()
             axis.controller.set_speed_limit(self.linear_speed_limit)
         self.get_logger().info("Odrives configured")
+
+
+    def update_linear_speed_limit(self):
+        self.linear_speed_limit = self.get_parameter("speed_limit").get_parameter_value()
+
 
     def dianostic(self):
         for odrv in self.odrvs:
@@ -173,12 +185,21 @@ class DiffDriveNode(Node):
                 case "rear":
                     self.left_wheels.append(odrv.axis1)
                     self.right_wheels.append(odrv.axis0)
+    
+    def diagnose(self):
+        if not self.has_errors:
+            for odrv in self.odrvs:
+                self.has_errors = odrv.check_and_print_errors()
+        
+
 
     def drive_callback(self, msg: Twist):
         """
         Callback function that receives Twist messages.
         Convert Twist message to wheel speed.
         """
+        
+
         left_speed = (
             (msg.linear.x - msg.angular.z * self.track_width / 2)
             * self.linear_speed_limit
@@ -252,13 +273,13 @@ def main(args=None):
         try:
             assert len(drive_subscriber.odrvs) == 3, "All 3 ODrives must be connected"
         except AssertionError:
-            drive_subscriber.odrvs = asyncio.run(find_odrvs_async(
+            drive_subscriber.odrvs = find_odrvs(
                 config_file=Path(__file__).parents[4]
                 / "share"
                 / "drive"
                 / "odrivelib"
                 / "config.yml"
-            ))
+            )
 
     rclpy.spin(drive_subscriber)
 
