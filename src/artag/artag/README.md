@@ -1,6 +1,19 @@
 # AR Tag Detection System
 
-## Overview
+
+### Launch camera
+`ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2`
+
+### View live video (compressed)
+`ros2 run image_view image_view --ros-args --remap image/compressed:=/zed/zed_node/rgb/image_rect_color/compressed -p image_transport:=compressed`
+
+### View debug video
+`ros2 run image_view image_view --ros-args --remap image:=/aruco_box`
+
+### Run ARtag detection code
+`ros2 run artag detect`
+
+## Archive
 
 This folder contains two scripts designed to detect AR (Augmented Reality) tags in images and live video feeds using OpenCV. The detection process involves filtering contours, identifying square shapes, and determining the position of potential AR tags relative to a camera.
 
