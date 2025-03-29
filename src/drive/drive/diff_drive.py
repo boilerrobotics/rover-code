@@ -3,7 +3,8 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
-from custom_interfaces.srv import Reboot
+from custom_interfaces.action import Reboot
+from rclpy.action import ActionClient
 from std_msgs.msg import String
 from rclpy.qos import (
     QoSProfile,
@@ -40,6 +41,7 @@ class DiffDriveNode(Node):
             self.drive_callback,
             qos_profile,
         )
+        self.reboot_client = ActionClient(self, Reboot, 'reboot')
         self._pos_publisher = self.create_publisher(
             Twist, "pos", qos_profile_sensor_data
         )
@@ -52,7 +54,6 @@ class DiffDriveNode(Node):
         self._vel_publisher = self.create_publisher(
             String, "vel", qos_profile_sensor_data
         )
-        self.reboot_caller = self.create_client(Reboot, "reboot")
 
         self.declare_parameter("speed_limit", 10.0)
 
@@ -97,6 +98,12 @@ class DiffDriveNode(Node):
             axis.controller.set_speed_limit(self.linear_speed_limit)
         self.get_logger().info("Odrives configured")
 
+
+    def order_reboot(self, odrv):
+        goal_msg = Reboot.Goal()
+        goal_msg.odrv = odrv.section
+        self.reboot_client.wait_for_server()
+        return self.reboot_client.send_goal_async(goal_msg)
 
     def update_linear_speed_limit(self):
         self.linear_speed_limit = self.get_parameter("speed_limit").get_parameter_value().double_value
@@ -196,6 +203,13 @@ class DiffDriveNode(Node):
         if not self.has_errors:
             for odrv in self.odrvs:
                 self.has_errors = odrv.check_and_print_errors()
+                if(self.has_errors):
+                    future = self.order_reboot(odrv)
+                    while(not future.done()):
+                        print("Not done rebooting")
+                    print("done rebooting")
+                    self.has_errors = False
+                
         
 
 

@@ -73,7 +73,7 @@ class Odrive(Error):
         This function print part of the errors, and returns true if there are errors and false if there are not
         """
         if errors := component.get_errors():
-            print(f"  {name} has {errors}")
+            print(f"  ERROR: {name} has {errors}")
             return True
         return False
 
