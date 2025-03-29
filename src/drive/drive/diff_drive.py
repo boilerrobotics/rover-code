@@ -54,7 +54,7 @@ class DiffDriveNode(Node):
         )
         self.reboot_caller = self.create_client(Reboot, "reboot")
 
-        self.declare_parameter("speed_limit", 10)
+        self.declare_parameter("speed_limit", 10.0)
 
         time_period = 0.1
         self.timer = self.create_timer(time_period, self.timer_callback)
@@ -72,7 +72,13 @@ class DiffDriveNode(Node):
        
         #  Find all ODrives
 
-        self.odrvs = []
+        self.odrvs = find_odrvs(
+                config_file=Path(__file__).parents[4]
+                / "share"
+                / "drive"
+                / "odrivelib"
+                / "config.yml"
+            )
 
         """req = Reboot.Request()
             req.odrive = "front"
@@ -93,7 +99,7 @@ class DiffDriveNode(Node):
 
 
     def update_linear_speed_limit(self):
-        self.linear_speed_limit = self.get_parameter("speed_limit").get_parameter_value()
+        self.linear_speed_limit = self.get_parameter("speed_limit").get_parameter_value().double_value
 
 
     def dianostic(self):
@@ -268,18 +274,6 @@ def main(args=None):
     rclpy.init(args=args)
 
     drive_subscriber = DiffDriveNode()
-
-    while not len(drive_subscriber.odrvs) == 3:
-        try:
-            assert len(drive_subscriber.odrvs) == 3, "All 3 ODrives must be connected"
-        except AssertionError:
-            drive_subscriber.odrvs = find_odrvs(
-                config_file=Path(__file__).parents[4]
-                / "share"
-                / "drive"
-                / "odrivelib"
-                / "config.yml"
-            )
 
     rclpy.spin(drive_subscriber)
 
