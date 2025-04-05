@@ -5,6 +5,7 @@ from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
 from custom_interfaces.action import Reboot
 from rclpy.action import ActionClient
+from rclpy.action import ActionServer
 from std_msgs.msg import String
 from rclpy.qos import (
     QoSProfile,
@@ -19,7 +20,7 @@ from pathlib import Path
 import numpy
 
 
-from drive.odrivelib.utils import find_odrvs_async, find_odrvs
+from drive.odrivelib.utils import find_odrvs
 from drive.odrivelib.axis import Axis
 
 
@@ -54,19 +55,20 @@ class DiffDriveNode(Node):
         self._vel_publisher = self.create_publisher(
             String, "vel", qos_profile_sensor_data
         )
+        self.reboot_action = ActionServer(self, Reboot, "reboot", self.reboot_callback)
 
         self.declare_parameter("speed_limit", 10.0)
 
         time_period = 0.1
         self.timer = self.create_timer(time_period, self.timer_callback)
-        self.check_err = self.create_timer(.1, self.diagnose)
+        self.check_err = self.create_timer(.1, self.emergency_diagnostic)
         self.x = 0
         self.y = 0
-        self.z = math.pi / 2
+        self.z = 0
         self.r = 0.9398
         self.has_errors = False
 
-        self.dianostic = self.create_timer(10, self.dianostic)
+        self.constant_diagnostic = self.create_timer(10, self.constant_diagnostic)
 
         self.update_speed = self.create_timer(1, self.update_linear_speed_limit)
 
@@ -104,12 +106,25 @@ class DiffDriveNode(Node):
         goal_msg.odrv = odrv.section
         self.reboot_client.wait_for_server()
         return self.reboot_client.send_goal_async(goal_msg)
+    
+    def reboot_callback(self, goal_handle):
+        odr = None
+        for odrv in self.odrvs:
+            match odrv.section:
+                case goal_handle.request.odrv: odr = odrv
+            
+        asyncio.run(odrv.reboot())
+
+        goal_handle.succeed()
+        result = Reboot.result()
+        result.success = 'worked'
+        return result
 
     def update_linear_speed_limit(self):
         self.linear_speed_limit = self.get_parameter("speed_limit").get_parameter_value().double_value
 
 
-    def dianostic(self):
+    def constant_diagnostic(self):
         for odrv in self.odrvs:
             odrv.check_errors()
 
@@ -199,7 +214,7 @@ class DiffDriveNode(Node):
                     self.left_wheels.append(odrv.axis1)
                     self.right_wheels.append(odrv.axis0)
     
-    def diagnose(self):
+    def emergency_diagnostic(self):
         if not self.has_errors:
             for odrv in self.odrvs:
                 self.has_errors = odrv.check_and_print_errors()
