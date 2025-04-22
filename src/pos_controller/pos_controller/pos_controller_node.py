@@ -21,10 +21,10 @@ from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 import time
 import math
-
+'''
 import adafruit_gps
 import serial
-
+'''
 
 class PosController(Node):
     def __init__(self) -> None:
@@ -34,10 +34,10 @@ class PosController(Node):
         self.publisher_cmd_vel = self.create_publisher(
             Twist, "cmd_vel", qos_profile_sensor_data
         )
-
+        '''
         self.uart = serial.Serial('COM5', baudrate=9600, timeout=3000)
         self.gps = adafruit_gps.GPS(self.uart)    
-
+        '''
         self.subscriber_depth_image = self.create_subscription(
             Image,
             "/zed/zed_node/depth/depth_registered",
@@ -45,7 +45,7 @@ class PosController(Node):
             qos_profile_sensor_data,
         )
 
-        self.using_odom = False
+        self.using_odom = True
         self.pos = [0, 0, 0]
 
         self.bridge = CvBridge()
@@ -74,6 +74,7 @@ class PosController(Node):
         time_period = 0.1
 
         self.timer = self.create_timer(time_period, self.pub_cmd_vel)
+        '''
         self.update_gps = self.create_timer(time_period, self.update_gps_callback)
 
     def update_gps_callback(self):
@@ -108,7 +109,7 @@ class PosController(Node):
             if self.gps.height_geoid is not None:
                 print(f'Height geoid: {self.gps.height_geoid} meters')        
                 self.current_gps_info['height_geoid'] = self.gps.height_geoid
-
+    '''
 
     def calibrate_heading(self):
         startPos = self.pos
@@ -128,10 +129,11 @@ class PosController(Node):
 
     def pub_cmd_vel(self):
         if(self.using_odom):
+            '''
             if not self.isCalibrated:
                 self.calibrate_heading()
                 self.isCalibrated = True
-
+            '''
             dist = math.sqrt(
                 (self.target_pos[1] - self.pos[1]) ** 2
                 + (self.target_pos[0] - self.pos[0]) ** 2
