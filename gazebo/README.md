@@ -71,7 +71,7 @@ First enter directory by `cd gazebo`.
 Then build an image by `docker build -t gazebo .`.
 You can change `-t gazebo` to other tag's name that you prefer.
 Check image that just built by `docker images`.
-Running docker container by `docker run -it gazebo`.
+Running docker container by `docker run -it -rm gazebo`.
 
 still have problem to run Gazebo from docker.
 Need to config desktop environment.
