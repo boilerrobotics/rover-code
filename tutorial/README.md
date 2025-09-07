@@ -16,7 +16,7 @@ The list below is software you need to install.
    The recommendation is [Virtual Box](https://www.virtualbox.org/).
    Use version 7 or newer.
 
-2. [Ubuntu 22.04](https://ubuntu.com/download/desktop) (LTS - Long Term Support). This is a first tier support by ROS Humble.
+2. [Ubuntu 22.04](https://releases.ubuntu.com/jammy/) (LTS - Long Term Support). This is a first tier support by ROS Humble.
    You are welcome to choose any [flavors](https://ubuntu.com/desktop/flavours) that you want.
 
 3. [ROS 2 Humble](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html).
@@ -55,18 +55,17 @@ If you prefer to dig into Jetson TX2 and JetPack 4 SDK, you will need to install
 
    ![choose-iso](./img/select-iso.png)
 
-
-3. Start the machine and follow the installation instructions. 
-The install process will make you an admin of this virtual machine, and the password that you choose for it is important:
-if you forget the password, there is no way to recover it. 
-You will need this password to install software packages later.
+3. Start the machine and follow the installation instructions.
+   The install process will make you an admin of this virtual machine, and the password that you choose for it is important:
+   if you forget the password, there is no way to recover it.
+   You will need this password to install software packages later.
 
 4. Follow this tutorial to install ROS: https://docs.ros.org/en/iron/Installation/Ubuntu-Install-Debians.html
 
-5. You can choose either (but not both) "desktop" or "base". 
-The base version has everything we are using right now. 
-The desktop version has tools that could be beneficial, but that we don't use often. 
-If you choose to install the base version, keep in mind that you might not be able to run some commands.
+5. You can choose either (but not both) "desktop" or "base".
+   The base version has everything we are using right now.
+   The desktop version has tools that could be beneficial, but that we don't use often.
+   If you choose to install the base version, keep in mind that you might not be able to run some commands.
 
 6. At the end, run the following command to add a script to activate ROS everytime you open a new terminal:
 
@@ -79,6 +78,7 @@ If you choose to install the base version, keep in mind that you might not be ab
    ```bash
    sudo apt install python3-colcon-common-extensions
    ```
+
 ### Visual Studio Code and GitHub
 
 We recommend using [Visual Studio Code](https://code.visualstudio.com/) (VS Code) for writing code.
@@ -95,7 +95,6 @@ This tutorial will only cover the VS Code option.
 
 First, copy the source code URL from GitHub.
 ![github-url](./img/github-url.png)
-
 
 In VS Code, click `View -> Command Palette` (Ctrl + Shift + P) and type `git: clone`.
 ![gitclone](./img/gitclone.png)
@@ -121,7 +120,6 @@ Fortunately, we can do most of the tasks in VS Code.
 In the "Source Control" tab, you will find all Git commands.
 
 ![vscode-git](./img/vscode-git.png)
-
 
 Each time you make any commits, make sure that you are working in the correct branch.
 By default, you will be in the main (or master) branch.
