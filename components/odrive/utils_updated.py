@@ -105,8 +105,8 @@ class Odrive(Error):
     def check_version(self) -> None:
         """Print firmware and hardware version information."""
         print(
-            f"Firmware version is {self.fw_version}"
-            f'{' ' * 3} Hardware version is {self.hw_version}'
+            f"Firmware version is {self.fw_version}",
+            f"{' ' * 3} Hardware version is {self.hw_version}"
         )
 
     async def reboot(self, save_config: bool = False) -> None:

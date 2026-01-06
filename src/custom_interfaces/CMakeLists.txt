@@ -15,6 +15,10 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "action/Reboot.action"
+  "msg/ControllerStatus.msg"
+  "msg/ControlMessage.msg"
+  "msg/OdriveStatus.msg"
+  "srv/AxisState.srv"
 )
 
 

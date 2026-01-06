@@ -24,6 +24,6 @@ setup(
     license="TODO: License declaration",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": ["diff_drive = drive.diff_drive:main"],
+        "console_scripts": ["diff_drive = drive.diff_drive:main", "swerve_drive = drive.swerve_drive:main"],
     },
 )

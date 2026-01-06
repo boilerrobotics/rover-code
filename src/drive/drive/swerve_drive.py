@@ -1,7 +1,7 @@
 import asyncio
 import rclpy
-from drive.srv import AxisState
-from drive.msg import ControlMessage, ControllerStatus, OdriveStatus
+from custom_interfaces.srv import AxisState
+from custom_interfaces.msg import ControlMessage, ControllerStatus, OdriveStatus
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
@@ -18,9 +18,8 @@ import math
 from pathlib import Path
 import numpy
 
-
-from drive.odrivelib.utils import find_odrvs
-from drive.odrivelib.axis import Axis
+#from drive.odrivelib.utils import find_odrvs
+#from drive.odrivelib.axis import Axis
 
 
 class SwerveDriveNode(Node):
@@ -42,7 +41,7 @@ class SwerveDriveNode(Node):
             Twist,
             "cmd_vel",
             self.drive_callback,
-            self.qos_profile,
+            self.qos_publish,
         )
         self._pos_publisher = self.create_publisher(
             Twist, "pos", qos_profile_sensor_data
@@ -87,8 +86,8 @@ class SwerveDriveNode(Node):
 
     def create_odrive_publishers_subscribers(self):
         ids = []
-        with open('node_ids.txt', 'r') as f:
-            ids = [x for x in f.readlines()]
+        with open('/home/gparamas/rover-code/rover-code/src/drive/drive/node_ids.txt', 'r') as f:
+            ids = [x.strip() for x in f.readlines()]
         publishers = []
         control_subscribers = []
         state_subscribers = []
@@ -97,7 +96,7 @@ class SwerveDriveNode(Node):
                 self.controller_status[x] = msg
             def set_odrive_status(msg):
                 self.odrive_status[x] = msg
-            publishers.append(self.create_publisher(Twist, f'/odrive{x}/control_message', self.qos_profile))
+            publishers.append(self.create_publisher(Twist, f'/odrive{x}/control_message', self.qos_sub))
             control_subscribers.append(self.create_subscription(ControllerStatus, f'/odrive{x}/controller_status', set_controller_status, self.qos_sub))
             state_subscribers.append(self.create_subscription(OdriveStatus, f'/odrive{x}/odrive_status', set_odrive_status, self.qos_sub))
         return publishers, control_subscribers, state_subscribers
@@ -113,8 +112,8 @@ class SwerveDriveNode(Node):
         velocities = [self.controller_status[0], self.controller_status[2], self.controller_status[4], self.controller_status[6]]
         vix, viy = [], [] #individual module x and y velocities w.r.t. chassis
         for v, p in zip(velocities, positions):
-            vix.append(v * math.cos(p * 2 * math.pi))
-            viy.append(v * math.sin(p * 2 * math.pi))
+            vix.append(v.vel_estimate * math.cos(p.pos_estimate * 2 * math.pi))
+            viy.append(v.vel_estimate * math.sin(p.pos_estimate * 2 * math.pi))
         vxb = sum(vix) / 4 #rover x velocity w.r.t. chassis
         vyb = sum(viy) / 4 #rover y velocity w.r.t. chassis
         wc = sum([v1 * lx - v2 * ly for v1, v2, (lx, ly) in zip(vix, viy, module_positions)]) / sum([lx**2 + ly **2 for lx, ly in module_positions]) #rover angular velocity w.r.t. chassis
@@ -150,7 +149,7 @@ class SwerveDriveNode(Node):
         # Getting voltage and current using average measurements
 
         volt = sum(odrv.bus_voltage for odrv in self.odrive_status) / len(self.odrive_status)
-        cur = sum(odrv.bus_current() for odrv in self.odrive_status) / len(self.odrive_status)
+        cur = sum(odrv.bus_current for odrv in self.odrive_status) / len(self.odrive_status)
 
         # Publish battery percentage to bat topic
 
