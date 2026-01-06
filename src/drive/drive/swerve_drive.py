@@ -1,7 +1,7 @@
 import asyncio
 import rclpy
 from drive.srv import AxisState
-from drive.msg import ControlMessage
+from drive.msg import ControlMessage, ControllerStatus, OdriveStatus
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
@@ -23,17 +23,20 @@ from drive.odrivelib.utils import find_odrvs
 from drive.odrivelib.axis import Axis
 
 
-class DiffDriveNode(Node):
+class SwerveDriveNode(Node):
 
     def __init__(self):
         super().__init__("ve_subscriber")
-        self.qos_profile = QoSProfile(
+        self.qos_publish = QoSProfile(
             history=HistoryPolicy.KEEP_LAST,
             reliability=ReliabilityPolicy.BEST_EFFORT,
             depth=1,
             durability=DurabilityPolicy.VOLATILE,
             liveliness=LivelinessPolicy.AUTOMATIC,
             lifespan=Duration(seconds=0.1, nanoseconds=0),
+        )
+        self.qos_sub = QoSProfile(
+            history=HistoryPolicy.KEEP_ALL
         )
         self._subscription = self.create_subscription(
             Twist,
@@ -53,67 +56,118 @@ class DiffDriveNode(Node):
         self._vel_publisher = self.create_publisher(
             String, "vel", qos_profile_sensor_data
         )
-        self._state_publisher = self.create_vel_publishers()
+        self._state_publisher, self._controller_status_subscriber, self._odrive_status_subscriber = self.create_odrive_publishers_subscribers()
 
-
+        self.odrive_status = [OdriveStatus() for x in range(8)]
+        self.controller_status = [ControllerStatus() for x in range(8)]
 
         self.declare_parameter("speed_limit", 10.0)
 
-        time_period = 0.1
-        self.pose_update = self.create_timer(time_period, self.odometry_callback)
-        self.check_err = self.create_timer(.1, self.emergency_diagnostic)
+        self.time_period = 0.1
+        self.state_update = self.create_timer(self.time_period, self.state_callback)
+        self.update_speed = self.create_timer(self.time_period, self.update_linear_speed_limit)
+
         self.x = 0
         self.y = 0
         self.z = 0
+
         self.track_width = 0.9398
         self.wheelbase = 1
+        
+        self.linear_speed_limit = 10  # use turn for seconds
+        self.angular_speed_limit = 3  # radians per second
+
         self.has_errors = False
 
-        self.constant_diagnostic = self.create_timer(10, self.constant_diagnostic)
 
-        self.update_speed = self.create_timer(1, self.update_linear_speed_limit)
 
        
         #  Find all ODrives
 
-        self.linear_speed_limit = 10  # use turn for seconds
-        self.angular_speed_limit = 3  # radians per second
-        self.track_width = 1  # meters **TODO: change to actual value
 
-
-    def create_vel_publishers(self):
+    def create_odrive_publishers_subscribers(self):
         ids = []
         with open('node_ids.txt', 'r') as f:
             ids = [x for x in f.readlines()]
         publishers = []
+        control_subscribers = []
+        state_subscribers = []
         for x in ids:
-            publishers.append(self.create_publisher(Twist, f'/odrive{x}/cmd_vel', self.qos_profile))
-        return publishers
+            def set_controller_status(msg):
+                self.controller_status[x] = msg
+            def set_odrive_status(msg):
+                self.odrive_status[x] = msg
+            publishers.append(self.create_publisher(Twist, f'/odrive{x}/control_message', self.qos_profile))
+            control_subscribers.append(self.create_subscription(ControllerStatus, f'/odrive{x}/controller_status', set_controller_status, self.qos_sub))
+            state_subscribers.append(self.create_subscription(OdriveStatus, f'/odrive{x}/odrive_status', set_odrive_status, self.qos_sub))
+        return publishers, control_subscribers, state_subscribers
+    
 
     def update_linear_speed_limit(self):
         self.linear_speed_limit = self.get_parameter("speed_limit").get_parameter_value().double_value
 
 
-    def constant_diagnostic(self):
-        for odrv in self.odrvs:
-            odrv.check_errors()
+    def state_callback(self):
+        module_positions = [(self.wheelbase / 2, self.track_width/2), (self.wheelbase/2, -self.track_width/2), (-self.wheelbase/2, self.track_width/2), (-self.wheelbase/2, -self.track_width/2)] # constants for kinematics equations
+        positions = [self.controller_status[1], self.controller_status[3], self.controller_status[5], self.controller_status[7]]
+        velocities = [self.controller_status[0], self.controller_status[2], self.controller_status[4], self.controller_status[6]]
+        vix, viy = [], [] #individual module x and y velocities w.r.t. chassis
+        for v, p in zip(velocities, positions):
+            vix.append(v * math.cos(p * 2 * math.pi))
+            viy.append(v * math.sin(p * 2 * math.pi))
+        vxb = sum(vix) / 4 #rover x velocity w.r.t. chassis
+        vyb = sum(viy) / 4 #rover y velocity w.r.t. chassis
+        wc = sum([v1 * lx - v2 * ly for v1, v2, (lx, ly) in zip(vix, viy, module_positions)]) / sum([lx**2 + ly **2 for lx, ly in module_positions]) #rover angular velocity w.r.t. chassis
+        vx = vxb * math.cos(self.z) - vyb * math.sin(self.z)
+        vy = vxb * math.sin(self.z) + vyb * math.cos(self.z)
 
-    def odometry_callback(self):
-        pass
-  
-    def emergency_diagnostic(self):
-        if not self.has_errors:
-            for odrv in self.odrvs:
-                self.has_errors = odrv.check_and_print_errors()
-                if(self.has_errors):
-                    future = self.order_reboot(odrv)
-                    while(not future.done()):
-                        print("Not done rebooting")
-                    print("done rebooting")
-                    self.has_errors = False
-                
+            
         
+        matrix1 = [
+            [math.cos(self.z), -math.sin(self.z), 0],
+            [math.sin(self.z), math.cos(self.z), 0],
+            [0, 0, 1],
+        ]
+        matrix2 = [
+            [1 - (wc * self.time_period) ** 2, -(wc * self.time_period) / 2, 0],
+            [(wc * self.time_period) / 2, 1 - (wc * self.time_period) ** 2, 0],
+            [0, 0, 1],
+        ]
+        vector = [vx * self.time_period, vy * self.time_period, wc * self.time_period]
+        [dx, dy, d_theta] = numpy.dot(numpy.dot(matrix1, matrix2), vector)
+        self.x += dx
+        self.y += dy
+        self.z += d_theta
 
+        # Publish linear and angular position to pos
+
+        msg = Twist()
+        msg.linear.x = self.x
+        msg.linear.y = self.y
+        msg.angular.z = self.z
+        self._pos_publisher.publish(msg)
+
+        # Getting voltage and current using average measurements
+
+        volt = sum(odrv.bus_voltage for odrv in self.odrive_status) / len(self.odrive_status)
+        cur = sum(odrv.bus_current() for odrv in self.odrive_status) / len(self.odrive_status)
+
+        # Publish battery percentage to bat topic
+
+        bat_msg = String()
+        bat_msg.data = f"Battery: {self.get_battery(volt)}"
+        self._bat_publisher.publish(bat_msg)
+
+        # Publish voltage and current to volt_cur topic
+        volt_cur_msg = String()
+        volt_cur_msg.data = f"Voltage: {volt}\nCurrent: {cur}"
+        self._volt_cur_publisher.publish(volt_cur_msg)
+
+        # Publish velocity to vel topic
+        vel_msg = String()
+        vel_msg.data = f"Velocity-x: {vx}\nVelocity-y: {vy}\nAngular: {wc}"
+        self._vel_publisher.publish(vel_msg)
+  
 
     def drive_callback(self, msg: Twist):
         """
@@ -199,7 +253,7 @@ class DiffDriveNode(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    drive_subscriber = DiffDriveNode()
+    drive_subscriber = SwerveDriveNode()
 
     rclpy.spin(drive_subscriber)
 
