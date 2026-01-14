@@ -68,7 +68,7 @@ class SwerveDriveNode(Node):
 
         self.x = 0
         self.y = 0
-        self.z = 0
+        self.z = math.pi/2
 
         self.track_width = 0.9398
         self.wheelbase = 1
@@ -96,7 +96,7 @@ class SwerveDriveNode(Node):
                 self.controller_status[x] = msg
             def set_odrive_status(msg):
                 self.odrive_status[x] = msg
-            publishers.append(self.create_publisher(Twist, f'/odrive{x}/control_message', self.qos_sub))
+            publishers.append(self.create_publisher(ControlMessage, f'/odrive{x}/control_message', self.qos_sub))
             control_subscribers.append(self.create_subscription(ControllerStatus, f'/odrive{x}/controller_status', set_controller_status, self.qos_sub))
             state_subscribers.append(self.create_subscription(OdriveStatus, f'/odrive{x}/odrive_status', set_odrive_status, self.qos_sub))
         return publishers, control_subscribers, state_subscribers
@@ -180,24 +180,26 @@ class SwerveDriveNode(Node):
             vx = vxw - vww * x[1] #module relative x velocity
             vy = vyw + vww * x[0] #module relative y velocity
             v = math.sqrt(vx**2 + vy**2)  #module relative velocity magnitude
-            w = (math.atan2(vy/vx) + math.pi) / (2 * math.pi) #module relative velocity direction, scaled to [0, 1), which is the input odrive takes in circular position control mode
-            module_vel_pos.append((v, w))
+            w = math.atan2(vy, vx) / (2 * math.pi) #module relative velocity direction, scaled to [0, 1), which is the input odrive takes in circular position control mode
+            module_vel_pos.extend((v, w))
 
-        for i, (v, w) in enumerate(module_vel_pos):
-            msg_v = ControlMessage()
-            msg_v.control_mode = 2
-            msg_v.input_mode = 2
-            msg_v.input_pos = 0.0
-            msg_v.input_vel = v
-            msg_v.input_torque = 0.0
-            self._state_publisher[i].publish(msg_v)
-            msg_w = ControlMessage()
-            msg_w.control_mode = 3
-            msg_w.input_mode = 1
-            msg_w.input_pos = w
-            msg_w.input_vel = 0.0
-            msg_w.input_torque = 0.0
-            self._state_publisher[i+1].publish(msg_w)
+        for i in range(0, 8):
+            if(i % 2 == 0): 
+                msg_v = ControlMessage()
+                msg_v.control_mode = 2
+                msg_v.input_mode = 2
+                msg_v.input_pos = 0.0
+                msg_v.input_vel = module_vel_pos[i]
+                msg_v.input_torque = 0.0
+                self._state_publisher[i].publish(msg_v)
+            else:
+                msg_w = ControlMessage()
+                msg_w.control_mode = 3
+                msg_w.input_mode = 1
+                msg_w.input_pos = module_vel_pos[i]
+                msg_w.input_vel = 0.0
+                msg_w.input_torque = 0.0
+                self._state_publisher[i].publish(msg_w)
 
 
         
