@@ -55,8 +55,8 @@ class SwerveDriveNode(Node):
         self._vel_publisher = self.create_publisher(
             String, "vel", qos_profile_sensor_data
         )
-        self._state_publisher, self._controller_status_subscriber, self._odrive_status_subscriber = self.create_odrive_publishers_subscribers()
-
+        self._state_publisher, self._controller_status_subscriber, self._odrive_status_subscriber, self._odrive_control_mode_client = self.create_odrive_publishers_subscribers()
+        
         self.odrive_status = [OdriveStatus() for x in range(8)]
         self.controller_status = [ControllerStatus() for x in range(8)]
 
@@ -91,6 +91,14 @@ class SwerveDriveNode(Node):
         publishers = []
         control_subscribers = []
         state_subscribers = []
+        control_mode_client = []
+        
+        def init_odrives(odrvs):
+            promises = []
+            for x in odrvs:
+                req = AxisState.Request()
+                req.axis_requested_state = 8
+                promises.append(x.call(req))
         for x in ids:
             def set_controller_status(msg):
                 self.controller_status[x] = msg
@@ -99,11 +107,14 @@ class SwerveDriveNode(Node):
             publishers.append(self.create_publisher(ControlMessage, f'/odrive{x}/control_message', self.qos_sub))
             control_subscribers.append(self.create_subscription(ControllerStatus, f'/odrive{x}/controller_status', set_controller_status, self.qos_sub))
             state_subscribers.append(self.create_subscription(OdriveStatus, f'/odrive{x}/odrive_status', set_odrive_status, self.qos_sub))
-        return publishers, control_subscribers, state_subscribers
+            control_mode_client.append(self.create_client(AxisState, f'/odrive{x}/request_axis_state'))
+        init_odrives(control_mode_client)
+        return publishers, control_subscribers, state_subscribers, control_mode_client
     
 
     def update_linear_speed_limit(self):
         self.linear_speed_limit = self.get_parameter("speed_limit").get_parameter_value().double_value
+
 
 
     def state_callback(self):
