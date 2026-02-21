@@ -2,12 +2,19 @@ import heapq
 import numpy as np
 import sys
 
-from enum import Enum
-import sys
+import rclpy
+from rclpy.node import Node as RosNode
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import PointCloud
+from rclpy.qos import (
+    QoSProfile,
+    ReliabilityPolicy,
+    HistoryPolicy,
+    DurabilityPolicy,
+    LivelinessPolicy,
+    Duration,
+)
 import math
-
-
-
 
 class Node():
     def __init__(self, loc):
@@ -121,17 +128,76 @@ class Map():
         
     
 
+class ObstacleDetectionNode(RosNode):
+
+    def __init__(self):
+        super().__init__('obstacle_detection_node')
+        self.start = (0, 0)
+        self.target = (10, 10)
+        self.map = Map(self.start, self.target)
+        zed_qos = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
+            history = HistoryPolicy.KEEP_LAST,
+            depth = 10,
+            durability=DurabilityPolicy.VOLATILE,
+            liveliness=LivelinessPolicy.AUTOMATIC
+        )
+        pub_qos = QoSProfile(
+            history=HistoryPolicy.KEEP_LAST,
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            depth=1,
+            durability=DurabilityPolicy.VOLATILE,
+            liveliness=LivelinessPolicy.AUTOMATIC,
+            lifespan=Duration(seconds=0.1, nanoseconds=0),
+        )
+        self._cloud_subscription = self.create_subscription(
+            PointCloud,
+            "/zed/zed_node/point_cloud/cloud_registered",
+            self.update_map,
+            zed_qos
+        )
+        self._pos_subscriber = self.create_subscription(
+            Twist,
+            "/zed/zed_node/pos",
+            self.update_pos,
+            zed_qos
+        )
+        self._next_point_publisher = self.create_publisher(
+            Twist,
+            "next_point",
+            pub_qos,
+        )
+
+    def update_pos(self, msg):
+        pos = (int(msg.linear.x), int(msg.linear.y))
+        if(self.start != pos):
+            self.map.k_m += self.map.map[self.start].heuristic(self.map.map[pos])
+            self.start = pos
+            self.map.start = self.map.map[self.start]
+            self.map.compute_shorted_path()
+            if self.map.start.rhs != sys.float_info.max:
+                next_node = min(self.map.start.neighbors, key=lambda x: x.cost(self.map.start) + x.g)
+                next_point_msg = Twist()
+                next_point_msg.linear.x = next_node.loc[0]
+                next_point_msg.linear.y = next_node.loc[1]
+                self._next_point_publisher.publish(next_point_msg)
+    
+    def update_map(self, msg):
+        for point in msg.points:
+            x = int(point.x)
+            y = int(point.y)
+            if (x, y) in self.map.map.keys():
+                self.map.map[(x, y)].blocked = True
+                self.map.update_vertex(self.map.map[(x, y)])
+        self.map.compute_shorted_path()
 
 
-                
-start = (0, 0)
-target = (10, 10)
-map = Map(start, target)
-map.map[(5, 5)].blocked = True 
-map.map[(4, 5)].blocked = True 
-map.map[(6, 5)].blocked = True 
+def main(args=None):
+    rclpy.init(args=args)
+    node = ObstacleDetectionNode()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
 
-map.map[(3, 5)].blocked = True 
-map.compute_shorted_path()
-map.print_map()
-
+if __name__ == '__main__':
+    main()

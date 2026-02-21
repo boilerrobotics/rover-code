@@ -21,7 +21,7 @@ class ObstacleAvoidance(Node):
         self.pub = self.create_publisher(Twist, '/cmd_vel', 10)
 
         self.depth_threshold = 130
-        self.min_gap_width_ratio = #idk what value yet
+        self.min_gap_width_ratio = 10 #dummy 
         self.speed = 0.3
         self.turn_speed = 0.5
 

@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'detector = obstacle_detection2.obstacle_detect:main'
+            'detector = obstacle_detection2.obstacle_detect_d:main'
         ],
     },
 )
