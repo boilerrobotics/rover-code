@@ -5,6 +5,7 @@ import sys
 import rclpy
 from rclpy.node import Node as RosNode
 from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
 from sensor_msgs.msg import PointCloud
 from rclpy.qos import (
     QoSProfile,
@@ -135,6 +136,7 @@ class ObstacleDetectionNode(RosNode):
         self.start = (0, 0)
         self.target = (10, 10)
         self.map = Map(self.start, self.target)
+        self.map.compute_shorted_path()
         zed_qos = QoSProfile(
             reliability=ReliabilityPolicy.RELIABLE,
             history = HistoryPolicy.KEEP_LAST,
@@ -150,15 +152,15 @@ class ObstacleDetectionNode(RosNode):
             liveliness=LivelinessPolicy.AUTOMATIC,
             lifespan=Duration(seconds=0.1, nanoseconds=0),
         )
-        self._cloud_subscription = self.create_subscription(
-            PointCloud,
-            "/zed/zed_node/point_cloud/cloud_registered",
-            self.update_map,
-            zed_qos
-        )
+        # self._cloud_subscription = self.create_subscription(
+        #     PointCloud,
+        #     "/zed/zed_node/point_cloud/cloud_registered",
+        #     self.update_map,
+        #     zed_qos
+        # )
         self._pos_subscriber = self.create_subscription(
-            Twist,
-            "/zed/zed_node/pos",
+            Odometry,
+            "/zed/zed_node/odom",
             self.update_pos,
             zed_qos
         )
@@ -167,9 +169,14 @@ class ObstacleDetectionNode(RosNode):
             "next_point",
             pub_qos,
         )
+        self.timer = self.create_timer(5, self.publish_map)
+
+    def publish_map(self):
+        self.map.print_map()
 
     def update_pos(self, msg):
-        pos = (int(msg.linear.x), int(msg.linear.y))
+        pos = (int(msg.pose.pose.position.x), int(msg.pose.pose.position.y))
+
         if(self.start != pos):
             self.map.k_m += self.map.map[self.start].heuristic(self.map.map[pos])
             self.start = pos
