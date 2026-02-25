@@ -4,9 +4,10 @@ import sys
 
 import rclpy
 from rclpy.node import Node as RosNode
-from geometry_msgs.msg import Twist
-from nav_msgs.msg import Odometry
-from sensor_msgs.msg import PointCloud
+from geometry_msgs.msg import Twist, PoseStamped
+from sensor_msgs_py import point_cloud2
+
+from sensor_msgs.msg import PointCloud2
 from rclpy.qos import (
     QoSProfile,
     ReliabilityPolicy,
@@ -16,6 +17,7 @@ from rclpy.qos import (
     Duration,
 )
 import math
+import struct
 
 class Node():
     def __init__(self, loc):
@@ -152,15 +154,15 @@ class ObstacleDetectionNode(RosNode):
             liveliness=LivelinessPolicy.AUTOMATIC,
             lifespan=Duration(seconds=0.1, nanoseconds=0),
         )
-        # self._cloud_subscription = self.create_subscription(
-        #     PointCloud,
-        #     "/zed/zed_node/point_cloud/cloud_registered",
-        #     self.update_map,
-        #     zed_qos
-        # )
+        self._cloud_subscription = self.create_subscription(
+            PointCloud2,
+            "/zed/zed_node/point_cloud/cloud_registered",
+            self.update_map,
+            zed_qos
+        )
         self._pos_subscriber = self.create_subscription(
-            Odometry,
-            "/zed/zed_node/odom",
+            PoseStamped,
+            "/zed/zed_node/pose",
             self.update_pos,
             zed_qos
         )
@@ -175,13 +177,14 @@ class ObstacleDetectionNode(RosNode):
         self.map.print_map()
 
     def update_pos(self, msg):
-        pos = (int(msg.pose.pose.position.x), int(msg.pose.pose.position.y))
+        pos = (int(msg.pose.position.x), int(msg.pose.position.y))
+        print(pos)
 
         if(self.start != pos):
             self.map.k_m += self.map.map[self.start].heuristic(self.map.map[pos])
             self.start = pos
             self.map.start = self.map.map[self.start]
-            self.map.compute_shorted_path()
+            #self.map.compute_shorted_path()
             if self.map.start.rhs != sys.float_info.max:
                 next_node = min(self.map.start.neighbors, key=lambda x: x.cost(self.map.start) + x.g)
                 next_point_msg = Twist()
@@ -190,13 +193,22 @@ class ObstacleDetectionNode(RosNode):
                 self._next_point_publisher.publish(next_point_msg)
     
     def update_map(self, msg):
-        for point in msg.points:
-            x = int(point.x)
-            y = int(point.y)
+        cloud = point_cloud2.read_points(msg, field_names=('x', 'y', 'z'), skip_nans=True)
+        full = []
+        for point in cloud:
+            if(np.all(np.isfinite([point['x'], point['y'],point['z']]))):
+                x = int(point['x'])
+                y = int(point['y'])
+                z = int(point['z'])
+                full.append((x, y, z))
+        full = list(set(full))
+        for point in full:
+            x, y, z = point
             if (x, y) in self.map.map.keys():
-                self.map.map[(x, y)].blocked = True
-                self.map.update_vertex(self.map.map[(x, y)])
-        self.map.compute_shorted_path()
+                    self.map.map[(x, y)].blocked = True
+                    self.map.update_vertex(self.map.map[(x, y)])
+        np.savetxt("points.txt", full, delimiter=',')
+        #self.map.compute_shorted_path()
 
 
 def main(args=None):
