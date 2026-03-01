@@ -4,8 +4,9 @@ import sys
 
 import rclpy
 from rclpy.node import Node as RosNode
-from geometry_msgs.msg import Twist, PoseStamped
+from geometry_msgs.msg import Twist, PoseStamped, TransformStamped
 from sensor_msgs_py import point_cloud2
+from tf2_sensor_msgs.tf2_sensor_msgs import do_transform_cloud
 
 from sensor_msgs.msg import PointCloud2
 from rclpy.qos import (
@@ -93,7 +94,10 @@ class Map():
                 heapq.heappush(self.p_queue, (key[0], key[1], node))
     
     def compute_shorted_path(self):
+        i = 0
         while(self.p_queue and (self.p_queue[0][:2] < tuple(self.calculate_key(self.start)) or self.start.rhs != self.start.g)):
+            if i > 1000:
+                break
             k_old = (self.p_queue[0][0], self.p_queue[0][1])
             node = heapq.heappop(self.p_queue)[2]
 
@@ -108,6 +112,7 @@ class Map():
                 node.g = sys.float_info.max
                 for x in node.neighbors:
                     self.update_vertex(x)
+            i += 1
 
     def print_map(self):
         for y in range(self.target.loc[1] + 5, self.start.loc[1] - 5, -1):
@@ -117,13 +122,13 @@ class Map():
                 elif(self.map[(x, y)] == self.target):
                     print("T ", end="")
                 else:
-                    if self.map[(x, y)].g == sys.float_info.max:
+                    if self.map[(x, y)].g == sys.float_info.max or self.map[(x, y)].blocked:
                         if self.map[(x, y)].blocked:
                             print("B ", end="")
                         else:
                             print("∞ ", end="")
                     else:
-                        print(self.map[(x, y)].g//100, end=" ")
+                        print(self.map[(x, y)].g//1000, end=" ")
             print()
         
 
@@ -136,9 +141,10 @@ class ObstacleDetectionNode(RosNode):
     def __init__(self):
         super().__init__('obstacle_detection_node')
         self.start = (0, 0)
-        self.target = (10, 10)
+        self.target = (0, 10)
         self.map = Map(self.start, self.target)
         self.map.compute_shorted_path()
+        self.pos = PoseStamped()
         zed_qos = QoSProfile(
             reliability=ReliabilityPolicy.RELIABLE,
             history = HistoryPolicy.KEEP_LAST,
@@ -177,23 +183,40 @@ class ObstacleDetectionNode(RosNode):
         self.map.print_map()
 
     def update_pos(self, msg):
+        self.pos = msg
         pos = (int(msg.pose.position.x), int(msg.pose.position.y))
-        print(pos)
 
         if(self.start != pos):
             self.map.k_m += self.map.map[self.start].heuristic(self.map.map[pos])
             self.start = pos
             self.map.start = self.map.map[self.start]
-            #self.map.compute_shorted_path()
+            self.map.compute_shorted_path()
             if self.map.start.rhs != sys.float_info.max:
                 next_node = min(self.map.start.neighbors, key=lambda x: x.cost(self.map.start) + x.g)
                 next_point_msg = Twist()
                 next_point_msg.linear.x = next_node.loc[0]
                 next_point_msg.linear.y = next_node.loc[1]
                 self._next_point_publisher.publish(next_point_msg)
+
+    def poseToTransform(self, frame):
+        t = TransformStamped()
+        t.header.stamp = self.pos.header.stamp
+        t.header.frame_id = 'start frame'
+        t.child_frame_id = frame
+
+        t.transform.translation.x = self.pos.pose.position.x
+        t.transform.translation.y = self.pos.pose.position.y
+        t.transform.translation.z = self.pos.pose.position.z
+
+        t.transform.rotation = self.pos.pose.orientation
+
+        return t
+
     
     def update_map(self, msg):
-        cloud = point_cloud2.read_points(msg, field_names=('x', 'y', 'z'), skip_nans=True)
+        transform = self.poseToTransform(msg.header.frame_id)
+        cloud_trans = do_transform_cloud(msg, transform)
+        cloud = point_cloud2.read_points(cloud_trans, field_names=('x', 'y', 'z'), skip_nans=True)
         full = []
         for point in cloud:
             if(np.all(np.isfinite([point['x'], point['y'],point['z']]))):
@@ -204,11 +227,13 @@ class ObstacleDetectionNode(RosNode):
         full = list(set(full))
         for point in full:
             x, y, z = point
-            if (x, y) in self.map.map.keys():
-                    self.map.map[(x, y)].blocked = True
-                    self.map.update_vertex(self.map.map[(x, y)])
+            if (y, x) in self.map.map.keys() and z > 0 and abs(x) < 3 and abs(y) < 3:
+                    self.map.map[(y, x)].blocked = True
+                    self.map.update_vertex(self.map.map[(y, x)])
+            else:
+                full.remove(point)
         np.savetxt("points.txt", full, delimiter=',')
-        #self.map.compute_shorted_path()
+        self.map.compute_shorted_path()
 
 
 def main(args=None):
