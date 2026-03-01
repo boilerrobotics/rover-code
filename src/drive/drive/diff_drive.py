@@ -3,6 +3,9 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from geometry_msgs.msg import Twist
+from custom_interfaces.action import Reboot
+from rclpy.action import ActionClient
+from rclpy.action import ActionServer
 from std_msgs.msg import String
 from rclpy.qos import (
     QoSProfile,
@@ -17,7 +20,7 @@ from pathlib import Path
 import numpy
 
 
-from drive.odrivelib.utils import find_odrvs_async
+from drive.odrivelib.utils import find_odrvs
 from drive.odrivelib.axis import Axis
 
 
@@ -39,6 +42,7 @@ class DiffDriveNode(Node):
             self.drive_callback,
             qos_profile,
         )
+        self.reboot_client = ActionClient(self, Reboot, 'reboot')
         self._pos_publisher = self.create_publisher(
             Twist, "pos", qos_profile_sensor_data
         )
@@ -51,26 +55,40 @@ class DiffDriveNode(Node):
         self._vel_publisher = self.create_publisher(
             String, "vel", qos_profile_sensor_data
         )
+        self.reboot_action = ActionServer(self, Reboot, "reboot", self.reboot_callback)
+
+        self.declare_parameter("speed_limit", 10.0)
+
         time_period = 0.1
         self.timer = self.create_timer(time_period, self.timer_callback)
+        self.check_err = self.create_timer(.1, self.emergency_diagnostic)
         self.x = 0
         self.y = 0
-        self.z = math.pi / 2
+        self.z = 0
         self.r = 0.9398
+        self.has_errors = False
 
-        self.dianostic = self.create_timer(10, self.dianostic)
+        self.constant_diagnostic = self.create_timer(10, self.constant_diagnostic)
 
+        self.update_speed = self.create_timer(1, self.update_linear_speed_limit)
+
+       
         #  Find all ODrives
-        self.odrvs = asyncio.run(
-            find_odrvs_async(
+
+        self.odrvs = find_odrvs(
                 config_file=Path(__file__).parents[4]
                 / "share"
                 / "drive"
                 / "odrivelib"
                 / "config.yml"
             )
-        )
-        assert len(self.odrvs) == 3, "All 3 ODrives must be connected"
+
+        """req = Reboot.Request()
+            req.odrive = "front"
+            future = self.reboot_caller.call_async(req)
+            response = future.result()
+            print(response.success)"""
+
         self.assign_odrive()
         self.get_logger().info("Odrives initialized")
         # configure ODrives
@@ -82,7 +100,31 @@ class DiffDriveNode(Node):
             axis.controller.set_speed_limit(self.linear_speed_limit)
         self.get_logger().info("Odrives configured")
 
-    def dianostic(self):
+
+    def order_reboot(self, odrv):
+        goal_msg = Reboot.Goal()
+        goal_msg.odrv = odrv.section
+        self.reboot_client.wait_for_server()
+        return self.reboot_client.send_goal_async(goal_msg)
+    
+    def reboot_callback(self, goal_handle):
+        odr = None
+        for odrv in self.odrvs:
+            match odrv.section:
+                case goal_handle.request.odrv: odr = odrv
+            
+        asyncio.run(odrv.reboot())
+
+        goal_handle.succeed()
+        result = Reboot.result()
+        result.success = 'worked'
+        return result
+
+    def update_linear_speed_limit(self):
+        self.linear_speed_limit = self.get_parameter("speed_limit").get_parameter_value().double_value
+
+
+    def constant_diagnostic(self):
         for odrv in self.odrvs:
             odrv.check_errors()
 
@@ -171,12 +213,28 @@ class DiffDriveNode(Node):
                 case "rear":
                     self.left_wheels.append(odrv.axis1)
                     self.right_wheels.append(odrv.axis0)
+    
+    def emergency_diagnostic(self):
+        if not self.has_errors:
+            for odrv in self.odrvs:
+                self.has_errors = odrv.check_and_print_errors()
+                if(self.has_errors):
+                    future = self.order_reboot(odrv)
+                    while(not future.done()):
+                        print("Not done rebooting")
+                    print("done rebooting")
+                    self.has_errors = False
+                
+        
+
 
     def drive_callback(self, msg: Twist):
         """
         Callback function that receives Twist messages.
         Convert Twist message to wheel speed.
         """
+        
+
         left_speed = (
             (msg.linear.x - msg.angular.z * self.track_width / 2)
             * self.linear_speed_limit
@@ -245,6 +303,7 @@ def main(args=None):
     rclpy.init(args=args)
 
     drive_subscriber = DiffDriveNode()
+
     rclpy.spin(drive_subscriber)
 
     drive_subscriber.destroy_node()

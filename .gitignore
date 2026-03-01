@@ -5,5 +5,4 @@ venv/
 build/
 install/
 log/
-*.txt
 *.pyc
