@@ -227,9 +227,9 @@ class ObstacleDetectionNode(RosNode):
         full = list(set(full))
         for point in full:
             x, y, z = point
-            if (y, x) in self.map.map.keys() and z > 0 and abs(x) < 3 and abs(y) < 3:
-                    self.map.map[(y, x)].blocked = True
-                    self.map.update_vertex(self.map.map[(y, x)])
+            if (-y, x) in self.map.map.keys() and z > 0 and abs(x) < 3 and abs(y) < 3:
+                    self.map.map[(-y, x)].blocked = True
+                    self.map.update_vertex(self.map.map[(-y, x)])
             else:
                 full.remove(point)
         np.savetxt("points.txt", full, delimiter=',')
