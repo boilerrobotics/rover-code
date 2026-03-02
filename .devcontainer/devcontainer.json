@@ -1,0 +1,7 @@
+{
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "name": "Gazebo Harmonic",
+  "build": {
+    "dockerfile": "Dockerfile"
+  }
+}
