@@ -1,12 +1,14 @@
 import heapq
 import numpy as np
 import sys
+import math
 
 import rclpy
 from rclpy.node import Node as RosNode
 from geometry_msgs.msg import Twist, PoseStamped, TransformStamped
 from sensor_msgs_py import point_cloud2
 from tf2_sensor_msgs.tf2_sensor_msgs import do_transform_cloud
+import open3d as o3d
 
 from sensor_msgs.msg import PointCloud2
 from rclpy.qos import (
@@ -217,24 +219,77 @@ class ObstacleDetectionNode(RosNode):
         transform = self.poseToTransform(msg.header.frame_id)
         cloud_trans = do_transform_cloud(msg, transform)
         cloud = point_cloud2.read_points(cloud_trans, field_names=('x', 'y', 'z'), skip_nans=True)
+        o3d_cld = o3d.geometry.PointCloud()
+        o3d_cld.points = o3d.utility.Vector3dVector(np.array(cloud))
+
+        #distance cropping
+        points = np.asarray(cloud.points)
+        mask = np.logical_and(points[:,2] > .5, points[:,2] < 5.0)
+        cloud = cloud.select_by_index(np.where(mask)[0])
+
+        #downsample
+        cloud = cloud.voxel_down_sample(voxel_size=.1)
+
+        #outlier removal
+        cloud, ind = cloud.remove_statistical_outlier(
+            nb_neighbors=40,
+            std_ratio=1.0
+        )
+        cloud = cloud.select_by_index(ind)
+
+        #ground plane removal
+        plane_model, inliers = cloud.segment_plane(
+            distance_threshold=0.04,
+            ransac_n=3,
+            num_iterations=1000
+        )
+
+        ground = cloud.select_by_index(inliers)
+        obstacles = cloud.select_by_index(inliers, invert=True)
+
+
+        # obstacle grouping
+        labels = np.array(
+            obstacles.cluster_dbscan(
+                eps=0.4,
+                min_points=50,
+                print_progress=False
+            )
+        ) 
+        min_bounds = []
+        max_bounds = []
+        for cluster_id in np.unique(labels):
+            if(cluster_id == -1):
+                continue
+            cluster = obstacles.select_by_index(np.where(labels == cluster_id)[0])
+            bbox = cluster.get_axis_aligned_bounding_box()
+            min_bounds.append(bbox.min_bound)
+            max_bounds.append(bbox.max_bound)
+
+
+
+        //TODO A CTUALLY FILL THE GRID YOU FUCKKG MORIAN AF OA FA
+        '''
         full = []
         for point in cloud:
             if(np.all(np.isfinite([point['x'], point['y'],point['z']]))):
-                x = int(point['x'])
-                y = int(point['y'])
-                z = int(point['z'])
+                x = point['x']
+                y = point['y']
+                z = point['z']
                 full.append((x, y, z))
         full = list(set(full))
+        full2 = []
         for point in full:
-            x, y, z = point
-            if (-y, x) in self.map.map.keys() and z > 0 and abs(x) < 3 and abs(y) < 3:
+            x1, y1, z1 = point
+            x, y, z = (int(math.floor(x1)), int(math.floor(y1)), int(math.floor(z1)))
+            if (-y, x) in self.map.map.keys() and z > -1 and abs(x) < 3 and abs(y) < 3:
                     self.map.map[(-y, x)].blocked = True
                     self.map.update_vertex(self.map.map[(-y, x)])
-            else:
-                full.remove(point)
-        np.savetxt("points.txt", full, delimiter=',')
+                    full2.append(point)
+        np.savetxt("points.txt", full2, delimiter=',')
         self.map.compute_shorted_path()
 
+        '''
 
 def main(args=None):
     rclpy.init(args=args)
