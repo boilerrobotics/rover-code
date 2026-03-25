@@ -86,7 +86,7 @@ class Map():
                 if x != node and (x.loc[0] in (node.loc[0] - 1, node.loc[0], node.loc[0] + 1) and x.loc[1] in (node.loc[1] - 1, node.loc[1], node.loc[1] + 1)):
                     node.neighbors.append(x)
 
-
+  
     def update_vertex(self, node):
         if(self.target != node):
             node.rhs = min([(node.cost(x) + x.g) for x in node.neighbors])
@@ -219,33 +219,41 @@ class ObstacleDetectionNode(RosNode):
         transform = self.poseToTransform(msg.header.frame_id)
         cloud_trans = do_transform_cloud(msg, transform)
         cloud = point_cloud2.read_points(cloud_trans, field_names=('x', 'y', 'z'), skip_nans=True)
+        cloud = np.array(cloud)
+
+        points_transformed = np.zeros_like(cloud)
+
+# Apply the transformation
+        points_transformed[:, 0] = cloud[:, 1]  # Y -> X
+        points_transformed[:, 1] = cloud[:, 0]  # X -> Y
+        points_transformed[:, 2] = cloud[:, 2]  # Z -> Z (no change)
+
         o3d_cld = o3d.geometry.PointCloud()
-        o3d_cld.points = o3d.utility.Vector3dVector(np.array(cloud))
+        o3d_cld.points = o3d.utility.Vector3dVector(np.array(points_transformed))
 
         #distance cropping
-        points = np.asarray(cloud.points)
+        points = np.asarray(o3d_cld.points)
         mask = np.logical_and(points[:,2] > .5, points[:,2] < 5.0)
-        cloud = cloud.select_by_index(np.where(mask)[0])
+        o3d_cld = o3d_cld.select_by_index(np.where(mask)[0])
 
         #downsample
-        cloud = cloud.voxel_down_sample(voxel_size=.1)
+        o3d_cld = o3d_cld.voxel_down_sample(voxel_size=.1)
 
         #outlier removal
-        cloud, ind = cloud.remove_statistical_outlier(
+        o3d_cld, ind = o3d_cld.remove_statistical_outlier(
             nb_neighbors=40,
             std_ratio=1.0
         )
-        cloud = cloud.select_by_index(ind)
 
         #ground plane removal
-        plane_model, inliers = cloud.segment_plane(
+        plane_model, inliers = o3d_cld.segment_plane(
             distance_threshold=0.04,
             ransac_n=3,
             num_iterations=1000
         )
 
-        ground = cloud.select_by_index(inliers)
-        obstacles = cloud.select_by_index(inliers, invert=True)
+        ground = o3d_cld.select_by_index(inliers)
+        obstacles = o3d_cld.select_by_index(inliers, invert=True)
 
 
         # obstacle grouping
@@ -263,12 +271,19 @@ class ObstacleDetectionNode(RosNode):
                 continue
             cluster = obstacles.select_by_index(np.where(labels == cluster_id)[0])
             bbox = cluster.get_axis_aligned_bounding_box()
-            min_bounds.append(bbox.min_bound)
-            max_bounds.append(bbox.max_bound)
+            min_bounds.append(bbox.get_min_bound())
+            max_bounds.append(bbox.get_max_bound())
+
+        
+        for minb, maxb in zip(min_bounds, max_bounds):
+            for x in range(int(minb[0]), int(maxb[0]) + 1):
+                for y in range(int(minb[1]), int(maxb[1]) + 1):
+                    if((x, y) in self.map.map.keys()):
+                        self.map.map[(x, y)].blocked = True
 
 
 
-        //TODO A CTUALLY FILL THE GRID YOU FUCKKG MORIAN AF OA FA
+
         '''
         full = []
         for point in cloud:
