@@ -10,7 +10,8 @@ from sensor_msgs_py import point_cloud2
 from tf2_sensor_msgs.tf2_sensor_msgs import do_transform_cloud
 import open3d as o3d
 
-from sensor_msgs.msg import PointCloud2
+from sensor_msgs.msg import PointCloud2, PointField
+from std_msgs.msg import Header
 from rclpy.qos import (
     QoSProfile,
     ReliabilityPolicy,
@@ -98,8 +99,7 @@ class Map():
     def compute_shorted_path(self):
         i = 0
         while(self.p_queue and (self.p_queue[0][:2] < tuple(self.calculate_key(self.start)) or self.start.rhs != self.start.g)):
-            if i > 1000:
-                break
+            
             k_old = (self.p_queue[0][0], self.p_queue[0][1])
             node = heapq.heappop(self.p_queue)[2]
 
@@ -114,7 +114,7 @@ class Map():
                 node.g = sys.float_info.max
                 for x in node.neighbors:
                     self.update_vertex(x)
-            i += 1
+            
 
     def print_map(self):
         for y in range(self.target.loc[1] + 5, self.start.loc[1] - 5, -1):
@@ -179,6 +179,11 @@ class ObstacleDetectionNode(RosNode):
             "next_point",
             pub_qos,
         )
+        self._filtered_pointcloud_publisher = self.create_publisher(
+            PointCloud2,
+            "filtered_pc",
+            zed_qos
+        )
         self.timer = self.create_timer(5, self.publish_map)
 
     def publish_map(self):
@@ -219,22 +224,22 @@ class ObstacleDetectionNode(RosNode):
         transform = self.poseToTransform(msg.header.frame_id)
         cloud_trans = do_transform_cloud(msg, transform)
         cloud = point_cloud2.read_points(cloud_trans, field_names=('x', 'y', 'z'), skip_nans=True)
-        cloud = np.array(cloud)
 
-        points_transformed = np.zeros_like(cloud)
-
+        
 # Apply the transformation
-        points_transformed[:, 0] = cloud[:, 1]  # Y -> X
-        points_transformed[:, 1] = cloud[:, 0]  # X -> Y
-        points_transformed[:, 2] = cloud[:, 2]  # Z -> Z (no change)
-
+        #points_transformed = np.array([np.array([-y, x, z]) for x, y, z in cloud], dtype=np.float64)
+        #points_transformed = np.ascontiguousarray(points_transformed)
+        points_transformed = np.ascontiguousarray([np.array([x, y, z], dtype=np.float64) for x, y, z in cloud], dtype=np.float64)
+    
         o3d_cld = o3d.geometry.PointCloud()
         o3d_cld.points = o3d.utility.Vector3dVector(np.array(points_transformed))
 
         #distance cropping
         points = np.asarray(o3d_cld.points)
-        mask = np.logical_and(points[:,2] > .5, points[:,2] < 5.0)
-        o3d_cld = o3d_cld.select_by_index(np.where(mask)[0])
+        mask = np.sqrt(points[:, 0]**2 + points[:, 1]**2)
+        mask2 = points[:, 2] >= .5
+        np.savetxt("Points.txt", points, delimiter=',')
+        o3d_cld = o3d_cld.select_by_index(np.where((mask < 3) & mask2)[0])
 
         #downsample
         o3d_cld = o3d_cld.voxel_down_sample(voxel_size=.1)
@@ -246,15 +251,30 @@ class ObstacleDetectionNode(RosNode):
         )
 
         #ground plane removal
-        plane_model, inliers = o3d_cld.segment_plane(
-            distance_threshold=0.04,
-            ransac_n=3,
-            num_iterations=1000
-        )
+        # plane_model, inliers = o3d_cld.segment_plane(
+        #     distance_threshold=0.04,
+        #     ransac_n=3,
+        #     num_iterations=1000
+        # )
 
-        ground = o3d_cld.select_by_index(inliers)
-        obstacles = o3d_cld.select_by_index(inliers, invert=True)
+        # ground = o3d_cld.select_by_index(inliers)
+        # obstacles = o3d_cld.select_by_index(inliers, invert=True)
 
+        obstacles = o3d_cld
+        pub_cld = np.asarray(obstacles.points)
+
+        pfield = [
+                PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
+                PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
+                PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
+                ]
+        head = Header()
+        head.frame_id = "map"   # change as needed
+        head.stamp = self.get_clock().now().to_msg()
+
+        pcloud = point_cloud2.create_cloud(head, pfield, pub_cld)
+        self._filtered_pointcloud_publisher.publish(pcloud)
+        
 
         # obstacle grouping
         labels = np.array(
@@ -278,10 +298,11 @@ class ObstacleDetectionNode(RosNode):
         for minb, maxb in zip(min_bounds, max_bounds):
             for x in range(int(minb[0]), int(maxb[0]) + 1):
                 for y in range(int(minb[1]), int(maxb[1]) + 1):
-                    if((x, y) in self.map.map.keys()):
-                        self.map.map[(x, y)].blocked = True
+                    if((-y, x) in self.map.map.keys()):
+                        self.map.map[(-y, x)].blocked = True
+                        self.map.update_vertex(self.map.map[(-y, x)])
 
-
+        self.map.compute_shorted_path()
 
 
         '''
