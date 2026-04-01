@@ -5,7 +5,8 @@ import math
 
 import rclpy
 from rclpy.node import Node as RosNode
-from geometry_msgs.msg import Twist, PoseStamped, TransformStamped
+from geometry_msgs.msg import Twist, PoseStamped, TransformStamped, Pose, Vector3
+from vision_msgs.msg import BoundingBox3DArray, BoundingBox3D
 from sensor_msgs_py import point_cloud2
 from tf2_sensor_msgs.tf2_sensor_msgs import do_transform_cloud
 import open3d as o3d
@@ -184,6 +185,13 @@ class ObstacleDetectionNode(RosNode):
             "filtered_pc",
             zed_qos
         )
+
+        self._boundingbox_publisher = self.create_publisher(
+            BoundingBox3DArray, 
+            "Boxes",
+            zed_qos
+        )
+
         self.timer = self.create_timer(5, self.publish_map)
 
     def publish_map(self):
@@ -221,9 +229,9 @@ class ObstacleDetectionNode(RosNode):
 
     
     def update_map(self, msg):
-        transform = self.poseToTransform(msg.header.frame_id)
-        cloud_trans = do_transform_cloud(msg, transform)
-        cloud = point_cloud2.read_points(cloud_trans, field_names=('x', 'y', 'z'), skip_nans=True)
+        # transform = self.poseToTransform(msg.header.frame_id)
+        # cloud_trans = do_transform_cloud(msg, transform)
+        cloud = point_cloud2.read_points(msg, field_names=('x', 'y', 'z'), skip_nans=True)
 
         
 # Apply the transformation
@@ -238,7 +246,7 @@ class ObstacleDetectionNode(RosNode):
         points = np.asarray(o3d_cld.points)
         mask = np.sqrt(points[:, 0]**2 + points[:, 1]**2)
         mask2 = points[:, 2] >= .5
-        np.savetxt("Points.txt", points, delimiter=',')
+        np.savetxt("points.txt", points, delimiter=',')
         o3d_cld = o3d_cld.select_by_index(np.where((mask < 3) & mask2)[0])
 
         #downsample
@@ -269,7 +277,7 @@ class ObstacleDetectionNode(RosNode):
                 PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
                 ]
         head = Header()
-        head.frame_id = "map"   # change as needed
+        head.frame_id = "map"   
         head.stamp = self.get_clock().now().to_msg()
 
         pcloud = point_cloud2.create_cloud(head, pfield, pub_cld)
@@ -286,6 +294,10 @@ class ObstacleDetectionNode(RosNode):
         ) 
         min_bounds = []
         max_bounds = []
+        bbox_array = BoundingBox3DArray()
+        bbox_array.header.stamp = self.get_clock().now().to_msg()
+        bbox_array.header.frame_id = 'map'
+        i = 0
         for cluster_id in np.unique(labels):
             if(cluster_id == -1):
                 continue
@@ -293,6 +305,18 @@ class ObstacleDetectionNode(RosNode):
             bbox = cluster.get_axis_aligned_bounding_box()
             min_bounds.append(bbox.get_min_bound())
             max_bounds.append(bbox.get_max_bound())
+            tbbox = BoundingBox3D()
+            tbbox.center = Pose()
+            tbbox.center.position.x = bbox.get_center()[0]
+            tbbox.center.position.y = bbox.get_center()[1]
+            tbbox.center.position.z = bbox.get_center()[2]
+            tbbox.size = Vector3()
+            tbbox.size.x = bbox.get_extent()[0]
+            tbbox.size.y = bbox.get_extent()[1]
+            tbbox.size.z = bbox.get_extent()[2]
+            bbox_array.boxes.append(tbbox)
+        
+        self._boundingbox_publisher.publish(bbox_array)
 
         
         for minb, maxb in zip(min_bounds, max_bounds):
