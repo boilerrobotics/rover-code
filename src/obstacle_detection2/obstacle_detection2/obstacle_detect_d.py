@@ -146,6 +146,18 @@ class ObstacleDetectionNode(RosNode):
         self.start = (0, 0)
         self.target = (0, 10)
         self.map = Map(self.start, self.target)
+        pfield = [
+                PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
+                PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
+                PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
+                ]
+        head = Header()
+        head.frame_id = "map"   
+        head.stamp = self.get_clock().now().to_msg()
+
+        self.pointcloud = point_cloud2.create_cloud(head, pfield, [])
+
+
         self.map.compute_shorted_path()
         self.pos = PoseStamped()
         zed_qos = QoSProfile(
@@ -201,17 +213,17 @@ class ObstacleDetectionNode(RosNode):
         self.pos = msg
         pos = (int(msg.pose.position.x), int(msg.pose.position.y))
 
-        if(self.start != pos):
-            self.map.k_m += self.map.map[self.start].heuristic(self.map.map[pos])
-            self.start = pos
-            self.map.start = self.map.map[self.start]
-            self.map.compute_shorted_path()
-            if self.map.start.rhs != sys.float_info.max:
-                next_node = min(self.map.start.neighbors, key=lambda x: x.cost(self.map.start) + x.g)
-                next_point_msg = Twist()
-                next_point_msg.linear.x = next_node.loc[0]
-                next_point_msg.linear.y = next_node.loc[1]
-                self._next_point_publisher.publish(next_point_msg)
+        # if(self.start != pos):
+        #     self.map.k_m += self.map.map[self.start].heuristic(self.map.map[pos])
+        #     self.start = pos
+        #     self.map.start = self.map.map[self.start]
+        #     self.map.compute_shorted_path()
+        #     if self.map.start.rhs != sys.float_info.max:
+        #         next_node = min(self.map.start.neighbors, key=lambda x: x.cost(self.map.start) + x.g)
+        #         next_point_msg = Twist()
+        #         next_point_msg.linear.x = next_node.loc[0]
+        #         next_point_msg.linear.y = next_node.loc[1]
+        #         self._next_point_publisher.publish(next_point_msg)
 
     def poseToTransform(self, frame):
         t = TransformStamped()
@@ -229,22 +241,23 @@ class ObstacleDetectionNode(RosNode):
 
     
     def update_map(self, msg):
-        # transform = self.poseToTransform(msg.header.frame_id)
-        # cloud_trans = do_transform_cloud(msg, transform)
-        cloud = point_cloud2.read_points(msg, field_names=('x', 'y', 'z'), skip_nans=True)
+        transform = self.poseToTransform(msg.header.frame_id)
+        cloud_trans = do_transform_cloud(msg, transform)
+        cloud = point_cloud2.read_points(cloud_trans, field_names=('x', 'y', 'z'), skip_nans=True)
 
         
 # Apply the transformation
         #points_transformed = np.array([np.array([-y, x, z]) for x, y, z in cloud], dtype=np.float64)
         #points_transformed = np.ascontiguousarray(points_transformed)
         points_transformed = np.ascontiguousarray([np.array([x, y, z], dtype=np.float64) for x, y, z in cloud], dtype=np.float64)
+        np.savetxt("points.txt", points_transformed, delimiter=",")
     
         o3d_cld = o3d.geometry.PointCloud()
         o3d_cld.points = o3d.utility.Vector3dVector(np.array(points_transformed))
 
         #distance cropping
         points = np.asarray(o3d_cld.points)
-        mask = np.sqrt(points[:, 0]**2 + points[:, 1]**2)
+        mask = np.sqrt((points[:, 0] - self.pos.pose.position.x)**2 + (points[:, 1] - self.pos.pose.position.y)**2)
         mask2 = points[:, 2] >= .5
         np.savetxt("points.txt", points, delimiter=',')
         o3d_cld = o3d_cld.select_by_index(np.where((mask < 3) & mask2)[0])
@@ -271,17 +284,21 @@ class ObstacleDetectionNode(RosNode):
         obstacles = o3d_cld
         pub_cld = np.asarray(obstacles.points)
 
-        pfield = [
-                PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
-                PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
-                PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
-                ]
-        head = Header()
-        head.frame_id = "map"   
-        head.stamp = self.get_clock().now().to_msg()
+        
 
-        pcloud = point_cloud2.create_cloud(head, pfield, pub_cld)
-        self._filtered_pointcloud_publisher.publish(pcloud)
+        curr_cld = np.asarray(list(point_cloud2.read_points(self.pointcloud, field_names=('x', 'y', 'z'), skip_nans=True)))
+        curr_cld = np.ascontiguousarray([np.array([x, y, z], dtype=np.float64) for x, y, z in curr_cld], dtype=np.float64)
+
+        print(curr_cld.shape)
+        print(pub_cld.shape)
+
+        if(len(curr_cld) == 0 and pub_cld.ndim == 2):
+            self.pointcloud = point_cloud2.create_cloud(self.pointcloud.header, self.pointcloud.fields, pub_cld)
+        elif(pub_cld.ndim == 2):
+            self.pointcloud = point_cloud2.create_cloud(self.pointcloud.header, self.pointcloud.fields, np.concatenate((list(pub_cld), list(curr_cld))))
+        self._filtered_pointcloud_publisher.publish(self.pointcloud)
+
+        
         
 
         # obstacle grouping
@@ -326,7 +343,7 @@ class ObstacleDetectionNode(RosNode):
                         self.map.map[(-y, x)].blocked = True
                         self.map.update_vertex(self.map.map[(-y, x)])
 
-        self.map.compute_shorted_path()
+        # self.map.compute_shorted_path()
 
 
         '''
